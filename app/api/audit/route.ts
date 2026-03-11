@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 import { AUDIT_CATEGORIES } from '@/lib/audit-data'
 import { calculateScore, getTopIssues } from '@/lib/scoring'
+import { fetchSiteData, buildSiteReport } from '@/lib/site-fetcher'
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
@@ -9,6 +10,10 @@ export async function POST(req: NextRequest) {
   try {
     const { url } = await req.json()
     if (!url) return NextResponse.json({ error: 'URL required' }, { status: 400 })
+
+    // Fetch real site data
+    const siteData = await fetchSiteData(url)
+    const siteReport = buildSiteReport(siteData)
 
     const allItems = AUDIT_CATEGORIES.flatMap(cat =>
       cat.sections.flatMap(sec =>
@@ -20,24 +25,31 @@ export async function POST(req: NextRequest) {
       )
     )
 
-    const prompt = `You are a senior UX + SEO auditor. Analyze the website at: ${url}
+    const prompt = `You are a senior UX + SEO auditor. Below is REAL data fetched from: ${url}
 
-For each item below, respond with ONLY a JSON object where keys are item IDs and values are one of:
-"Pass", "Partial", "Fail", or "N/A"
+${siteReport}
 
-Audit items:
-${allItems.map(i => `${i.id}: [${i.category}] ${i.item}`).join('\n')}
+=== AUDIT TASK ===
+Based STRICTLY on the real data above, evaluate each audit item below.
+You MUST base your judgment on the evidence provided — do NOT guess or assume.
 
 Rules:
-- "Pass" = clearly meets the standard
-- "Partial" = partially meets or unclear
-- "Fail" = clearly does not meet
-- "N/A" = not applicable for this site type
-- Respond with ONLY the JSON object, no other text`
+- "Pass" = the data above clearly shows this standard is met
+- "Fail" = the data above clearly shows this standard is NOT met
+- "Partial" = the data partially meets the standard or evidence is inconclusive
+- "N/A" = not applicable for this site type based on the data
+- If an item cannot be verified from the data provided (e.g., requires Google Search Console access), mark it "N/A"
+- Be consistent: the same data must always produce the same verdict
+
+Respond with ONLY a JSON object where keys are item IDs and values are "Pass", "Partial", "Fail", or "N/A".
+
+Audit items:
+${allItems.map(i => `${i.id}: [${i.category}] ${i.item}`).join('\n')}`
 
     const message = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 4000,
+      temperature: 0,
       messages: [{ role: 'user', content: prompt }],
     })
 
