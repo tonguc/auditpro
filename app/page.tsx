@@ -395,12 +395,14 @@ function AuditView({ onComplete }: { onComplete: (url: string, results: AuditRes
   )
 }
 
-function WhiteLabelView({ score, auditUrl, results }: {
-  score: AuditScore | null; auditUrl: string; results: AuditResults
+function WhiteLabelView({ audits, currentUrl, score, results, onSelect, onDelete }: {
+  audits: SavedAudit[]; currentUrl: string; score: AuditScore | null; results: AuditResults
+  onSelect: (a: SavedAudit) => void; onDelete: (id: string) => void
 }) {
   const [name, setName]     = useState('Acme Agency')
   const [color, setColor]   = useState('#0EA5E9')
   const [saved, setSaved]   = useState(false)
+  const [downloading, setDownloading] = useState(false)
 
   // Load from localStorage on mount
   useEffect(() => {
@@ -421,13 +423,11 @@ function WhiteLabelView({ score, auditUrl, results }: {
     setTimeout(() => setSaved(false), 2000)
   }
 
-  const [downloading, setDownloading] = useState(false)
-
   const handleDownload = async () => {
     if (!score) return
     setDownloading(true)
     try {
-      await downloadPDF({ agencyName: name, brandColor: color }, auditUrl, score, results)
+      await downloadPDF({ agencyName: name, brandColor: color }, currentUrl, score, results)
     } catch (e) {
       console.error('PDF generation failed:', e)
     } finally {
@@ -442,6 +442,7 @@ function WhiteLabelView({ score, auditUrl, results }: {
     <div style={{ padding: '32px 36px', flex: 1, overflowY: 'auto' }}>
       <h1 style={{ fontSize: 26, fontWeight: 800, color: C.text, marginBottom: 8 }}>White Label</h1>
       <p style={{ color: C.muted, fontSize: 13, marginBottom: 28 }}>Customize branding on client-facing PDF reports.</p>
+
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, maxWidth: 720 }}>
         {/* Settings Panel */}
         <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 12, padding: 24 }}>
@@ -477,14 +478,11 @@ function WhiteLabelView({ score, auditUrl, results }: {
         <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 12, padding: 24 }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 20 }}>PDF Preview</div>
           <div style={{ background: C.bg, borderRadius: 10, padding: 20, border: `1px solid ${C.border}` }}>
-            {/* Header preview */}
             <div style={{ background: color, borderRadius: 8, padding: '16px 20px', marginBottom: 14 }}>
               <div style={{ fontSize: 14, fontWeight: 800, color: '#fff' }}>{name || 'Agency Name'}</div>
               <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.7)', marginTop: 2 }}>UX + SEO Audit Report</div>
-              {hasAudit && <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)', marginTop: 4 }}>{auditUrl}</div>}
+              {hasAudit && <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)', marginTop: 4 }}>{currentUrl}</div>}
             </div>
-
-            {/* Score preview - show real data if available */}
             {hasAudit && score ? (
               <>
                 <div style={{ textAlign: 'center', marginBottom: 12 }}>
@@ -504,9 +502,9 @@ function WhiteLabelView({ score, auditUrl, results }: {
               </>
             ) : (
               <div style={{ display: 'flex', gap: 8 }}>
-                {['Technical','On-Page','UX','CRO'].map((l, i) => (
+                {['Technical','On-Page','UX','CRO'].map((l) => (
                   <div key={l} style={{ flex: 1, background: C.surface, borderRadius: 6, padding: 8, textAlign: 'center' }}>
-                    <div style={{ fontSize: 15, fontWeight: 800, color, lineHeight: 1 }}>{['--','--','--','--'][i]}</div>
+                    <div style={{ fontSize: 15, fontWeight: 800, color, lineHeight: 1 }}>--</div>
                     <div style={{ fontSize: 9, color: C.muted, marginTop: 2 }}>{l}</div>
                   </div>
                 ))}
@@ -520,8 +518,78 @@ function WhiteLabelView({ score, auditUrl, results }: {
           )}
         </div>
       </div>
+
+      {/* Saved Audits List */}
+      {audits.length > 0 && (
+        <div style={{ marginTop: 28, maxWidth: 720 }}>
+          <div style={{ fontSize: 16, fontWeight: 700, color: C.text, marginBottom: 14 }}>Saved Audits ({audits.length})</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {audits.map(a => {
+              const isActive = a.url === currentUrl
+              const d = new Date(a.date)
+              const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+              const timeStr = d.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+              return (
+                <div key={a.id} style={{
+                  display: 'flex', alignItems: 'center', gap: 14, padding: '12px 18px',
+                  background: isActive ? `${C.accent}15` : C.surface,
+                  border: `1px solid ${isActive ? C.accent : C.border}`, borderRadius: 10,
+                  cursor: 'pointer', transition: 'border-color 0.15s',
+                }} onClick={() => onSelect(a)}>
+                  <div style={{ width: 44, height: 44, borderRadius: 10, display: 'flex', alignItems: 'center',
+                    justifyContent: 'center', fontWeight: 800, fontSize: 16,
+                    background: `${a.score.weighted >= 70 ? C.green : a.score.weighted >= 50 ? C.amber : C.red}22`,
+                    color: a.score.weighted >= 70 ? C.green : a.score.weighted >= 50 ? C.amber : C.red,
+                  }}>{a.score.weighted}</div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: C.text, overflow: 'hidden',
+                      textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{a.url}</div>
+                    <div style={{ fontSize: 11, color: C.muted, marginTop: 2 }}>
+                      {dateStr} at {timeStr} — Grade {a.score.grade}
+                    </div>
+                  </div>
+                  <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0 }}>
+                    {isActive && <span style={{ fontSize: 10, color: C.accent, fontWeight: 700,
+                      background: `${C.accent}22`, padding: '3px 10px', borderRadius: 12 }}>SELECTED</span>}
+                    <button onClick={e => { e.stopPropagation(); onDelete(a.id) }}
+                      style={{ background: 'transparent', border: `1px solid ${C.border}`, borderRadius: 6,
+                        padding: '4px 10px', color: C.muted, fontSize: 12, cursor: 'pointer' }}
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = C.red; e.currentTarget.style.color = C.red }}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.color = C.muted }}>
+                      ✕
+                    </button>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
     </div>
   )
+}
+
+interface SavedAudit {
+  id: string
+  url: string
+  results: AuditResults
+  score: AuditScore
+  date: string
+}
+
+function loadAudits(): SavedAudit[] {
+  try {
+    const raw = localStorage.getItem('auditpro_audits')
+    if (raw) return JSON.parse(raw) as SavedAudit[]
+  } catch { /* ignore */ }
+  return []
+}
+
+function saveAudits(audits: SavedAudit[]) {
+  try {
+    // Keep max 20 audits to avoid localStorage overflow
+    localStorage.setItem('auditpro_audits', JSON.stringify(audits.slice(0, 20)))
+  } catch { /* ignore */ }
 }
 
 export default function App() {
@@ -530,29 +598,54 @@ export default function App() {
   const [issues, setIssues]   = useState<ReturnType<typeof getTopIssues>>([])
   const [auditUrl, setUrl]    = useState('')
   const [results, setResults] = useState<AuditResults>({})
+  const [audits, setAudits]   = useState<SavedAudit[]>([])
 
-  // Load last audit from localStorage on mount
+  // Load all audits from localStorage on mount
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem('auditpro_last_audit')
-      if (raw) {
-        const data = JSON.parse(raw)
-        if (data.url && data.results && data.score) {
-          setUrl(data.url)
-          setResults(data.results)
-          setScore(data.score)
-          setIssues(getTopIssues(data.results))
-        }
-      }
-    } catch { /* ignore */ }
+    const saved = loadAudits()
+    setAudits(saved)
+    // Show the most recent audit on Dashboard
+    if (saved.length > 0) {
+      const latest = saved[0]
+      setUrl(latest.url)
+      setResults(latest.results)
+      setScore(latest.score)
+      setIssues(getTopIssues(latest.results))
+    }
   }, [])
 
   const handleComplete = (url: string, res: AuditResults, sc: AuditScore) => {
     setUrl(url); setScore(sc); setResults(res); setIssues(getTopIssues(res)); setPage('dashboard')
-    // Persist to localStorage
-    try {
-      localStorage.setItem('auditpro_last_audit', JSON.stringify({ url, results: res, score: sc }))
-    } catch { /* ignore */ }
+    // Add to saved audits (newest first)
+    const newAudit: SavedAudit = {
+      id: `${Date.now()}`,
+      url,
+      results: res,
+      score: sc,
+      date: new Date().toISOString(),
+    }
+    const updated = [newAudit, ...audits.filter(a => a.url !== url)]
+    setAudits(updated)
+    saveAudits(updated)
+  }
+
+  const handleSelectAudit = (audit: SavedAudit) => {
+    setUrl(audit.url)
+    setResults(audit.results)
+    setScore(audit.score)
+    setIssues(getTopIssues(audit.results))
+  }
+
+  const handleDeleteAudit = (id: string) => {
+    const updated = audits.filter(a => a.id !== id)
+    setAudits(updated)
+    saveAudits(updated)
+    // If we deleted the currently viewed audit, show the next one or clear
+    if (updated.length > 0) {
+      handleSelectAudit(updated[0])
+    } else {
+      setUrl(''); setResults({}); setScore(null); setIssues([])
+    }
   }
 
   return (
@@ -562,7 +655,8 @@ export default function App() {
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
         {page === 'dashboard'  && <DashboardView score={score} issues={issues} auditUrl={auditUrl} results={results} setPage={setPage} />}
         {page === 'audit'      && <div style={{ flex: 1, display: 'flex', overflowY: 'auto' }}><AuditView onComplete={handleComplete} /></div>}
-        {page === 'whitelabel' && <WhiteLabelView score={score} auditUrl={auditUrl} results={results} />}
+        {page === 'whitelabel' && <WhiteLabelView audits={audits} currentUrl={auditUrl} score={score} results={results}
+          onSelect={handleSelectAudit} onDelete={handleDeleteAudit} />}
       </div>
     </div>
   )
