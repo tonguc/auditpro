@@ -1,8 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { AUDIT_CATEGORIES } from '@/lib/audit-data'
 import { calculateScore, getTopIssues, type AuditScore, type AuditResults } from '@/lib/scoring'
+import { downloadPDF } from '@/lib/pdf-generator'
+import type { WhiteLabelConfig } from '@/lib/pdf-generator'
 
 const C = {
   bg: '#0A0E1A', surface: '#111827', surfaceHover: '#1a2235',
@@ -393,21 +395,62 @@ function AuditView({ onComplete }: { onComplete: (url: string, results: AuditRes
   )
 }
 
-function WhiteLabelView() {
-  const [name, setName]   = useState('Acme Agency')
-  const [color, setColor] = useState('#0EA5E9')
+function WhiteLabelView({ score, auditUrl, results }: {
+  score: AuditScore | null; auditUrl: string; results: AuditResults
+}) {
+  const [name, setName]     = useState('Acme Agency')
+  const [color, setColor]   = useState('#0EA5E9')
+  const [saved, setSaved]   = useState(false)
+
+  // Load from localStorage on mount
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('auditpro_whitelabel')
+      if (raw) {
+        const cfg = JSON.parse(raw) as WhiteLabelConfig
+        setName(cfg.agencyName)
+        setColor(cfg.brandColor)
+      }
+    } catch { /* ignore */ }
+  }, [])
+
+  const handleSave = () => {
+    const cfg: WhiteLabelConfig = { agencyName: name, brandColor: color }
+    localStorage.setItem('auditpro_whitelabel', JSON.stringify(cfg))
+    setSaved(true)
+    setTimeout(() => setSaved(false), 2000)
+  }
+
+  const [downloading, setDownloading] = useState(false)
+
+  const handleDownload = async () => {
+    if (!score) return
+    setDownloading(true)
+    try {
+      await downloadPDF({ agencyName: name, brandColor: color }, auditUrl, score, results)
+    } catch (e) {
+      console.error('PDF generation failed:', e)
+    } finally {
+      setDownloading(false)
+    }
+  }
+
+  const catScores = score?.categories ?? []
+  const hasAudit = !!score
+
   return (
     <div style={{ padding: '32px 36px', flex: 1, overflowY: 'auto' }}>
       <h1 style={{ fontSize: 26, fontWeight: 800, color: C.text, marginBottom: 8 }}>White Label</h1>
       <p style={{ color: C.muted, fontSize: 13, marginBottom: 28 }}>Customize branding on client-facing PDF reports.</p>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, maxWidth: 680 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, maxWidth: 720 }}>
+        {/* Settings Panel */}
         <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 12, padding: 24 }}>
           <div style={{ marginBottom: 16 }}>
             <label style={{ fontSize: 11, color: C.muted, fontWeight: 600, textTransform: 'uppercase',
               letterSpacing: '0.08em', display: 'block', marginBottom: 8 }}>Agency Name</label>
             <input value={name} onChange={e => setName(e.target.value)} style={{ width: '100%',
               background: C.bg, border: `1px solid ${C.border}`, borderRadius: 8,
-              padding: '10px 14px', color: C.text, fontSize: 13, outline: 'none' }} />
+              padding: '10px 14px', color: C.text, fontSize: 13, outline: 'none', boxSizing: 'border-box' }} />
           </div>
           <div style={{ marginBottom: 24 }}>
             <label style={{ fontSize: 11, color: C.muted, fontWeight: 600, textTransform: 'uppercase',
@@ -418,25 +461,63 @@ function WhiteLabelView() {
               <span style={{ fontSize: 13, color: C.muted }}>{color}</span>
             </div>
           </div>
-          <button style={{ background: color, border: 'none', borderRadius: 8, padding: '11px 20px',
-            color: '#fff', fontWeight: 600, fontSize: 13, width: '100%', cursor: 'pointer' }}>Save Changes</button>
+          <button onClick={handleSave} style={{ background: color, border: 'none', borderRadius: 8, padding: '11px 20px',
+            color: '#fff', fontWeight: 600, fontSize: 13, width: '100%', cursor: 'pointer', marginBottom: 10 }}>
+            {saved ? '✓ Saved!' : 'Save Settings'}
+          </button>
+          <button onClick={handleDownload} disabled={!hasAudit || downloading}
+            style={{ background: hasAudit ? C.green : C.border, border: 'none', borderRadius: 8, padding: '11px 20px',
+              color: '#fff', fontWeight: 600, fontSize: 13, width: '100%',
+              cursor: hasAudit && !downloading ? 'pointer' : 'not-allowed', opacity: hasAudit ? 1 : 0.5 }}>
+            {downloading ? 'Generating PDF...' : hasAudit ? '↓ Download PDF Report' : 'Run an audit first to export PDF'}
+          </button>
         </div>
+
+        {/* Live Preview Panel */}
         <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 12, padding: 24 }}>
           <div style={{ fontSize: 13, fontWeight: 700, color: C.text, marginBottom: 20 }}>PDF Preview</div>
           <div style={{ background: C.bg, borderRadius: 10, padding: 20, border: `1px solid ${C.border}` }}>
+            {/* Header preview */}
             <div style={{ background: color, borderRadius: 8, padding: '16px 20px', marginBottom: 14 }}>
-              <div style={{ fontSize: 14, fontWeight: 800, color: '#fff' }}>{name}</div>
+              <div style={{ fontSize: 14, fontWeight: 800, color: '#fff' }}>{name || 'Agency Name'}</div>
               <div style={{ fontSize: 10, color: 'rgba(255,255,255,0.7)', marginTop: 2 }}>UX + SEO Audit Report</div>
+              {hasAudit && <div style={{ fontSize: 9, color: 'rgba(255,255,255,0.5)', marginTop: 4 }}>{auditUrl}</div>}
             </div>
-            <div style={{ display: 'flex', gap: 8 }}>
-              {['Technical','On-Page','UX','CRO'].map((l, i) => (
-                <div key={l} style={{ flex: 1, background: C.surface, borderRadius: 6, padding: 8, textAlign: 'center' }}>
-                  <div style={{ fontSize: 15, fontWeight: 800, color, lineHeight: 1 }}>{[72,58,81,44][i]}</div>
-                  <div style={{ fontSize: 9, color: C.muted, marginTop: 2 }}>{l}</div>
+
+            {/* Score preview - show real data if available */}
+            {hasAudit && score ? (
+              <>
+                <div style={{ textAlign: 'center', marginBottom: 12 }}>
+                  <div style={{ fontSize: 28, fontWeight: 800, color, lineHeight: 1 }}>{score.weighted}</div>
+                  <div style={{ fontSize: 9, color: C.muted, marginTop: 2 }}>Weighted Score — Grade {score.grade}</div>
                 </div>
-              ))}
-            </div>
+                <div style={{ display: 'flex', gap: 6 }}>
+                  {catScores.map(cat => (
+                    <div key={cat.id} style={{ flex: 1, background: C.surface, borderRadius: 6, padding: 8, textAlign: 'center' }}>
+                      <div style={{ fontSize: 15, fontWeight: 800, color, lineHeight: 1 }}>{cat.score}</div>
+                      <div style={{ fontSize: 8, color: C.muted, marginTop: 2 }}>
+                        {cat.label.replace('Technical SEO', 'Tech SEO').replace('On-Page & Content', 'On-Page').replace('UX Heuristics', 'UX').replace('Conversion & CTA', 'CRO')}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div style={{ display: 'flex', gap: 8 }}>
+                {['Technical','On-Page','UX','CRO'].map((l, i) => (
+                  <div key={l} style={{ flex: 1, background: C.surface, borderRadius: 6, padding: 8, textAlign: 'center' }}>
+                    <div style={{ fontSize: 15, fontWeight: 800, color, lineHeight: 1 }}>{['--','--','--','--'][i]}</div>
+                    <div style={{ fontSize: 9, color: C.muted, marginTop: 2 }}>{l}</div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
+          {!hasAudit && (
+            <div style={{ marginTop: 12, fontSize: 11, color: C.amber, textAlign: 'center' }}>
+              Run an audit to see real scores in preview
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -450,8 +531,28 @@ export default function App() {
   const [auditUrl, setUrl]    = useState('')
   const [results, setResults] = useState<AuditResults>({})
 
+  // Load last audit from localStorage on mount
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('auditpro_last_audit')
+      if (raw) {
+        const data = JSON.parse(raw)
+        if (data.url && data.results && data.score) {
+          setUrl(data.url)
+          setResults(data.results)
+          setScore(data.score)
+          setIssues(getTopIssues(data.results))
+        }
+      }
+    } catch { /* ignore */ }
+  }, [])
+
   const handleComplete = (url: string, res: AuditResults, sc: AuditScore) => {
     setUrl(url); setScore(sc); setResults(res); setIssues(getTopIssues(res)); setPage('dashboard')
+    // Persist to localStorage
+    try {
+      localStorage.setItem('auditpro_last_audit', JSON.stringify({ url, results: res, score: sc }))
+    } catch { /* ignore */ }
   }
 
   return (
@@ -461,7 +562,7 @@ export default function App() {
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
         {page === 'dashboard'  && <DashboardView score={score} issues={issues} auditUrl={auditUrl} results={results} setPage={setPage} />}
         {page === 'audit'      && <div style={{ flex: 1, display: 'flex', overflowY: 'auto' }}><AuditView onComplete={handleComplete} /></div>}
-        {page === 'whitelabel' && <WhiteLabelView />}
+        {page === 'whitelabel' && <WhiteLabelView score={score} auditUrl={auditUrl} results={results} />}
       </div>
     </div>
   )
