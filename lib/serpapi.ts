@@ -20,6 +20,8 @@ export interface SerpData {
   topResults: SerpResult[]             // Top 10 organic results
   competitorAvgWords: number           // Avg word count of top 3 results
   siteAppearsInSERP: boolean
+  hasAIOverview: boolean               // Google AI Overview present for this keyword
+  siteInAIOverview: boolean            // Site cited as source in AI Overview
 }
 
 // Extract main keyword from page title or H1
@@ -103,6 +105,13 @@ export async function fetchSerpData(
     const hasAnswerBox = !!(data.answer_box)
     const hasPeopleAlsoAsk = Array.isArray(data.related_questions) && data.related_questions.length > 0
 
+    // AI Overview (Google AIO)
+    const hasAIOverview = !!(data.ai_overview)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const siteInAIOverview = hasAIOverview && !!(data.ai_overview?.sources?.some((s: any) =>
+      s.link?.includes(siteDomain)
+    ))
+
     // Competitor avg words (top 3)
     const top3 = organic.slice(0, 3)
     const competitorAvgWords = top3.length > 0
@@ -120,6 +129,8 @@ export async function fetchSerpData(
       topResults: organic,
       competitorAvgWords,
       siteAppearsInSERP: siteRank !== null,
+      hasAIOverview,
+      siteInAIOverview,
     }
   } catch {
     return null

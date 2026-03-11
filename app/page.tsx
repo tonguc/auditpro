@@ -258,7 +258,7 @@ function DashboardView({ score, issues, auditUrl, results, setPage }: {
   )
 }
 
-const SCAN_STEPS = ['Crawling site structure…','Checking Technical SEO…','Analyzing On-Page content…','Evaluating UX heuristics…','Auditing CRO elements…','Generating AI report…']
+const SCAN_STEPS = ['Crawling site structure…','Checking Technical SEO…','Analyzing On-Page content…','Evaluating UX heuristics…','Auditing CRO & conversions…','Checking AI & SERP visibility…','Generating AI report…']
 
 function AuditView({ onComplete }: { onComplete: (url: string, results: AuditResults, score: AuditScore) => void }) {
   const [step, setStep]           = useState<'url' | 'scanning' | 'manual'>('url')
@@ -501,11 +501,13 @@ function WhiteLabelView({ audits, currentUrl, score, results, onSelect, onDelete
                 </div>
               </>
             ) : (
-              <div style={{ display: 'flex', gap: 8 }}>
-                {['Technical','On-Page','UX','CRO'].map((l) => (
-                  <div key={l} style={{ flex: 1, background: C.surface, borderRadius: 6, padding: 8, textAlign: 'center' }}>
+              <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                {AUDIT_CATEGORIES.map((cat) => (
+                  <div key={cat.id} style={{ flex: '1 1 60px', background: C.surface, borderRadius: 6, padding: 8, textAlign: 'center' }}>
                     <div style={{ fontSize: 15, fontWeight: 800, color, lineHeight: 1 }}>--</div>
-                    <div style={{ fontSize: 9, color: C.muted, marginTop: 2 }}>{l}</div>
+                    <div style={{ fontSize: 9, color: C.muted, marginTop: 2 }}>
+                      {cat.label.replace('Technical SEO','Tech SEO').replace('On-Page & Content','On-Page').replace('UX Heuristics','UX').replace('Conversion & CTA','CRO').replace('AI & SERP Visibility','AI/SERP')}
+                    </div>
                   </div>
                 ))}
               </div>

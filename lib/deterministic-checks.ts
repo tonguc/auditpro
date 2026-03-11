@@ -662,6 +662,7 @@ export function runDeterministicChecks(data: SiteData): CheckResult {
     r.serp1 = 'N/A'; r.serp2 = 'N/A'; r.serp3 = 'N/A'
     r.serp4 = 'N/A'; r.serp5 = 'N/A'; r.serp6 = 'N/A'
     r.serp7 = 'N/A'; r.serp8 = 'N/A'
+    r.serp9 = 'N/A'; r.serp10 = 'N/A'; r.serp11 = 'N/A'
   } else {
     const s = data.serp
 
@@ -725,6 +726,27 @@ export function runDeterministicChecks(data: SiteData): CheckResult {
     const titleLower = (p.title || '').toLowerCase()
     const powerWords = /best|top|ultimate|complete|proven|guide|\d{4}|\d+\s*(tips|ways|steps|reasons)|free|easy|fast|simple/i
     r.serp8 = powerWords.test(titleLower) ? 'Pass' : 'Partial'
+
+    // ── Google AI Overview (AIO) checks ──────────────────────────────────────
+
+    // serp9: AI Overview detected for this keyword
+    // If AIO is present, it's an opportunity signal — not inherently good or bad
+    r.serp9 = s.hasAIOverview ? 'Pass' : 'N/A'
+
+    // serp10: Site cited as source in AI Overview
+    if (s.hasAIOverview) {
+      r.serp10 = s.siteInAIOverview ? 'Pass' : 'Fail'
+    } else {
+      r.serp10 = 'N/A' // No AIO for this keyword
+    }
+
+    // serp11: Content structured for AI answer extraction
+    // Check: short direct intro, use of lists/tables, clear H2 questions
+    const hasDirectAnswer = p.wordCount > 0 && p.h2.length >= 1
+    const hasListOrTable = /<(ul|ol|table)/i.test(data.html)
+    const hasQuestionHeadings = p.h2.some(h => /\?|what|how|why|when|who|which|is |are |does /i.test(h))
+    const aioSignals = [hasDirectAnswer, hasListOrTable, hasQuestionHeadings].filter(Boolean).length
+    r.serp11 = aioSignals >= 3 ? 'Pass' : aioSignals >= 1 ? 'Partial' : 'Fail'
   }
 
   return r
