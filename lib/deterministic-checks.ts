@@ -743,6 +743,7 @@ export function getLLMItems(): string[] {
     'o11', // H1 contains keyword
     'o14', // H2s contain secondary keywords
     'o15', // Headings descriptive
+    'o16', // FAQ sections use H2/H3 for questions
     'o17', // No keyword stuffing
     'o18', // Keyword in first 100 words
     'o19', // Keyword density natural
