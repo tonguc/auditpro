@@ -1,3 +1,6 @@
+import { fetchSerpData, extractMainKeyword, type SerpData } from './serpapi'
+export type { SerpData }
+
 // ─── Types ──────────────────────────────────────────────────────────────────
 
 export interface SiteData {
@@ -15,6 +18,7 @@ export interface SiteData {
   html: string
   parsed: ParsedHTML
   crawledPages: CrawledPage[]
+  serp: SerpData | null
 }
 
 export interface SitemapData {
@@ -434,8 +438,12 @@ export async function fetchSiteData(inputUrl: string): Promise<SiteData> {
   const parsed = parseHTML(html, finalUrl)
   const origin = new URL(finalUrl).origin
 
-  // Parallel: fetch robots.txt, sitemap, PageSpeed, SSL, internal pages
-  const [robotsTxt, sitemap, pageSpeed, ssl, crawledPages] = await Promise.all([
+  // Extract main keyword for SERP check
+  const mainKeyword = extractMainKeyword(parsed.title, parsed.h1)
+  const serpApiKey = process.env.SERPAPI_KEY || ''
+
+  // Parallel: fetch robots.txt, sitemap, PageSpeed, SSL, internal pages, SERP
+  const [robotsTxt, sitemap, pageSpeed, ssl, crawledPages, serp] = await Promise.all([
     // Robots.txt
     (async () => {
       const res = await safeFetch(`${origin}/robots.txt`, 5000)
@@ -454,6 +462,8 @@ export async function fetchSiteData(inputUrl: string): Promise<SiteData> {
     checkSSL(finalUrl),
     // Crawl internal pages
     crawlInternalPages(parsed.internalUrls),
+    // SerpApi — only if key is configured
+    serpApiKey ? fetchSerpData(mainKeyword, finalUrl, serpApiKey) : Promise.resolve(null),
   ])
 
   // Count broken links from crawl
@@ -463,7 +473,7 @@ export async function fetchSiteData(inputUrl: string): Promise<SiteData> {
   return {
     url: inputUrl, finalUrl, isHttps, httpToHttpsRedirect,
     statusCode, ttfbMs, headers, robotsTxt, sitemap,
-    pageSpeed, ssl, html, parsed, crawledPages,
+    pageSpeed, ssl, html, parsed, crawledPages, serp,
   }
 }
 
@@ -587,6 +597,24 @@ Noindex pages: ${noindexPages.length}${noindexPages.length > 0 ? ' → ' + noind
     for (const pg of data.crawledPages) {
       report += `\n  ${pg.url} → ${pg.statusCode} | title: "${pg.title ?? 'MISSING'}" | H1: ${pg.h1.length > 0 ? pg.h1[0] : 'MISSING'} | ${pg.wordCount}w`
     }
+  }
+
+  // SERP data
+  if (data.serp) {
+    const s = data.serp
+    report += `\n\n=== SERP ANALYSIS (SerpApi) ===
+Keyword: "${s.keyword}"
+Site rank in top 10: ${s.siteRank !== null ? `#${s.siteRank}` : 'Not in top 10'}
+Featured snippet present: ${s.hasFeatureSnippet ? 'YES — AEO opportunity' : 'No'}
+People Also Ask present: ${s.hasPeopleAlsoAsk ? 'YES — FAQ schema opportunity' : 'No'}
+Answer box present: ${s.hasAnswerBox ? 'YES — direct answer present' : 'No'}
+SERP intent: ${s.intentType}
+Competitor avg word count (top 3): ${s.competitorAvgWords}w
+Page word count: ${data.parsed.wordCount}w (${data.parsed.wordCount >= s.competitorAvgWords ? '✓ meets/exceeds competitor depth' : `⚠ ${s.competitorAvgWords - data.parsed.wordCount}w below competitors`})
+Top 3 results:
+${s.topResults.slice(0, 3).map(r => `  #${r.position}: ${r.title} — ${r.link}`).join('\n')}`
+  } else {
+    report += '\n\n=== SERP ANALYSIS ===\nSerpApi not configured or keyword could not be extracted.'
   }
 
   // Add truncated HTML

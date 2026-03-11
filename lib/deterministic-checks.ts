@@ -653,6 +653,80 @@ export function runDeterministicChecks(data: SiteData): CheckResult {
   const hasExitIntent = /exit.?intent|mouseout|mouseleave/i.test(data.html)
   r.c35 = hasExitIntent ? 'Pass' : 'N/A'
 
+  // ═══════════════════════════════════════════════════════════════════════════
+  // SERP & AEO (requires SerpApi data — gracefully N/A if not available)
+  // ═══════════════════════════════════════════════════════════════════════════
+
+  if (!data.serp) {
+    // No SerpApi key configured — mark all N/A
+    r.serp1 = 'N/A'; r.serp2 = 'N/A'; r.serp3 = 'N/A'
+    r.serp4 = 'N/A'; r.serp5 = 'N/A'; r.serp6 = 'N/A'
+    r.serp7 = 'N/A'; r.serp8 = 'N/A'
+  } else {
+    const s = data.serp
+
+    // serp1: Site appears in Google top 10
+    r.serp1 = s.siteAppearsInSERP
+      ? (s.siteRank && s.siteRank <= 3 ? 'Pass' : 'Partial')
+      : 'Fail'
+
+    // serp2: SERP intent matches content type
+    // We check if page content type (word count / structure) fits the detected intent
+    if (s.intentType === 'informational') {
+      // Informational → should have decent word count and headings
+      r.serp2 = p.wordCount >= 600 && p.h2.length >= 2 ? 'Pass' : 'Partial'
+    } else if (s.intentType === 'transactional') {
+      // Transactional → should have buttons/CTAs and forms
+      r.serp2 = p.buttons >= 2 || p.forms >= 1 ? 'Pass' : 'Partial'
+    } else if (s.intentType === 'commercial') {
+      // Commercial → should have comparison elements or reviews
+      r.serp2 = /review|compar|vs\b|best|top/i.test(data.html) ? 'Pass' : 'Partial'
+    } else {
+      r.serp2 = 'Partial'
+    }
+
+    // serp3: Content depth ≥ competitor average (top 3)
+    if (s.competitorAvgWords > 0) {
+      const ratio = p.wordCount / s.competitorAvgWords
+      r.serp3 = ratio >= 1.0 ? 'Pass' : ratio >= 0.7 ? 'Partial' : 'Fail'
+    } else {
+      r.serp3 = 'N/A'
+    }
+
+    // serp4: Featured snippet / AEO opportunity
+    // If featured snippet exists → check if we have Q&A structure
+    if (s.hasFeatureSnippet || s.hasAnswerBox) {
+      const hasQAStructure = p.h2.some(h => /\?|what|how|why|when|who/i.test(h))
+        || /\b(what|how|why|when|is|are|does|do)\b.{10,50}\?/i.test(data.html)
+      r.serp4 = hasQAStructure ? 'Pass' : 'Partial'
+    } else {
+      r.serp4 = 'N/A' // No featured snippet in SERP, not applicable
+    }
+
+    // serp5: People Also Ask → FAQ schema
+    if (s.hasPeopleAlsoAsk) {
+      const hasFaqSchema = p.schemaOrg.some(s => /faq|question/i.test(s))
+      r.serp5 = hasFaqSchema ? 'Pass' : 'Fail'
+    } else {
+      r.serp5 = 'N/A'
+    }
+
+    // serp6: Content answers a clear question
+    // Check if H1 or title is a question or direct keyword phrase
+    const h1Text = p.h1[0] || p.title || ''
+    const isQuestion = /\?|what|how|why|best|guide|top|vs\b/i.test(h1Text)
+    r.serp6 = isQuestion ? 'Pass' : p.wordCount > 300 ? 'Partial' : 'Fail'
+
+    // serp7: Content in short scannable chunks
+    const avgWordsPerHeading = p.h2.length > 0 ? p.wordCount / p.h2.length : p.wordCount
+    r.serp7 = avgWordsPerHeading <= 300 ? 'Pass' : avgWordsPerHeading <= 500 ? 'Partial' : 'Fail'
+
+    // serp8: Title has emotional trigger / power word
+    const titleLower = (p.title || '').toLowerCase()
+    const powerWords = /best|top|ultimate|complete|proven|guide|\d{4}|\d+\s*(tips|ways|steps|reasons)|free|easy|fast|simple/i
+    r.serp8 = powerWords.test(titleLower) ? 'Pass' : 'Partial'
+  }
+
   return r
 }
 

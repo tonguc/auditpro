@@ -356,6 +356,43 @@ const cro: AuditCategory = {
   ]
 }
 
+// ─── SERP & AEO ──────────────────────────────────────────────────────────────
+// Items powered by SerpApi real data (serp1–serp8)
+const serpAEO: AuditCategory = {
+  id: 'serp', label: 'SERP & AEO', icon: '🔍', color: '#8B5CF6',
+  sections: [
+    {
+      id: 'serp_visibility', label: 'SERP Visibility',
+      items: [
+        { id:'serp1', num:1, item:'Site appears in Google top 10 for main keyword',    howTo:'Run target keyword in Google. If not in top 10, focus on content depth, backlinks, and on-page SEO.',   priority:'Critical' },
+        { id:'serp2', num:2, item:'SERP intent matches content type',                  howTo:'Check top 10 results: informational/commercial/transactional? Your content format must match.',            priority:'Critical' },
+        { id:'serp3', num:3, item:'Content depth ≥ competitor average (top 3)',        howTo:'If top 3 competitors avg 1500 words and your page has 400, add depth. Use SerpApi competitor data.',      priority:'High'     },
+      ]
+    },
+    {
+      id: 'aeo', label: 'AEO — Answer Engine Optimization',
+      items: [
+        { id:'serp4', num:4, item:'Featured snippet / answer box opportunity detected', howTo:'If featured snippet present in SERP, structure content with direct Q&A format, 40–60 word answers.',     priority:'High'     },
+        { id:'serp5', num:5, item:'People Also Ask (PAA) detected → FAQ schema added', howTo:'PAA in SERP = FAQ opportunity. Add FAQ schema markup and answer PAA questions in content.',               priority:'High'     },
+        { id:'serp6', num:6, item:'Content answers a clear, specific question',         howTo:'Every page should answer ONE clear question. Use it as the H1. Helps AI/SGE summarization.',             priority:'High'     },
+        { id:'serp7', num:7, item:'Content structured in short, scannable chunks',      howTo:'Use H2/H3 headers every 200–300 words. Short paragraphs (2–3 lines). Helps AI extract answers.',         priority:'Medium'   },
+      ]
+    },
+    {
+      id: 'serp_ctr', label: 'CTR Optimization',
+      items: [
+        { id:'serp8', num:8, item:'Title tag has emotional trigger or power word',      howTo:'Add "best", "ultimate", "proven", year, or number to title. Compare title pattern vs SERP competitors.',  priority:'Medium'   },
+      ]
+    },
+  ]
+}
+
+// Extend onPage with SERP items via sections (keeps category intact)
+onPage.sections.push({
+  id: 'serp_onpage', label: 'SERP & AEO (Powered by SerpApi)',
+  items: serpAEO.sections.flatMap(s => s.items),
+})
+
 export const AUDIT_CATEGORIES: AuditCategory[] = [
   technicalSEO,
   onPage,
