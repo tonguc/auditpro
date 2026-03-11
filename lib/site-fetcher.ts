@@ -246,7 +246,7 @@ async function fetchPageSpeed(url: string): Promise<PageSpeedData | null> {
   async function run(strategy: 'mobile' | 'desktop') {
     try {
       const apiUrl = `${PSI_API}?url=${encodeURIComponent(url)}&strategy=${strategy}&category=performance`
-      const res = await safeFetch(apiUrl, 30000)
+      const res = await safeFetch(apiUrl, 25000)
       if (!res || !res.ok) return null
       const data = await res.json()
 
