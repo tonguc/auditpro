@@ -282,11 +282,11 @@ function AuditView({ onComplete }: { onComplete: (url: string, results: AuditRes
     try {
       const res = await fetch('/api/audit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url }) })
       clearInterval(t)
-      if (!res.ok) throw new Error('failed')
       const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Audit failed')
       setProgress(100)
       setTimeout(() => onComplete(url, data.results, data.scores), 400)
-    } catch { clearInterval(t); setError('AI audit failed. Try manual mode.'); setStep('url') }
+    } catch (e) { clearInterval(t); setError(e instanceof Error ? e.message : 'AI audit failed. Try manual mode.'); setStep('url') }
   }
 
   if (step === 'scanning') return (

@@ -107,7 +107,7 @@ async function safeFetch(url: string, timeoutMs = 10000): Promise<Response | nul
     const timer = setTimeout(() => controller.abort(), timeoutMs)
     const res = await fetch(url, {
       signal: controller.signal,
-      headers: { 'User-Agent': 'AuditPro/1.0 (SEO Audit Bot)' },
+      headers: { 'User-Agent': 'Mozilla/5.0 (compatible; AuditPro/1.0; +https://auditpro.tonguckaracay.com)' },
       redirect: 'follow',
     })
     clearTimeout(timer)
@@ -408,7 +408,7 @@ export async function fetchSiteData(inputUrl: string): Promise<SiteData> {
       const timer = setTimeout(() => controller.abort(), 5000)
       const httpRes = await fetch(httpUrl, {
         signal: controller.signal, redirect: 'manual',
-        headers: { 'User-Agent': 'AuditPro/1.0 (SEO Audit Bot)' },
+        headers: { 'User-Agent': 'Mozilla/5.0 (compatible; AuditPro/1.0; +https://auditpro.tonguckaracay.com)' },
       })
       clearTimeout(timer)
       const location = httpRes.headers.get('location') || ''
