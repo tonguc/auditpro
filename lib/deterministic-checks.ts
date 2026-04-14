@@ -184,16 +184,46 @@ export function runDeterministicChecks(data: SiteData): CheckResult {
   r.t34 = sensitivePatterns.test(data.html) ? 'Fail' : 'Pass'
 
   // t35-t43: Structured Data / Schema
+  // homepageSchemas: sadece ana sayfa, innerSchemas: iç sayfalardan toplanan
   const schemas = p.schemaOrg.map(s => s.toLowerCase())
-  r.t35 = schemas.includes('organization') ? 'Pass' : 'Fail'
-  r.t36 = schemas.includes('website') ? 'Pass' : 'Fail'
-  r.t37 = schemas.includes('breadcrumblist') ? 'Pass' : 'N/A'
-  r.t38 = schemas.includes('product') ? 'Pass' : 'N/A' // N/A if not e-commerce
-  r.t39 = schemas.some(s => s.includes('article') || s.includes('blogposting')) ? 'Pass' : 'N/A'
-  r.t40 = schemas.includes('faqpage') ? 'Pass' : 'N/A'
-  r.t41 = schemas.some(s => s.includes('review') || s.includes('rating')) ? 'Pass' : 'N/A'
+  const innerSchemas = data.crawledPages.flatMap(pg => pg.schemaOrg.map(s => s.toLowerCase()))
+
+  // Organization: OLMALI ana sayfada (SEO best practice). İç sayfada bulunursa Partial.
+  r.t35 = schemas.includes('organization') ? 'Pass'
+         : innerSchemas.includes('organization') ? 'Partial' // iç sayfada var, ana sayfada yok
+         : 'Fail'
+
+  // WebSite: ana sayfada olmalı
+  r.t36 = schemas.includes('website') ? 'Pass'
+         : innerSchemas.includes('website') ? 'Partial'
+         : 'Fail'
+
+  // BreadcrumbList: iç sayfalarda olması yeterli
+  const allBreadcrumb = schemas.includes('breadcrumblist') || innerSchemas.includes('breadcrumblist')
+  r.t37 = allBreadcrumb ? 'Pass' : 'N/A'
+
+  // Product: e-ticaret sayfalarında
+  const allProduct = schemas.includes('product') || innerSchemas.includes('product')
+  r.t38 = allProduct ? 'Pass' : 'N/A'
+
+  // Article/BlogPosting: blog sayfalarında
+  const allArticle = [...schemas, ...innerSchemas].some(s => s.includes('article') || s.includes('blogposting'))
+  r.t39 = allArticle ? 'Pass' : 'N/A'
+
+  // FAQ: herhangi bir sayfada olması yeterli
+  const allFaq = schemas.includes('faqpage') || innerSchemas.includes('faqpage')
+  r.t40 = allFaq ? 'Pass' : 'N/A'
+
+  // Review/Rating
+  const allReview = [...schemas, ...innerSchemas].some(s => s.includes('review') || s.includes('rating'))
+  r.t41 = allReview ? 'Pass' : 'N/A'
+
   r.t42 = 'N/A' // Requires GSC
-  r.t43 = schemas.includes('localbusiness') ? 'Pass' : 'N/A'
+
+  // LocalBusiness: ana sayfada olmalı
+  r.t43 = schemas.includes('localbusiness') ? 'Pass'
+         : innerSchemas.includes('localbusiness') ? 'Partial'
+         : 'N/A'
 
   // t44: Mobile-first indexing compatible (viewport present)
   r.t44 = p.viewport ? 'Pass' : 'Fail'

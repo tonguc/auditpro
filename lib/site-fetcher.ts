@@ -50,6 +50,7 @@ export interface CrawledPage {
   wordCount: number
   canonical: string | null
   hasNoindex: boolean
+  schemaOrg: string[]
 }
 
 export interface ParsedHTML {
@@ -369,10 +370,10 @@ async function crawlInternalPages(urls: string[], maxPages = 20): Promise<Crawle
 
   const tasks = toCrawl.map(async (url) => {
     const res = await safeFetch(url, 8000)
-    if (!res) return { url, statusCode: 0, title: null, metaDescription: null, h1: [], wordCount: 0, canonical: null, hasNoindex: false }
+    if (!res) return { url, statusCode: 0, title: null, metaDescription: null, h1: [], wordCount: 0, canonical: null, hasNoindex: false, schemaOrg: [] }
 
     const statusCode = res.status
-    if (statusCode >= 400) return { url, statusCode, title: null, metaDescription: null, h1: [], wordCount: 0, canonical: null, hasNoindex: false }
+    if (statusCode >= 400) return { url, statusCode, title: null, metaDescription: null, h1: [], wordCount: 0, canonical: null, hasNoindex: false, schemaOrg: [] }
 
     const html = await res.text()
     const titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)
@@ -391,7 +392,20 @@ async function crawlInternalPages(urls: string[], maxPages = 20): Promise<Crawle
       .replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
     const wordCount = textContent.split(/\s+/).filter(w => w.length > 0).length
 
-    return { url, statusCode, title, metaDescription, h1, wordCount, canonical, hasNoindex }
+    // Extract schema types from inner pages
+    const schemaOrg: string[] = []
+    const jsonLdBlocks = html.match(/<script[^>]*type\s*=\s*["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi) || []
+    for (const block of jsonLdBlocks) {
+      const content = block.replace(/<script[^>]*>|<\/script>/gi, '').trim()
+      try {
+        const parsed = JSON.parse(content)
+        if (parsed['@type']) schemaOrg.push(parsed['@type'])
+        if (Array.isArray(parsed['@graph']))
+          for (const item of parsed['@graph']) if (item['@type']) schemaOrg.push(item['@type'])
+      } catch { /* ignore */ }
+    }
+
+    return { url, statusCode, title, metaDescription, h1, wordCount, canonical, hasNoindex, schemaOrg }
   })
 
   const settled = await Promise.allSettled(tasks)
