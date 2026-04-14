@@ -5,7 +5,10 @@
       "Bash(pip install PyPDF2 -q)",
       "Bash(python -c \":*)",
       "Bash(python -m pip install PyPDF2 -q)",
-      "mcp__Claude_Preview__preview_start"
+      "mcp__Claude_Preview__preview_start",
+      "mcp__504cb1fc-2be4-4253-9d7c-7b453399f83d__list_teams",
+      "mcp__504cb1fc-2be4-4253-9d7c-7b453399f83d__list_projects",
+      "mcp__504cb1fc-2be4-4253-9d7c-7b453399f83d__get_project"
     ]
   }
 }
