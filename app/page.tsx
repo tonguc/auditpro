@@ -102,7 +102,7 @@ function CategoryDetail({ catId, results, onClose }: { catId: string; results: A
             { key: 'Fail',    label: `Fail (${counts.Fail})`,       color: C.red },
             { key: 'Partial', label: `Partial (${counts.Partial})`, color: C.amber },
             { key: 'Pass',    label: `Pass (${counts.Pass})`,       color: C.green },
-            { key: 'N/A',     label: `N/A (${counts['N/A']})`,     color: C.muted },
+            { key: 'N/A',     label: `Manuel (${counts['N/A']})`,  color: C.muted },
           ].map(f => (
             <button key={f.key} onClick={() => setFilter(f.key)} style={{
               padding: '6px 14px', borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: 'pointer',
@@ -143,7 +143,7 @@ function CategoryDetail({ catId, results, onClose }: { catId: string; results: A
                     <div style={{ flexShrink: 0, padding: '4px 12px', borderRadius: 20, fontSize: 11, fontWeight: 700,
                       background: STATUS_BG[status], color: STATUS_COLOR[status],
                       border: `1px solid ${STATUS_COLOR[status]}44` }}>
-                      {status === 'Pass' ? '✓ Pass' : status === 'Fail' ? '✗ Fail' : status === 'Partial' ? '~ Partial' : 'N/A'}
+                      {status === 'Pass' ? '✓ Pass' : status === 'Fail' ? '✗ Fail' : status === 'Partial' ? '~ Partial' : '○ Manuel kontrol'}
                     </div>
                   )}
                 </div>

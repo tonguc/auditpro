@@ -76,6 +76,7 @@ export interface ParsedHTML {
   charCount: number
   wordCount: number
   internalUrls: string[]
+  buttonTexts: string[]
 }
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -203,6 +204,15 @@ function parseHTML(html: string, siteUrl: string): ParsedHTML {
     + (html.match(/<input[^>]*type\s*=\s*["']submit["'][^>]*>/gi) || []).length
     + (html.match(/<a[^>]*class\s*=\s*["'][^"']*btn[^"']*["'][^>]*>/gi) || []).length
 
+  // Button / CTA text extraction for content-based detection
+  const buttonTexts: string[] = []
+  for (const m of html.matchAll(/<button[^>]*>([\s\S]*?)<\/button>/gi))
+    buttonTexts.push(m[1].replace(/<[^>]*>/g, '').trim())
+  for (const m of html.matchAll(/<input[^>]*type\s*=\s*["']submit["'][^>]*value\s*=\s*["']([^"']*)["'][^>]*>/gi))
+    buttonTexts.push(m[1].trim())
+  for (const m of html.matchAll(/<a[^>]*class\s*=\s*["'][^"']*btn[^"']*["'][^>]*>([\s\S]*?)<\/a>/gi))
+    buttonTexts.push(m[1].replace(/<[^>]*>/g, '').trim())
+
   // Schema.org
   const jsonLdBlocks = html.match(/<script[^>]*type\s*=\s*["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi) || []
   const schemaOrg: string[] = []
@@ -239,6 +249,7 @@ function parseHTML(html: string, siteUrl: string): ParsedHTML {
     charCount: textContent.length,
     wordCount: textContent.split(/\s+/).filter(w => w.length > 0).length,
     internalUrls,
+    buttonTexts: buttonTexts.filter(t => t.length > 0),
   }
 }
 
@@ -304,7 +315,7 @@ async function fetchSitemap(origin: string): Promise<SitemapData | null> {
 
     // Extract sample URLs
     const locMatches = extractAllMatches(text, /<loc>([\s\S]*?)<\/loc>/gi)
-    const sampleUrls = locMatches.slice(0, 5)
+    const sampleUrls = locMatches.slice(0, 20)
 
     // Find lastmod
     const lastmodMatches = extractAllMatches(text, /<lastmod>([\s\S]*?)<\/lastmod>/gi)
@@ -352,7 +363,7 @@ async function checkSSL(url: string): Promise<SSLData | null> {
 
 // ─── Multi-page Crawl ───────────────────────────────────────────────────────
 
-async function crawlInternalPages(urls: string[], maxPages = 8): Promise<CrawledPage[]> {
+async function crawlInternalPages(urls: string[], maxPages = 20): Promise<CrawledPage[]> {
   const toCrawl = urls.slice(0, maxPages)
   const results: CrawledPage[] = []
 
@@ -442,8 +453,14 @@ export async function fetchSiteData(inputUrl: string): Promise<SiteData> {
   const mainKeyword = extractMainKeyword(parsed.title, parsed.h1)
   const serpApiKey = process.env.SERPAPI_KEY || ''
 
-  // Parallel: fetch robots.txt, sitemap, PageSpeed, SSL, internal pages, SERP
-  const [robotsTxt, sitemap, pageSpeed, ssl, crawledPages, serp] = await Promise.all([
+  // Pre-fetch sitemap (fast, ~1-2s) so we can include its URLs in the crawl
+  const sitemap = await fetchSitemap(origin)
+  const sitemapUrls = sitemap?.sampleUrls ?? []
+  // Merge homepage internal links + sitemap URLs, deduplicate
+  const combinedCrawlUrls = [...new Set([...parsed.internalUrls, ...sitemapUrls])]
+
+  // Parallel: fetch robots.txt, PageSpeed, SSL, internal pages, SERP
+  const [robotsTxt, pageSpeed, ssl, crawledPages, serp] = await Promise.all([
     // Robots.txt
     (async () => {
       const res = await safeFetch(`${origin}/robots.txt`, 5000)
@@ -454,14 +471,12 @@ export async function fetchSiteData(inputUrl: string): Promise<SiteData> {
       }
       return null
     })(),
-    // Sitemap
-    fetchSitemap(origin),
     // PageSpeed Insights
     fetchPageSpeed(finalUrl),
     // SSL
     checkSSL(finalUrl),
-    // Crawl internal pages
-    crawlInternalPages(parsed.internalUrls),
+    // Crawl internal pages (homepage links + sitemap URLs combined)
+    crawlInternalPages(combinedCrawlUrls),
     // SerpApi — only if key is configured
     serpApiKey ? fetchSerpData(mainKeyword, finalUrl, serpApiKey) : Promise.resolve(null),
   ])
