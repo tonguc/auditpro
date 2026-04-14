@@ -70,8 +70,11 @@ export function runDeterministicChecks(data: SiteData): CheckResult {
   r.t12 = 'N/A'
 
   // t13: JavaScript not blocking key content
-  const renderBlockingScripts = p.scripts.total - p.scripts.async - p.scripts.defer - p.scripts.inline
-  r.t13 = renderBlockingScripts <= 2 ? 'Pass' : renderBlockingScripts <= 5 ? 'Partial' : 'Fail'
+  // Since we fetch with a plain HTTP client (no browser/JS), if key content (H1, body text)
+  // is present in raw HTML, JavaScript is NOT blocking it for crawlers.
+  r.t13 = (p.wordCount > 200 && p.h1.length > 0) ? 'Pass'
+         : p.wordCount > 50 ? 'Partial'
+         : 'Fail'
 
   // t14: URL structure clean and descriptive
   try {
@@ -116,7 +119,8 @@ export function runDeterministicChecks(data: SiteData): CheckResult {
   if (p.images.total <= 2) r.t22 = 'N/A'
   else r.t22 = lazyCount > 0 ? 'Pass' : 'Fail'
 
-  // t23: Render-blocking JS/CSS minimized
+  // t23: Render-blocking JS/CSS minimized (external scripts without async/defer)
+  const renderBlockingScripts = Math.max(0, p.scripts.total - p.scripts.async - p.scripts.defer - p.scripts.inline)
   r.t23 = renderBlockingScripts <= 1 ? 'Pass' : renderBlockingScripts <= 3 ? 'Partial' : 'Fail'
 
   // t24: TTFB < 800ms
@@ -151,14 +155,24 @@ export function runDeterministicChecks(data: SiteData): CheckResult {
   r.t29 = data.httpToHttpsRedirect ? 'Pass' : data.isHttps ? 'Partial' : 'Fail'
 
   // t30: www / non-www canonicalized
-  r.t30 = p.canonical ? 'Pass' : 'Partial'
+  // Check that finalUrl and canonical agree on www vs non-www
+  if (p.canonical) {
+    try {
+      const finalHasWww = new URL(data.finalUrl).hostname.startsWith('www.')
+      const canonicalHasWww = new URL(p.canonical).hostname.startsWith('www.')
+      r.t30 = finalHasWww === canonicalHasWww ? 'Pass' : 'Fail'
+    } catch { r.t30 = 'Pass' }
+  } else {
+    r.t30 = 'Partial' // No canonical — can't confirm consolidation
+  }
 
   // t31: HSTS header present
   r.t31 = data.headers['strict-transport-security'] ? 'Pass' : 'Fail'
 
-  // t32: No mixed content
-  const httpResources = (data.html.match(/(?:src|href)\s*=\s*["']http:\/\//gi) || []).length
-  r.t32 = httpResources === 0 ? 'Pass' : 'Fail'
+  // t32: No mixed content — check src/href attributes AND CSS url() references
+  const httpAttrResources = (data.html.match(/(?:src|href|action)\s*=\s*["']http:\/\//gi) || []).length
+  const httpCssResources = (data.html.match(/url\s*\(\s*['"]?http:\/\//gi) || []).length
+  r.t32 = (httpAttrResources + httpCssResources) === 0 ? 'Pass' : 'Fail'
 
   // t33: Security headers present
   const secCount = ['content-security-policy', 'x-frame-options', 'x-content-type-options', 'referrer-policy']
@@ -195,9 +209,15 @@ export function runDeterministicChecks(data: SiteData): CheckResult {
   r.t47 = 'N/A'
 
   // t48: No intrusive interstitials
-  // Check for common popup/modal patterns in HTML
-  const hasPopup = /class\s*=\s*["'][^"']*(popup|modal|overlay|interstitial)[^"']*["']/i.test(data.html)
-  r.t48 = hasPopup ? 'Partial' : 'Pass'
+  // Check for popup/overlay patterns beyond just class names:
+  // cookie consent banners are acceptable (Google doesn't penalize them)
+  const hasPopupClass = /class\s*=\s*["'][^"']*(popup|modal|overlay|interstitial)[^"']*["']/i.test(data.html)
+  const hasExitIntent = /exit.?intent|mouseleave|mouseout.*document/i.test(data.html)
+  const hasNewsletterPopup = /(subscribe|newsletter|email).{0,60}(popup|modal|overlay)/i.test(data.html)
+  const hasCookieConsentOnly = /cookie.consent|cookie.notice|cookielaw|onetrust|cookieyes|cc-window/i.test(data.html)
+  const isJustCookieBanner = hasCookieConsentOnly && !hasExitIntent && !hasNewsletterPopup
+  const hasPopup = hasPopupClass || hasExitIntent || hasNewsletterPopup
+  r.t48 = !hasPopup ? 'Pass' : isJustCookieBanner ? 'Pass' : 'Partial'
 
   // t49: AMP implemented (if news/article)
   const hasAmp = /<link[^>]*rel\s*=\s*["']amphtml["']/i.test(data.html)
@@ -251,8 +271,12 @@ export function runDeterministicChecks(data: SiteData): CheckResult {
   r.t61 = hasSessionIds ? 'Fail' : 'Pass'
 
   // t62: Breadcrumb navigation present
-  const hasBreadcrumb = /class\s*=\s*["'][^"']*(breadcrumb)[^"']*["']/i.test(data.html) ||
-    schemas.includes('breadcrumblist')
+  // Check: class name, schema, OR nav > ol/ul with multiple li links (structural breadcrumb)
+  const hasBreadcrumbClass = /class\s*=\s*["'][^"']*(breadcrumb)[^"']*["']/i.test(data.html)
+  const hasBreadcrumbSchema = schemas.includes('breadcrumblist')
+  const hasArrowSeparator = /(<a[^>]*>[^<]+<\/a>\s*(?:&gt;|›|»|\/|&rsaquo;)\s*){2,}/i.test(data.html)
+  const hasNavList = /<nav[^>]*aria-label\s*=\s*["'][^"']*bread/i.test(data.html)
+  const hasBreadcrumb = hasBreadcrumbClass || hasBreadcrumbSchema || hasArrowSeparator || hasNavList
   r.t62 = hasBreadcrumb ? 'Pass' : 'Fail'
 
   // t63: Sitemap excludes noindex/redirect URLs
@@ -531,11 +555,14 @@ export function runDeterministicChecks(data: SiteData): CheckResult {
   // CONVERSION & CTA
   // ═══════════════════════════════════════════════════════════════════════════
 
-  // c1: Primary CTA visible above fold — check first 2000 chars of body
+  // c1: Primary CTA visible above fold — check first 3000 chars of body
   const bodyStart = data.html.match(/<body[^>]*>([\s\S]{0,3000})/i)?.[1] || ''
-  const hasCTAAboveFold = /<(button|a)[^>]*class\s*=\s*["'][^"']*(btn|button|cta)[^"']*["'][^>]*>/i.test(bodyStart) ||
-    /<button[^>]*>/i.test(bodyStart)
-  r.c1 = hasCTAAboveFold ? 'Pass' : 'Fail'
+  const ctaActionWords = /\b(get|start|try|buy|order|sign.?up|register|join|download|contact|request|subscribe|book|learn more|see|explore|hemen|başla|ücretsiz|dene|incele|keşfet|satın)\b/i
+  const hasBtnClass = /<(button|a)[^>]*class\s*=\s*["'][^"']*(btn|button|cta)[^"']*["'][^>]*>/i.test(bodyStart)
+  const hasButtonTag = /<button[^>]*>/i.test(bodyStart)
+  // Also check if button texts include action words
+  const hasActionBtn = p.buttonTexts.some(t => ctaActionWords.test(t))
+  r.c1 = (hasBtnClass || hasButtonTag || hasActionBtn) ? 'Pass' : 'Fail'
 
   // c2: CTA copy action-oriented — LLM needed
 
@@ -558,16 +585,27 @@ export function runDeterministicChecks(data: SiteData): CheckResult {
   const hasStickyElement = /(?:position\s*:\s*(?:sticky|fixed))|(?:class\s*=\s*["'][^"']*(?:sticky|fixed)[^"']*["'])/i.test(data.html)
   r.c8 = hasStickyElement ? 'Pass' : 'Partial'
 
-  // c9: Customer testimonials — check for testimonial-like content
-  const hasTestimonials = /class\s*=\s*["'][^"']*(testimonial|review|feedback|yorum)[^"']*["']/i.test(data.html)
+  // c9: Customer testimonials — class name OR semantic content patterns
+  const hasTestimonialClass = /class\s*=\s*["'][^"']*(testimonial|review|feedback|yorum)[^"']*["']/i.test(data.html)
+  const hasBlockquote = /<blockquote[^>]*>[\s\S]{20,}<\/blockquote>/i.test(data.html)
+  const hasStarRating = /[★☆⭐✩✪]{3,}|(?:rating|puan|yıldız).{0,20}\d[\d.]*\s*\/\s*5/i.test(data.html)
+  const hasCiteOrQuote = /<cite[^>]*>/i.test(data.html)
+  const hasReviewSchema = schemas.some(s => /review|rating/i.test(s))
+  const hasTestimonials = hasTestimonialClass || hasBlockquote || hasStarRating || hasCiteOrQuote || hasReviewSchema
   r.c9 = hasTestimonials ? 'Pass' : 'Fail'
 
-  // c10: Social proof
-  const hasSocialProof = /class\s*=\s*["'][^"']*(client|partner|logo|trusted|brand)[^"']*["']/i.test(data.html)
+  // c10: Social proof — class name OR "N+ customers/users/companies" text patterns
+  const hasSocialProofClass = /class\s*=\s*["'][^"']*(client|partner|logo|trusted|brand)[^"']*["']/i.test(data.html)
+  const hasSocialProofText = /\d[\d,.\s]*\+?\s*(customers?|clients?|users?|companies|businesses?|brands?|agencies|müşteri|şirket|kullanıcı|marka)/i.test(data.html)
+  const hasTrustedBy = /trusted by|used by|loved by|chosen by|güveniyor|kullanan|tercih eden/i.test(data.html)
+  const hasSocialProof = hasSocialProofClass || hasSocialProofText || hasTrustedBy
   r.c10 = hasSocialProof ? 'Pass' : 'Partial'
 
-  // c11: Trust badges
-  const hasTrustBadges = /class\s*=\s*["'][^"']*(trust|badge|secure|guarantee|güven)[^"']*["']/i.test(data.html)
+  // c11: Trust badges — class name OR guarantee/secure text patterns
+  const hasTrustClass = /class\s*=\s*["'][^"']*(trust|badge|secure|guarantee|güven)[^"']*["']/i.test(data.html)
+  const hasGuaranteeText = /money[\s-]?back|30[\s-]day|iade\s*garanti|para\s*iade|geri\s*ödeme|no[\s-]risk|risk[\s-]free|satisfaction\s*guaranteed|%\s*100\s*(garanti|memnun|iade)/i.test(data.html)
+  const hasSecureText = /secure\s*checkout|ssl\s*secur|güvenli\s*(ödeme|alışveriş)|verified\s*by\s*(visa|mastercard)|Norton\s*Secured/i.test(data.html)
+  const hasTrustBadges = hasTrustClass || hasGuaranteeText || hasSecureText
   r.c11 = hasTrustBadges ? 'Pass' : 'Partial'
 
   // c12: Pricing clear — check for pricing elements
@@ -650,8 +688,8 @@ export function runDeterministicChecks(data: SiteData): CheckResult {
   r.c34 = hasPricingTable ? 'Pass' : 'N/A'
 
   // c35: Exit intent
-  const hasExitIntent = /exit.?intent|mouseout|mouseleave/i.test(data.html)
-  r.c35 = hasExitIntent ? 'Pass' : 'N/A'
+  const hasExitIntentC35 = /exit.?intent|mouseout|mouseleave/i.test(data.html)
+  r.c35 = hasExitIntentC35 ? 'Pass' : 'N/A'
 
   // ═══════════════════════════════════════════════════════════════════════════
   // SERP & AEO (requires SerpApi data — gracefully N/A if not available)
