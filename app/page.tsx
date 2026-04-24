@@ -246,7 +246,8 @@ function DashboardView({ score, issues, auditUrl, results, setPage }: {
               </div>
               <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0 }}>
                 <div style={{ fontSize: 11, color: C.muted, background: C.border,
-                  borderRadius: 6, padding: '3px 10px', whiteSpace: 'nowrap' }}>{issue.category}</div>
+                  borderRadius: 6, padding: '3px 10px', whiteSpace: 'nowrap',
+                  width: 140, textAlign: 'left' }}>{issue.category}</div>
                 <div style={{ fontSize: 11, fontWeight: 600, color: SEV[issue.priority] ?? C.muted,
                   textTransform: 'uppercase', width: 60, textAlign: 'right' }}>{issue.priority}</div>
               </div>
