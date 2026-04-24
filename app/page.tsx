@@ -161,6 +161,17 @@ function DashboardView({ score, issues, auditUrl, results, setPage }: {
   auditUrl: string; results: AuditResults; setPage: (p: string) => void
 }) {
   const [detailCat, setDetailCat] = useState<string | null>(null)
+  const [exporting, setExporting] = useState(false)
+
+  async function handleExport() {
+    if (!score) return
+    setExporting(true)
+    try {
+      await downloadPDF({ agencyName: 'AuditPro', brandColor: '#0EA5E9' }, auditUrl, score, results)
+    } finally {
+      setExporting(false)
+    }
+  }
   if (!score) return (
     <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 16 }}>
       <div style={{ fontSize: 48 }}>📊</div>
@@ -181,10 +192,18 @@ function DashboardView({ score, issues, auditUrl, results, setPage }: {
             letterSpacing: '0.08em', marginBottom: 6 }}>{auditUrl}</div>
           <h1 style={{ fontSize: 26, fontWeight: 800, color: C.text }}>Audit Dashboard</h1>
         </div>
-        <button onClick={() => setPage('audit')} style={{ background: C.accent, border: 'none',
-          borderRadius: 8, padding: '9px 18px', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
-          + New Audit
-        </button>
+        <div style={{ display: 'flex', gap: 10 }}>
+          <button onClick={handleExport} disabled={exporting} style={{
+            background: 'transparent', border: `1px solid ${C.border}`, borderRadius: 8,
+            padding: '9px 18px', color: C.muted, fontSize: 13, fontWeight: 600,
+            cursor: exporting ? 'default' : 'pointer', opacity: exporting ? 0.6 : 1 }}>
+            {exporting ? 'Generating…' : '↓ Export PDF'}
+          </button>
+          <button onClick={() => setPage('audit')} style={{ background: C.accent, border: 'none',
+            borderRadius: 8, padding: '9px 18px', color: '#fff', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+            + New Audit
+          </button>
+        </div>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '200px 1fr', gap: 20, marginBottom: 20 }}>
         <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 12,
