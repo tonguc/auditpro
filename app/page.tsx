@@ -36,7 +36,9 @@ function ScoreRing({ score, size = 120, color = C.accent }: { score: number; siz
   )
 }
 
-function Sidebar({ page, setPage }: { page: string; setPage: (p: string) => void }) {
+function Sidebar({ page, setPage, isPro, onUpgrade }: {
+  page: string; setPage: (p: string) => void; isPro: boolean; onUpgrade: () => void
+}) {
   const nav = [
     { id: 'dashboard', icon: '▦', label: 'Dashboard' },
     { id: 'audit',     icon: '◎', label: 'New Audit' },
@@ -46,7 +48,16 @@ function Sidebar({ page, setPage }: { page: string; setPage: (p: string) => void
     <div style={{ width: 220, background: C.surface, borderRight: `1px solid ${C.border}`,
       display: 'flex', flexDirection: 'column', minHeight: '100vh', flexShrink: 0 }}>
       <div style={{ padding: '24px 24px 20px', borderBottom: `1px solid ${C.border}` }}>
-        <div style={{ fontSize: 16, fontWeight: 800, color: C.text }}><span style={{ color: C.accent }}>Audit</span>Pro</div>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+          <div style={{ fontSize: 16, fontWeight: 800, color: C.text }}><span style={{ color: C.accent }}>Audit</span>Pro</div>
+          <span style={{
+            fontSize: 9, fontWeight: 700, letterSpacing: '0.08em',
+            padding: '2px 7px', borderRadius: 10,
+            background: isPro ? `${C.accent}22` : `${C.amber}22`,
+            color: isPro ? C.accent : C.amber,
+            border: `1px solid ${isPro ? C.accent : C.amber}44`,
+          }}>{isPro ? 'PRO' : 'FREE'}</span>
+        </div>
         <div style={{ fontSize: 10, color: C.muted, marginTop: 2 }}>UX + SEO Intelligence</div>
       </div>
       <nav style={{ padding: '16px 12px', flex: 1 }}>
@@ -61,6 +72,21 @@ function Sidebar({ page, setPage }: { page: string; setPage: (p: string) => void
           </div>
         ))}
       </nav>
+      {!isPro && (
+        <div style={{ margin: '0 12px 12px', background: `${C.accent}11`,
+          border: `1px solid ${C.accent}33`, borderRadius: 10, padding: '14px 16px' }}>
+          <div style={{ fontSize: 12, fontWeight: 700, color: C.text, marginBottom: 4 }}>
+            18 / 190 checks
+          </div>
+          <div style={{ fontSize: 11, color: C.muted, marginBottom: 10, lineHeight: 1.5 }}>
+            Unlock 172 advanced checks across all categories.
+          </div>
+          <button onClick={onUpgrade} style={{ width: '100%', background: C.accent, border: 'none',
+            borderRadius: 7, padding: '8px', color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
+            Upgrade to Pro →
+          </button>
+        </div>
+      )}
       <div style={{ padding: '16px 24px', borderTop: `1px solid ${C.border}`, fontSize: 11, color: C.muted }}>
         auditpro.tonguckaracay.com
       </div>
@@ -280,7 +306,11 @@ function DashboardView({ score, issues, auditUrl, results, setPage }: {
 
 const SCAN_STEPS = ['Crawling site structure…','Checking Technical SEO…','Analyzing On-Page content…','Evaluating UX heuristics…','Auditing CRO & conversions…','Checking AI & SERP visibility…','Generating AI report…']
 
-function AuditView({ onComplete }: { onComplete: (url: string, results: AuditResults, score: AuditScore) => void }) {
+function AuditView({ onComplete, isPro, onUpgrade }: {
+  onComplete: (url: string, results: AuditResults, score: AuditScore) => void
+  isPro: boolean
+  onUpgrade: () => void
+}) {
   const [step, setStep]           = useState<'url' | 'scanning' | 'manual'>('url')
   const [url, setUrl]             = useState('')
   const [progress, setProgress]   = useState(0)
@@ -345,37 +375,61 @@ function AuditView({ onComplete }: { onComplete: (url: string, results: AuditRes
             </button>
           ))}
         </div>
-        {cat.sections.map(sec => (
-          <div key={sec.id} style={{ marginBottom: 16 }}>
-            <div style={{ padding: '10px 16px', background: cat.color, borderRadius: '8px 8px 0 0', fontSize: 12, fontWeight: 700, color: '#fff' }}>{sec.label}</div>
-            {sec.items.map((item, i) => {
-              const s = results[item.id] as string | undefined
-              return (
-                <div key={item.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 14,
-                  padding: '12px 16px', background: i % 2 === 0 ? C.surface : C.surfaceHover,
-                  borderBottom: `1px solid ${C.border}` }}>
-                  <div style={{ width: 26, height: 26, borderRadius: '50%', flexShrink: 0,
-                    background: `${SEV[item.priority]}22`, border: `1px solid ${SEV[item.priority]}44`,
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    fontSize: 10, fontWeight: 700, color: SEV[item.priority] }}>{item.num}</div>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: C.text, marginBottom: 3 }}>{item.item}</div>
-                    <div style={{ fontSize: 11, color: C.muted, fontStyle: 'italic', lineHeight: 1.5 }}>{item.howTo}</div>
+        {cat.sections.map(sec => {
+          const lockedCount = isPro ? 0 : sec.items.filter(item => !item.lite).length
+          return (
+            <div key={sec.id} style={{ marginBottom: 16 }}>
+              <div style={{ padding: '10px 16px', background: cat.color, borderRadius: '8px 8px 0 0',
+                fontSize: 12, fontWeight: 700, color: '#fff',
+                display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span>{sec.label}</span>
+                {lockedCount > 0 && (
+                  <span style={{ fontSize: 10, fontWeight: 600, opacity: 0.85 }}>
+                    {sec.items.length - lockedCount}/{sec.items.length} available
+                  </span>
+                )}
+              </div>
+              {sec.items.map((item, i) => {
+                const isLocked = !isPro && !item.lite
+                const s = results[item.id] as string | undefined
+                return (
+                  <div key={item.id} style={{ display: 'flex', alignItems: 'flex-start', gap: 14,
+                    padding: '12px 16px', background: i % 2 === 0 ? C.surface : C.surfaceHover,
+                    borderBottom: `1px solid ${C.border}`, opacity: isLocked ? 0.45 : 1 }}>
+                    <div style={{ width: 26, height: 26, borderRadius: '50%', flexShrink: 0,
+                      background: isLocked ? `${C.border}` : `${SEV[item.priority]}22`,
+                      border: `1px solid ${isLocked ? C.border : SEV[item.priority]}44`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      fontSize: 12, color: isLocked ? C.muted : SEV[item.priority] }}>
+                      {isLocked ? '🔒' : <span style={{ fontSize: 10, fontWeight: 700 }}>{item.num}</span>}
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: isLocked ? C.muted : C.text, marginBottom: 3 }}>{item.item}</div>
+                      {!isLocked && <div style={{ fontSize: 11, color: C.muted, fontStyle: 'italic', lineHeight: 1.5 }}>{item.howTo}</div>}
+                    </div>
+                    {isLocked ? (
+                      <button onClick={onUpgrade} style={{ flexShrink: 0, padding: '5px 12px', borderRadius: 6,
+                        fontSize: 11, fontWeight: 600, cursor: 'pointer',
+                        border: `1px solid ${C.accent}44`, background: `${C.accent}11`, color: C.accent }}>
+                        Pro
+                      </button>
+                    ) : (
+                      <div style={{ display: 'flex', gap: 5, flexShrink: 0 }}>
+                        {(['Pass','Partial','Fail','N/A'] as const).map(v => (
+                          <button key={v} onClick={() => setResults(r => ({ ...r, [item.id]: v }))} style={{
+                            padding: '5px 9px', borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: 'pointer',
+                            border: `1px solid ${s === v ? STATUS_COLOR[v] : C.border}`,
+                            background: s === v ? STATUS_BG[v] : 'transparent',
+                            color: s === v ? STATUS_COLOR[v] : C.muted }}>{v}</button>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                  <div style={{ display: 'flex', gap: 5, flexShrink: 0 }}>
-                    {(['Pass','Partial','Fail','N/A'] as const).map(v => (
-                      <button key={v} onClick={() => setResults(r => ({ ...r, [item.id]: v }))} style={{
-                        padding: '5px 9px', borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: 'pointer',
-                        border: `1px solid ${s === v ? STATUS_COLOR[v] : C.border}`,
-                        background: s === v ? STATUS_BG[v] : 'transparent',
-                        color: s === v ? STATUS_COLOR[v] : C.muted }}>{v}</button>
-                    ))}
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        ))}
+                )
+              })}
+            </div>
+          )
+        })}
       </div>
     )
   }
@@ -621,6 +675,9 @@ export default function App() {
   const [auditUrl, setUrl]    = useState('')
   const [results, setResults] = useState<AuditResults>({})
   const [audits, setAudits]   = useState<SavedAudit[]>([])
+  const [isPro, setIsPro]     = useState(() => {
+    try { return localStorage.getItem('auditpro_pro') === 'true' } catch { return false }
+  })
 
   // Load all audits from localStorage on mount
   useEffect(() => {
@@ -670,13 +727,18 @@ export default function App() {
     }
   }
 
+  const handleUpgrade = () => {
+    setIsPro(true)
+    try { localStorage.setItem('auditpro_pro', 'true') } catch { /* ignore */ }
+  }
+
   return (
     <div style={{ display: 'flex', minHeight: '100vh', background: C.bg, color: C.text,
       fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }}>
-      <Sidebar page={page} setPage={setPage} />
+      <Sidebar page={page} setPage={setPage} isPro={isPro} onUpgrade={handleUpgrade} />
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
         {page === 'dashboard'  && <DashboardView score={score} issues={issues} auditUrl={auditUrl} results={results} setPage={setPage} />}
-        {page === 'audit'      && <div style={{ flex: 1, display: 'flex', overflowY: 'auto' }}><AuditView onComplete={handleComplete} /></div>}
+        {page === 'audit'      && <div style={{ flex: 1, display: 'flex', overflowY: 'auto' }}><AuditView onComplete={handleComplete} isPro={isPro} onUpgrade={handleUpgrade} /></div>}
         {page === 'whitelabel' && <WhiteLabelView audits={audits} currentUrl={auditUrl} score={score} results={results}
           onSelect={handleSelectAudit} onDelete={handleDeleteAudit} />}
       </div>
