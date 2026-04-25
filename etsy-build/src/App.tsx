@@ -299,7 +299,7 @@ function DashboardView({ score, issues, auditUrl, results, isPro, onNewAudit, on
                     {cat.score}<span style={{ fontSize: 12, color: C.muted }}>/100</span>
                   </div>
                   <div style={{ fontSize: 11, color: C.muted, marginTop: 4 }}>
-                    {cat.passed} pass · {cat.failed} fail · <span style={{ color: C.accent }}>details →</span>
+                    {cat.passed} pass{cat.partial > 0 ? ` · ${cat.partial} partial` : ''} · {cat.failed} fail · <span style={{ color: C.accent }}>details →</span>
                   </div>
                 </div>
                 <div style={{ background: `${cat.color}22`, border: `1px solid ${cat.color}44`,
@@ -362,6 +362,7 @@ function ManualAuditView({ onComplete, isPro, onUpgrade, onResultsChange }: {
   const [activeCat, setActiveCat] = useState('technical')
   const [results, setResults]     = useState<AuditResults>({})
   const [showModal, setShowModal] = useState(false)
+  const [showFreeOnly, setShowFreeOnly] = useState(!isPro)
 
   function updateResults(updater: (r: AuditResults) => AuditResults) {
     setResults(r => {
@@ -391,10 +392,21 @@ function ManualAuditView({ onComplete, isPro, onUpgrade, onResultsChange }: {
             {answeredCount} of {isPro ? 190 : liteTotal} checks answered
           </div>
         </div>
-        <button onClick={handleComplete} style={{ background: C.green, border: 'none',
-          borderRadius: 8, padding: '10px 20px', color: '#fff', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}>
-          Complete Audit →
-        </button>
+        <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
+          {!isPro && (
+            <button onClick={() => setShowFreeOnly(v => !v)} style={{
+              background: showFreeOnly ? `${C.accent}22` : C.surface,
+              border: `1px solid ${showFreeOnly ? C.accent : C.border}`,
+              borderRadius: 8, padding: '9px 16px', color: showFreeOnly ? C.accent : C.muted,
+              fontSize: 12, fontWeight: 600, cursor: 'pointer' }}>
+              {showFreeOnly ? '◉ Free only (18)' : '○ Show all (190)'}
+            </button>
+          )}
+          <button onClick={handleComplete} style={{ background: C.green, border: 'none',
+            borderRadius: 8, padding: '10px 20px', color: '#fff', fontWeight: 600, fontSize: 13, cursor: 'pointer' }}>
+            Complete Audit →
+          </button>
+        </div>
       </div>
 
       {/* URL input */}
@@ -440,19 +452,21 @@ function ManualAuditView({ onComplete, isPro, onUpgrade, onResultsChange }: {
       {cat.sections.map(sec => {
         const liteCount = sec.items.filter(i => i.lite).length
         const lockedCount = isPro ? 0 : sec.items.filter(i => !i.lite).length
+        const visibleItems = (!isPro && showFreeOnly) ? sec.items.filter(i => i.lite) : sec.items
+        if (visibleItems.length === 0) return null
         return (
           <div key={sec.id} style={{ marginBottom: 16 }}>
             <div style={{ padding: '10px 16px', background: cat.color, borderRadius: '8px 8px 0 0',
               fontSize: 12, fontWeight: 700, color: '#fff',
               display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span>{sec.label}</span>
-              {lockedCount > 0 && (
+              {!isPro && !showFreeOnly && lockedCount > 0 && (
                 <span style={{ fontSize: 10, fontWeight: 600, opacity: 0.85 }}>
                   {liteCount}/{sec.items.length} available
                 </span>
               )}
             </div>
-            {sec.items.map((item, i) => {
+            {visibleItems.map((item, i) => {
               const isLocked = !isPro && !item.lite
               const s = results[item.id] as string | undefined
               return (
