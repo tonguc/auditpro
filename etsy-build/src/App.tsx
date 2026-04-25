@@ -42,14 +42,73 @@ function ScoreRing({ score, size = 120, color = C.accent }: { score: number; siz
   )
 }
 
+// ─── Pro Upsell Modal ─────────────────────────────────────────────────────────
+function ProModal({ onUpgrade, onClose }: { onUpgrade: () => void; onClose: () => void }) {
+  return (
+    <div style={{ position: 'fixed', inset: 0, background: '#000000bb', zIndex: 100,
+      display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}
+      onClick={onClose}>
+      <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 16,
+        padding: 32, maxWidth: 380, width: '100%', textAlign: 'center' }}
+        onClick={e => e.stopPropagation()}>
+        <div style={{ fontSize: 32, marginBottom: 12 }}>🔓</div>
+        <div style={{ fontSize: 18, fontWeight: 800, color: C.text, marginBottom: 8 }}>
+          Unlock Full Audit
+        </div>
+        <div style={{ fontSize: 13, color: C.muted, lineHeight: 1.6, marginBottom: 20 }}>
+          This check is part of Pro. Upgrade to access all <strong style={{ color: C.text }}>190 checks</strong> across every category.
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginBottom: 24,
+          textAlign: 'left', background: C.bg, borderRadius: 10, padding: '14px 16px' }}>
+          {[
+            { icon: '⚙️', text: 'Technical SEO — 65 checks' },
+            { icon: '📝', text: 'On-Page & Content — 50 checks' },
+            { icon: '🎯', text: 'UX Heuristics — 40 checks' },
+            { icon: '⚡', text: 'Conversion & CTA — 35 checks' },
+            { icon: '🤖', text: 'AI & SERP Visibility — 11 checks' },
+          ].map(r => (
+            <div key={r.text} style={{ display: 'flex', gap: 10, alignItems: 'center',
+              fontSize: 12, color: C.muted }}>
+              <span>{r.icon}</span><span>{r.text}</span>
+            </div>
+          ))}
+        </div>
+        <button onClick={onUpgrade} style={{ width: '100%', background: C.accent, border: 'none',
+          borderRadius: 8, padding: '12px', color: '#fff', fontSize: 14, fontWeight: 700,
+          cursor: 'pointer', marginBottom: 10 }}>
+          Unlock Full Audit →
+        </button>
+        <button onClick={onClose} style={{ background: 'transparent', border: 'none',
+          color: C.muted, fontSize: 12, cursor: 'pointer' }}>
+          Maybe later
+        </button>
+      </div>
+    </div>
+  )
+}
+
 // ─── Sidebar ───────────────────────────────────────────────────────────────────
-function Sidebar({ view, setView, isPro, onUpgrade }: {
-  view: string; setView: (v: 'audit' | 'dashboard') => void; isPro: boolean; onUpgrade: () => void
+function Sidebar({ view, setView, isPro, onUpgrade, liveResults }: {
+  view: string; setView: (v: 'audit' | 'dashboard') => void
+  isPro: boolean; onUpgrade: () => void; liveResults: AuditResults
 }) {
   const nav = [
     { id: 'audit',     icon: '◎', label: 'Audit' },
     { id: 'dashboard', icon: '▦', label: 'Dashboard' },
   ]
+
+  const allLiteItems = AUDIT_CATEGORIES.flatMap(c => c.sections.flatMap(s => s.items)).filter(i => i.lite)
+  let pass = 0, partial = 0, fail = 0
+  allLiteItems.forEach(item => {
+    const s = liveResults[item.id]
+    if (s === 'Pass') pass++
+    else if (s === 'Partial') partial++
+    else if (s === 'Fail') fail++
+  })
+  const answered = pass + partial + fail
+  const liveScore = answered > 0 ? Math.round((pass * 2 + partial) / (answered * 2) * 100) : null
+  const scoreColor = liveScore === null ? C.muted : liveScore >= 70 ? C.green : liveScore >= 50 ? C.amber : C.red
+
   return (
     <div style={{ width: 220, background: C.surface, borderRight: `1px solid ${C.border}`,
       display: 'flex', flexDirection: 'column', minHeight: '100vh', flexShrink: 0 }}>
@@ -75,17 +134,39 @@ function Sidebar({ view, setView, isPro, onUpgrade }: {
             <span style={{ fontSize: 13, fontWeight: view === n.id ? 600 : 400 }}>{n.label}</span>
           </div>
         ))}
+        {liveScore !== null && (
+          <div style={{ margin: '12px 0 0', padding: '12px', background: C.bg,
+            borderRadius: 10, border: `1px solid ${C.border}` }}>
+            <div style={{ fontSize: 10, color: C.muted, fontWeight: 600,
+              textTransform: 'uppercase', letterSpacing: '0.08em', marginBottom: 6 }}>
+              Current Score
+            </div>
+            <div style={{ fontSize: 28, fontWeight: 800, color: scoreColor, lineHeight: 1 }}>
+              {liveScore}
+              <span style={{ fontSize: 13, color: C.muted, fontWeight: 400 }}>/100</span>
+            </div>
+            <div style={{ fontSize: 10, color: C.muted, marginTop: 4 }}>
+              {answered} of {isPro ? 190 : allLiteItems.length} checks answered
+            </div>
+            <div style={{ marginTop: 8, background: C.border, borderRadius: 3, height: 3 }}>
+              <div style={{ height: 3, borderRadius: 3, background: scoreColor,
+                width: `${(answered / allLiteItems.length) * 100}%`, transition: 'width 0.3s' }} />
+            </div>
+          </div>
+        )}
       </nav>
       {!isPro && (
         <div style={{ margin: '0 12px 12px', background: `${C.accent}11`,
           border: `1px solid ${C.accent}33`, borderRadius: 10, padding: '14px 16px' }}>
-          <div style={{ fontSize: 12, fontWeight: 700, color: C.text, marginBottom: 4 }}>18 / 190 checks</div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: C.text, marginBottom: 4 }}>
+            Free: 18 / 190 checks
+          </div>
           <div style={{ fontSize: 11, color: C.muted, marginBottom: 10, lineHeight: 1.5 }}>
             Unlock 172 advanced checks + AI Auto-Audit.
           </div>
           <button onClick={onUpgrade} style={{ width: '100%', background: C.accent, border: 'none',
             borderRadius: 7, padding: '8px', color: '#fff', fontSize: 12, fontWeight: 700, cursor: 'pointer' }}>
-            Upgrade to Pro →
+            Unlock Full Audit →
           </button>
         </div>
       )}
@@ -271,26 +352,37 @@ function DashboardView({ score, issues, auditUrl, results, isPro, onNewAudit, on
 }
 
 // ─── Manual Audit ──────────────────────────────────────────────────────────────
-function ManualAuditView({ onComplete, isPro, onUpgrade }: {
+function ManualAuditView({ onComplete, isPro, onUpgrade, onResultsChange }: {
   onComplete: (url: string, results: AuditResults) => void
   isPro: boolean
   onUpgrade: () => void
+  onResultsChange: (r: AuditResults) => void
 }) {
-  const [url, setUrl]           = useState('')
+  const [url, setUrl]             = useState('')
   const [activeCat, setActiveCat] = useState('technical')
-  const [results, setResults]   = useState<AuditResults>({})
+  const [results, setResults]     = useState<AuditResults>({})
+  const [showModal, setShowModal] = useState(false)
+
+  function updateResults(updater: (r: AuditResults) => AuditResults) {
+    setResults(r => {
+      const next = updater(r)
+      onResultsChange(next)
+      return next
+    })
+  }
 
   const cat = AUDIT_CATEGORIES.find(c => c.id === activeCat)!
 
-  function handleComplete() {
-    onComplete(url, results)
-  }
+  function handleComplete() { onComplete(url, results) }
 
   const answeredCount = Object.keys(results).length
   const liteTotal = AUDIT_CATEGORIES.flatMap(c => c.sections.flatMap(s => s.items)).filter(i => i.lite).length
 
   return (
     <div style={{ padding: '32px 36px', flex: 1, overflowY: 'auto' }}>
+      {showModal && (
+        <ProModal onUpgrade={() => { setShowModal(false); onUpgrade() }} onClose={() => setShowModal(false)} />
+      )}
       {/* Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
         <div>
@@ -386,15 +478,15 @@ function ManualAuditView({ onComplete, isPro, onUpgrade }: {
                     )}
                   </div>
                   {isLocked ? (
-                    <button onClick={onUpgrade} style={{ flexShrink: 0, padding: '5px 12px', borderRadius: 6,
-                      fontSize: 11, fontWeight: 600, cursor: 'pointer',
+                    <button onClick={() => setShowModal(true)} style={{ flexShrink: 0, padding: '5px 12px',
+                      borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: 'pointer',
                       border: `1px solid ${C.accent}44`, background: `${C.accent}11`, color: C.accent }}>
                       Pro
                     </button>
                   ) : (
                     <div style={{ display: 'flex', gap: 5, flexShrink: 0 }}>
                       {(['Pass', 'Partial', 'Fail', 'N/A'] as const).map(v => (
-                        <button key={v} onClick={() => setResults(r => ({ ...r, [item.id]: v }))} style={{
+                        <button key={v} onClick={() => updateResults(r => ({ ...r, [item.id]: v }))} style={{
                           padding: '5px 9px', borderRadius: 6, fontSize: 11, fontWeight: 600, cursor: 'pointer',
                           border: `1px solid ${s === v ? STATUS_COLOR[v] : C.border}`,
                           background: s === v ? STATUS_BG[v] : 'transparent',
@@ -473,10 +565,11 @@ export default function App() {
       {detailCat && score && (
         <CategoryDetail catId={detailCat} results={results} isPro={isPro} onClose={() => setDetailCat(null)} />
       )}
-      <Sidebar view={view} setView={setView} isPro={isPro} onUpgrade={handleUpgrade} />
+      <Sidebar view={view} setView={setView} isPro={isPro} onUpgrade={handleUpgrade} liveResults={results} />
       <div style={{ flex: 1, display: 'flex', overflow: 'hidden' }}>
         {view === 'audit' && (
-          <ManualAuditView onComplete={handleComplete} isPro={isPro} onUpgrade={handleUpgrade} />
+          <ManualAuditView onComplete={handleComplete} isPro={isPro} onUpgrade={handleUpgrade}
+            onResultsChange={setResults} />
         )}
         {view === 'dashboard' && score && (
           <DashboardView
