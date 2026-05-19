@@ -13,7 +13,9 @@ const NM = path.join(__dirname, 'node_modules');
 // ── Read vendor libs ─────────────────────────────────────────────────────────
 const reactJs    = fs.readFileSync(path.join(NM, 'react/umd/react.production.min.js'), 'utf8');
 const reactDomJs = fs.readFileSync(path.join(NM, 'react-dom/umd/react-dom.production.min.js'), 'utf8');
-const jspdfJs    = fs.readFileSync(path.join(NM, 'jspdf/dist/jspdf.umd.js'), 'utf8');
+// Replace </script> inside the source so the HTML parser doesn't break the tag early
+const jspdfJs    = fs.readFileSync(path.join(NM, 'jspdf/dist/jspdf.umd.js'), 'utf8')
+                     .replace(/<\/script>/gi, '<\\/script>');
 
 // ── Read & compile app source ─────────────────────────────────────────────────
 const appSrc = fs.readFileSync(path.join(__dirname, 'app-source.jsx'), 'utf8');
