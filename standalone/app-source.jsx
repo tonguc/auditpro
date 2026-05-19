@@ -407,9 +407,11 @@ function downloadPDF(config, auditUrl, score, results) {
   doc.setFontSize(16); doc.setFont('helvetica','bold'); doc.setTextColor(30,30,30);
   doc.text('Category Scores', M, y);
   y += 10;
-  const catBoxW = (W - 2*M - 15) / 4;
+  const numCats = score.categories.length;
+  const catGap = 4;
+  const catBoxW = (W - 2*M - catGap * (numCats - 1)) / numCats;
   score.categories.forEach((cat, i) => {
-    const x = M + i * (catBoxW + 5);
+    const x = M + i * (catBoxW + catGap);
     const catColorRgb = hexToRgb(cat.color);
     const catLight = lighten(catColorRgb, 0.92);
     doc.setFillColor(...catLight);
@@ -440,9 +442,9 @@ function downloadPDF(config, auditUrl, score, results) {
     {label:'Partial', value:`${totalPartial}`, color:STATUS_COLORS_PDF.Partial},
     {label:'Failed', value:`${totalFail}`, color:STATUS_COLORS_PDF.Fail},
   ];
-  const statW = (W - 2*M - 15) / 4;
+  const statW = (W - 2*M - 12) / 4;
   stats.forEach((stat, i) => {
-    const x = M + i * (statW + 5);
+    const x = M + i * (statW + 4);
     doc.setFillColor(245,247,250);
     doc.roundedRect(x, y, statW, 22, 3, 3, 'F');
     doc.setFontSize(16); doc.setFont('helvetica','bold'); doc.setTextColor(...stat.color);
@@ -897,10 +899,19 @@ function WhiteLabelView({ audits, currentUrl, score, results, onSelect, onDelete
 
   const handleDownload = () => {
     if (!score) return;
+    if (!window.jspdf || !window.jspdf.jsPDF) {
+      alert('jsPDF library not loaded. Please reload the page and try again.');
+      return;
+    }
     setDownloading(true);
-    try { downloadPDF({ agencyName: name, brandColor: color }, currentUrl, score, results); }
-    catch (e) { console.error('PDF generation failed:', e); }
-    finally { setDownloading(false); }
+    try {
+      downloadPDF({ agencyName: name, brandColor: color }, currentUrl, score, results);
+    } catch (e) {
+      alert('PDF error: ' + (e && e.message ? e.message : String(e)));
+      console.error('PDF generation failed:', e);
+    } finally {
+      setDownloading(false);
+    }
   };
 
   const catScores = score?.categories ?? [];
