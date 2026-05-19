@@ -312,7 +312,8 @@ function calculateScore(results) {
       const s = results[item.id];
       if (s === 'Pass') pass++;
       else if (s === 'Partial') partial++;
-      else if (s === 'Fail') fail++;
+      else if (s === 'N/A') { /* excluded */ }
+      else fail++; // Fail OR blank → counts as Fail
     });
     const total = pass + partial + fail;
     const score = total > 0 ? Math.round((pass * 2 + partial * 1) / (total * 2) * 100) : 0;
@@ -673,8 +674,13 @@ function CategoryDetail({ catId, results, onClose }) {
   );
 }
 
-function DashboardView({ score, issues, auditUrl, results, setPage }) {
+function DashboardView({ score, issues, auditUrl, results, setPage, onEdit }) {
   const [detailCat, setDetailCat] = useState(null);
+
+  const totalItems = AUDIT_CATEGORIES.flatMap(c => c.sections.flatMap(s => s.items)).length;
+  const filledItems = Object.keys(results).filter(k => results[k] !== null && results[k] !== undefined).length;
+  const missingCount = totalItems - filledItems;
+
   if (!score) return (
     <div style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column', gap:16 }}>
       <div style={{ fontSize:48 }}>📊</div>
@@ -694,11 +700,25 @@ function DashboardView({ score, issues, auditUrl, results, setPage }) {
           <div style={{ fontSize:11, color:C.muted, fontWeight:600, textTransform:'uppercase',
             letterSpacing:'0.08em', marginBottom:6 }}>{auditUrl}</div>
           <h1 style={{ fontSize:26, fontWeight:800, color:C.text }}>Audit Dashboard</h1>
+          {missingCount > 0 && (
+            <div style={{ marginTop:6, fontSize:12, color:C.amber }}>
+              ⚠ {missingCount} items not yet reviewed —{' '}
+              <span onClick={onEdit} style={{ cursor:'pointer', textDecoration:'underline' }}>
+                continue audit
+              </span>
+            </div>
+          )}
         </div>
-        <button onClick={() => setPage('audit')} style={{ background:C.accent, border:'none',
-          borderRadius:8, padding:'9px 18px', color:'#fff', fontSize:13, fontWeight:600, cursor:'pointer' }}>
-          + New Audit
-        </button>
+        <div style={{ display:'flex', gap:8 }}>
+          <button onClick={onEdit} style={{ background:'transparent', border:`1px solid ${C.border}`,
+            borderRadius:8, padding:'9px 18px', color:C.muted, fontSize:13, fontWeight:600, cursor:'pointer' }}>
+            ✎ Edit Audit
+          </button>
+          <button onClick={() => setPage('audit')} style={{ background:C.accent, border:'none',
+            borderRadius:8, padding:'9px 18px', color:'#fff', fontSize:13, fontWeight:600, cursor:'pointer' }}>
+            + New Audit
+          </button>
+        </div>
       </div>
       <div style={{ display:'grid', gridTemplateColumns:'200px 1fr', gap:20, marginBottom:20 }}>
         <div style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:12,
@@ -772,19 +792,28 @@ function DashboardView({ score, issues, auditUrl, results, setPage }) {
   );
 }
 
-function AuditView({ onComplete }) {
-  const [url, setUrl]             = useState('');
-  const [results, setResults]     = useState({});
+function AuditView({ onComplete, initialUrl = '', initialResults = {}, isEditing = false }) {
+  const [url, setUrl]             = useState(initialUrl);
+  const [results, setResults]     = useState(initialResults);
   const [activeCat, setActiveCat] = useState('technical');
+
+  const totalItems = AUDIT_CATEGORIES.flatMap(c => c.sections.flatMap(s => s.items)).length;
+  const filledItems = Object.keys(results).filter(k => results[k] !== null && results[k] !== undefined).length;
+  const remaining = totalItems - filledItems;
 
   const cat = AUDIT_CATEGORIES.find(c => c.id === activeCat);
   return (
     <div style={{ padding:'32px 36px', flex:1, overflowY:'auto' }}>
       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:24 }}>
         <div>
-          <h1 style={{ fontSize:22, fontWeight:800, color:C.text }}>New Audit</h1>
+          <h1 style={{ fontSize:22, fontWeight:800, color:C.text }}>
+            {isEditing ? '✎ Edit Audit' : 'New Audit'}
+          </h1>
           <div style={{ fontSize:13, color:C.muted, marginTop:4 }}>
-            Check each item and mark Pass / Partial / Fail / N/A
+            {remaining > 0
+              ? <span style={{ color:C.amber }}>{remaining} items remaining — mark Pass / Partial / Fail / N/A</span>
+              : <span style={{ color:C.green }}>All {totalItems} items reviewed ✓</span>
+            }
           </div>
         </div>
         <div style={{ display:'flex', gap:10, alignItems:'center' }}>
@@ -795,7 +824,7 @@ function AuditView({ onComplete }) {
           <button onClick={() => onComplete(url || 'Manual Audit', results, calculateScore(results))}
             style={{ background:C.green, border:'none', borderRadius:8, padding:'10px 20px',
               color:'#fff', fontWeight:600, fontSize:13, cursor:'pointer', whiteSpace:'nowrap' }}>
-            Complete Audit →
+            {isEditing ? 'Save Changes →' : 'Complete Audit →'}
           </button>
         </div>
       </div>
@@ -1019,12 +1048,13 @@ function saveAudits(audits) {
 // ─── APP ──────────────────────────────────────────────────────────────────────
 
 function App() {
-  const [page, setPage]       = useState('dashboard');
-  const [score, setScore]     = useState(null);
-  const [issues, setIssues]   = useState([]);
-  const [auditUrl, setUrl]    = useState('');
-  const [results, setResults] = useState({});
-  const [audits, setAudits]   = useState([]);
+  const [page, setPage]         = useState('dashboard');
+  const [score, setScore]       = useState(null);
+  const [issues, setIssues]     = useState([]);
+  const [auditUrl, setUrl]      = useState('');
+  const [results, setResults]   = useState({});
+  const [audits, setAudits]     = useState([]);
+  const [editMode, setEditMode] = useState(false);
 
   useEffect(() => {
     const saved = loadAudits();
@@ -1037,10 +1067,21 @@ function App() {
   }, []);
 
   const handleComplete = (url, res, sc) => {
-    setUrl(url); setScore(sc); setResults(res); setIssues(getTopIssues(res)); setPage('dashboard');
+    setUrl(url); setScore(sc); setResults(res); setIssues(getTopIssues(res));
+    setPage('dashboard'); setEditMode(false);
     const newAudit = { id: `${Date.now()}`, url, results: res, score: sc, date: new Date().toISOString() };
     const updated = [newAudit, ...audits.filter(a => a.url !== url)];
     setAudits(updated); saveAudits(updated);
+  };
+
+  const handleEdit = () => {
+    setEditMode(true);
+    setPage('audit');
+  };
+
+  const handleNewAudit = () => {
+    setEditMode(false);
+    setPage('audit');
   };
 
   const handleSelectAudit = (audit) => {
@@ -1058,10 +1099,16 @@ function App() {
   return (
     <div style={{ display:'flex', minHeight:'100vh', background:C.bg, color:C.text,
       fontFamily:'-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }}>
-      <Sidebar page={page} setPage={setPage} />
+      <Sidebar page={page} setPage={p => { if (p === 'audit') { setEditMode(false); } setPage(p); }} />
       <div style={{ flex:1, display:'flex', overflow:'hidden' }}>
-        {page === 'dashboard'  && <DashboardView score={score} issues={issues} auditUrl={auditUrl} results={results} setPage={setPage} />}
-        {page === 'audit'      && <div style={{ flex:1, display:'flex', overflowY:'auto' }}><AuditView onComplete={handleComplete} /></div>}
+        {page === 'dashboard'  && <DashboardView score={score} issues={issues} auditUrl={auditUrl} results={results}
+          setPage={handleNewAudit} onEdit={handleEdit} />}
+        {page === 'audit'      && <div style={{ flex:1, display:'flex', overflowY:'auto' }}>
+          <AuditView onComplete={handleComplete}
+            initialUrl={editMode ? auditUrl : ''}
+            initialResults={editMode ? results : {}}
+            isEditing={editMode} />
+        </div>}
         {page === 'whitelabel' && <WhiteLabelView audits={audits} currentUrl={auditUrl} score={score} results={results}
           onSelect={handleSelectAudit} onDelete={handleDeleteAudit} />}
       </div>

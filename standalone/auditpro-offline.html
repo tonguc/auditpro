@@ -30537,7 +30537,7 @@ function calculateScore(results) {
       fail = 0;
     allItems.forEach(item => {
       const s = results[item.id];
-      if (s === 'Pass') pass++;else if (s === 'Partial') partial++;else if (s === 'Fail') fail++;
+      if (s === 'Pass') pass++;else if (s === 'Partial') partial++;else if (s === 'N/A') {/* excluded */} else fail++; // Fail OR blank → counts as Fail
     });
     const total = pass + partial + fail;
     const score = total > 0 ? Math.round((pass * 2 + partial * 1) / (total * 2) * 100) : 0;
@@ -31218,9 +31218,13 @@ function DashboardView({
   issues,
   auditUrl,
   results,
-  setPage
+  setPage,
+  onEdit
 }) {
   const [detailCat, setDetailCat] = useState(null);
+  const totalItems = AUDIT_CATEGORIES.flatMap(c => c.sections.flatMap(s => s.items)).length;
+  const filledItems = Object.keys(results).filter(k => results[k] !== null && results[k] !== undefined).length;
+  const missingCount = totalItems - filledItems;
   if (!score) return /*#__PURE__*/React.createElement("div", {
     style: {
       flex: 1,
@@ -31291,7 +31295,36 @@ function DashboardView({
       fontWeight: 800,
       color: C.text
     }
-  }, "Audit Dashboard")), /*#__PURE__*/React.createElement("button", {
+  }, "Audit Dashboard"), missingCount > 0 && /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 6,
+      fontSize: 12,
+      color: C.amber
+    }
+  }, "\u26A0 ", missingCount, " items not yet reviewed \u2014", ' ', /*#__PURE__*/React.createElement("span", {
+    onClick: onEdit,
+    style: {
+      cursor: 'pointer',
+      textDecoration: 'underline'
+    }
+  }, "continue audit"))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      gap: 8
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: onEdit,
+    style: {
+      background: 'transparent',
+      border: `1px solid ${C.border}`,
+      borderRadius: 8,
+      padding: '9px 18px',
+      color: C.muted,
+      fontSize: 13,
+      fontWeight: 600,
+      cursor: 'pointer'
+    }
+  }, "\u270E Edit Audit"), /*#__PURE__*/React.createElement("button", {
     onClick: () => setPage('audit'),
     style: {
       background: C.accent,
@@ -31303,7 +31336,7 @@ function DashboardView({
       fontWeight: 600,
       cursor: 'pointer'
     }
-  }, "+ New Audit")), /*#__PURE__*/React.createElement("div", {
+  }, "+ New Audit"))), /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'grid',
       gridTemplateColumns: '200px 1fr',
@@ -31513,11 +31546,17 @@ function DashboardView({
   })));
 }
 function AuditView({
-  onComplete
+  onComplete,
+  initialUrl = '',
+  initialResults = {},
+  isEditing = false
 }) {
-  const [url, setUrl] = useState('');
-  const [results, setResults] = useState({});
+  const [url, setUrl] = useState(initialUrl);
+  const [results, setResults] = useState(initialResults);
   const [activeCat, setActiveCat] = useState('technical');
+  const totalItems = AUDIT_CATEGORIES.flatMap(c => c.sections.flatMap(s => s.items)).length;
+  const filledItems = Object.keys(results).filter(k => results[k] !== null && results[k] !== undefined).length;
+  const remaining = totalItems - filledItems;
   const cat = AUDIT_CATEGORIES.find(c => c.id === activeCat);
   return /*#__PURE__*/React.createElement("div", {
     style: {
@@ -31538,13 +31577,21 @@ function AuditView({
       fontWeight: 800,
       color: C.text
     }
-  }, "New Audit"), /*#__PURE__*/React.createElement("div", {
+  }, isEditing ? '✎ Edit Audit' : 'New Audit'), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 13,
       color: C.muted,
       marginTop: 4
     }
-  }, "Check each item and mark Pass / Partial / Fail / N/A")), /*#__PURE__*/React.createElement("div", {
+  }, remaining > 0 ? /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: C.amber
+    }
+  }, remaining, " items remaining \u2014 mark Pass / Partial / Fail / N/A") : /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: C.green
+    }
+  }, "All ", totalItems, " items reviewed \u2713"))), /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
       gap: 10,
@@ -31576,7 +31623,7 @@ function AuditView({
       cursor: 'pointer',
       whiteSpace: 'nowrap'
     }
-  }, "Complete Audit \u2192"))), /*#__PURE__*/React.createElement("div", {
+  }, isEditing ? 'Save Changes →' : 'Complete Audit →'))), /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
       gap: 8,
@@ -32113,6 +32160,7 @@ function App() {
   const [auditUrl, setUrl] = useState('');
   const [results, setResults] = useState({});
   const [audits, setAudits] = useState([]);
+  const [editMode, setEditMode] = useState(false);
   useEffect(() => {
     const saved = loadAudits();
     setAudits(saved);
@@ -32130,6 +32178,7 @@ function App() {
     setResults(res);
     setIssues(getTopIssues(res));
     setPage('dashboard');
+    setEditMode(false);
     const newAudit = {
       id: `${Date.now()}`,
       url,
@@ -32140,6 +32189,14 @@ function App() {
     const updated = [newAudit, ...audits.filter(a => a.url !== url)];
     setAudits(updated);
     saveAudits(updated);
+  };
+  const handleEdit = () => {
+    setEditMode(true);
+    setPage('audit');
+  };
+  const handleNewAudit = () => {
+    setEditMode(false);
+    setPage('audit');
   };
   const handleSelectAudit = audit => {
     setUrl(audit.url);
@@ -32168,7 +32225,12 @@ function App() {
     }
   }, /*#__PURE__*/React.createElement(Sidebar, {
     page: page,
-    setPage: setPage
+    setPage: p => {
+      if (p === 'audit') {
+        setEditMode(false);
+      }
+      setPage(p);
+    }
   }), /*#__PURE__*/React.createElement("div", {
     style: {
       flex: 1,
@@ -32180,7 +32242,8 @@ function App() {
     issues: issues,
     auditUrl: auditUrl,
     results: results,
-    setPage: setPage
+    setPage: handleNewAudit,
+    onEdit: handleEdit
   }), page === 'audit' && /*#__PURE__*/React.createElement("div", {
     style: {
       flex: 1,
@@ -32188,7 +32251,10 @@ function App() {
       overflowY: 'auto'
     }
   }, /*#__PURE__*/React.createElement(AuditView, {
-    onComplete: handleComplete
+    onComplete: handleComplete,
+    initialUrl: editMode ? auditUrl : '',
+    initialResults: editMode ? results : {},
+    isEditing: editMode
   })), page === 'whitelabel' && /*#__PURE__*/React.createElement(WhiteLabelView, {
     audits: audits,
     currentUrl: auditUrl,
