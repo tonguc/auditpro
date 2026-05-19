@@ -367,26 +367,53 @@ function downloadPDF(config, auditUrl, score, results) {
   const W = 210, H = 297, M = 15;
   const brandRgb = hexToRgb(config.brandColor);
   const brandLight = lighten(brandRgb, 0.92);
+  const clientName = config.clientName || '';
+  const logoBase64 = config.logoBase64 || null;
   let y = 0;
 
   function addPage() { doc.addPage(); y = M; drawFooter(); }
   function drawFooter() {
     doc.setFontSize(8); doc.setTextColor(150,150,150);
-    doc.text(`${config.agencyName} — UX + SEO Audit Report`, M, H - 8);
+    const footerLeft = clientName
+      ? `${config.agencyName} → ${clientName}`
+      : `${config.agencyName} — UX + SEO Audit Report`;
+    doc.text(footerLeft, M, H - 8);
     doc.text(auditUrl, W - M, H - 8, { align: 'right' });
   }
   function checkPageBreak(needed) { if (y + needed > H - 20) addPage(); }
 
+  // ── Cover header bar ────────────────────────────────────────────────────────
+  const headerH = logoBase64 ? 72 : 60;
   doc.setFillColor(...brandRgb);
-  doc.rect(0, 0, W, 60, 'F');
-  doc.setTextColor(255,255,255);
-  doc.setFontSize(28); doc.setFont('helvetica','bold');
-  doc.text(config.agencyName, M, 30);
-  doc.setFontSize(13); doc.setFont('helvetica','normal');
-  doc.text('UX + SEO Audit Report', M, 42);
-  doc.setFontSize(10); doc.text(auditUrl, M, 52);
+  doc.rect(0, 0, W, headerH, 'F');
 
-  y = 75;
+  // Agency name (top-left)
+  doc.setTextColor(255,255,255);
+  doc.setFontSize(11); doc.setFont('helvetica','normal');
+  doc.text(config.agencyName, M, 14);
+
+  // Client logo (top-right, if provided)
+  if (logoBase64) {
+    try {
+      const fmt = logoBase64.includes('image/png') ? 'PNG' : 'JPEG';
+      const imgData = logoBase64.split(',')[1];
+      doc.addImage(imgData, fmt, W - M - 40, 6, 40, 20);
+    } catch (e) { /* skip logo if it fails */ }
+  }
+
+  // Client name — big heading
+  doc.setFontSize(clientName ? 22 : 26); doc.setFont('helvetica','bold');
+  doc.text(clientName || config.agencyName, M, clientName ? 38 : 32);
+
+  doc.setFontSize(11); doc.setFont('helvetica','normal');
+  doc.text('UX + SEO Audit Report', M, clientName ? 50 : 44);
+  doc.setFontSize(9);
+  doc.text(auditUrl, M, clientName ? 60 : 54);
+  if (logoBase64 && clientName) {
+    doc.setFontSize(8); doc.setTextColor(255,255,255,0.6);
+  }
+
+  y = headerH + 14;
   doc.setTextColor(100,100,100); doc.setFontSize(10);
   doc.text(`Report Date: ${new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})}`, M, y);
 
@@ -516,8 +543,8 @@ function downloadPDF(config, auditUrl, score, results) {
   doc.text(`Prepared by ${config.agencyName}`, M, y);
   drawFooter();
 
-  const safeName = auditUrl.replace(/https?:\/\//, '').replace(/[^a-zA-Z0-9.-]/g, '_');
-  doc.save(`${config.agencyName.replace(/\s+/g,'_')}_Audit_${safeName}.pdf`);
+  const safeClient = (clientName || auditUrl).replace(/https?:\/\//, '').replace(/[^a-zA-Z0-9.-]/g, '_');
+  doc.save(`${config.agencyName.replace(/\s+/g,'_')}_Audit_${safeClient}.pdf`);
 }
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
@@ -794,10 +821,11 @@ function DashboardView({ score, issues, auditUrl, results, setPage, onEdit }) {
   );
 }
 
-function AuditView({ onComplete, initialUrl = '', initialResults = {}, isEditing = false }) {
-  const [url, setUrl]             = useState(initialUrl);
-  const [results, setResults]     = useState(initialResults);
-  const [activeCat, setActiveCat] = useState('technical');
+function AuditView({ onComplete, initialUrl = '', initialClientName = '', initialResults = {}, isEditing = false }) {
+  const [url, setUrl]               = useState(initialUrl);
+  const [clientName, setClientName] = useState(initialClientName);
+  const [results, setResults]       = useState(initialResults);
+  const [activeCat, setActiveCat]   = useState('technical');
 
   const totalItems = AUDIT_CATEGORIES.flatMap(c => c.sections.flatMap(s => s.items)).length;
   const filledItems = Object.keys(results).filter(k => results[k] !== null && results[k] !== undefined).length;
@@ -818,12 +846,16 @@ function AuditView({ onComplete, initialUrl = '', initialResults = {}, isEditing
             }
           </div>
         </div>
-        <div style={{ display:'flex', gap:10, alignItems:'center' }}>
-          <input value={url} onChange={e => setUrl(e.target.value)}
-            placeholder="https://yoursite.com (optional)"
+        <div style={{ display:'flex', gap:8, alignItems:'center' }}>
+          <input value={clientName} onChange={e => setClientName(e.target.value)}
+            placeholder="Client name (e.g. Acme Corp)"
             style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:8,
-              padding:'9px 14px', color:C.text, fontSize:13, width:260 }} />
-          <button onClick={() => onComplete(url || 'Manual Audit', results, calculateScore(results))}
+              padding:'9px 14px', color:C.text, fontSize:13, width:190 }} />
+          <input value={url} onChange={e => setUrl(e.target.value)}
+            placeholder="https://yoursite.com"
+            style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:8,
+              padding:'9px 14px', color:C.text, fontSize:13, width:220 }} />
+          <button onClick={() => onComplete(url || clientName || 'Manual Audit', clientName, results, calculateScore(results))}
             style={{ background:C.green, border:'none', borderRadius:8, padding:'10px 20px',
               color:'#fff', fontWeight:600, fontSize:13, cursor:'pointer', whiteSpace:'nowrap' }}>
             {isEditing ? 'Save Changes →' : 'Complete Audit →'}
@@ -878,21 +910,37 @@ function AuditView({ onComplete, initialUrl = '', initialResults = {}, isEditing
   );
 }
 
-function WhiteLabelView({ audits, currentUrl, score, results, onSelect, onDelete }) {
+function WhiteLabelView({ audits, currentUrl, currentClientName, score, results, onSelect, onDelete }) {
   const [name, setName]               = useState('My Agency');
   const [color, setColor]             = useState('#0EA5E9');
+  const [logo, setLogo]               = useState(null); // base64 data URL
   const [saved, setSaved]             = useState(false);
   const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
     try {
       const raw = localStorage.getItem('auditpro_whitelabel');
-      if (raw) { const cfg = JSON.parse(raw); setName(cfg.agencyName); setColor(cfg.brandColor); }
+      if (raw) {
+        const cfg = JSON.parse(raw);
+        setName(cfg.agencyName);
+        setColor(cfg.brandColor);
+        if (cfg.logoBase64) setLogo(cfg.logoBase64);
+      }
     } catch {}
   }, []);
 
+  const handleLogoUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => setLogo(ev.target.result);
+    reader.readAsDataURL(file);
+  };
+
   const handleSave = () => {
-    localStorage.setItem('auditpro_whitelabel', JSON.stringify({ agencyName: name, brandColor: color }));
+    localStorage.setItem('auditpro_whitelabel', JSON.stringify({
+      agencyName: name, brandColor: color, logoBase64: logo || null,
+    }));
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
@@ -905,7 +953,10 @@ function WhiteLabelView({ audits, currentUrl, score, results, onSelect, onDelete
     }
     setDownloading(true);
     try {
-      downloadPDF({ agencyName: name, brandColor: color }, currentUrl, score, results);
+      downloadPDF(
+        { agencyName: name, brandColor: color, clientName: currentClientName, logoBase64: logo },
+        currentUrl, score, results
+      );
     } catch (e) {
       alert('PDF error: ' + (e && e.message ? e.message : String(e)));
       console.error('PDF generation failed:', e);
@@ -931,13 +982,36 @@ function WhiteLabelView({ audits, currentUrl, score, results, onSelect, onDelete
               background:C.bg, border:`1px solid ${C.border}`, borderRadius:8,
               padding:'10px 14px', color:C.text, fontSize:13, outline:'none', boxSizing:'border-box' }} />
           </div>
-          <div style={{ marginBottom:24 }}>
+          <div style={{ marginBottom:16 }}>
             <label style={{ fontSize:11, color:C.muted, fontWeight:600, textTransform:'uppercase',
               letterSpacing:'0.08em', display:'block', marginBottom:8 }}>Brand Color</label>
             <div style={{ display:'flex', gap:12, alignItems:'center' }}>
               <input type="color" value={color} onChange={e => setColor(e.target.value)}
                 style={{ width:44, height:44, border:'none', borderRadius:8, cursor:'pointer' }} />
               <span style={{ fontSize:13, color:C.muted }}>{color}</span>
+            </div>
+          </div>
+          <div style={{ marginBottom:24 }}>
+            <label style={{ fontSize:11, color:C.muted, fontWeight:600, textTransform:'uppercase',
+              letterSpacing:'0.08em', display:'block', marginBottom:8 }}>Client Logo (PDF Cover)</label>
+            <div style={{ display:'flex', gap:10, alignItems:'center' }}>
+              <label style={{ background:C.bg, border:`1px dashed ${C.border}`, borderRadius:8,
+                padding:'8px 16px', color:C.muted, fontSize:12, cursor:'pointer',
+                display:'flex', alignItems:'center', gap:6 }}>
+                📎 Upload PNG / JPG
+                <input type="file" accept="image/png,image/jpeg,image/jpg"
+                  onChange={handleLogoUpload}
+                  style={{ display:'none' }} />
+              </label>
+              {logo && (
+                <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                  <img src={logo} alt="logo" style={{ height:32, maxWidth:80, objectFit:'contain',
+                    borderRadius:4, background:'#fff', padding:2 }} />
+                  <button onClick={() => setLogo(null)} style={{ background:'transparent',
+                    border:`1px solid ${C.border}`, borderRadius:6, padding:'4px 8px',
+                    color:C.muted, fontSize:11, cursor:'pointer' }}>✕</button>
+                </div>
+              )}
             </div>
           </div>
           <button onClick={handleSave} style={{ background:color, border:'none', borderRadius:8,
@@ -956,10 +1030,18 @@ function WhiteLabelView({ audits, currentUrl, score, results, onSelect, onDelete
         <div style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:12, padding:24 }}>
           <div style={{ fontSize:13, fontWeight:700, color:C.text, marginBottom:20 }}>PDF Preview</div>
           <div style={{ background:C.bg, borderRadius:10, padding:20, border:`1px solid ${C.border}` }}>
-            <div style={{ background:color, borderRadius:8, padding:'16px 20px', marginBottom:14 }}>
-              <div style={{ fontSize:14, fontWeight:800, color:'#fff' }}>{name || 'Agency Name'}</div>
+            <div style={{ background:color, borderRadius:8, padding:'16px 20px', marginBottom:14, position:'relative' }}>
+              <div style={{ fontSize:10, color:'rgba(255,255,255,0.7)', marginBottom:4 }}>{name || 'Agency Name'}</div>
+              <div style={{ fontSize:14, fontWeight:800, color:'#fff' }}>
+                {currentClientName || hasAudit ? (currentClientName || currentUrl) : 'Client Name'}
+              </div>
               <div style={{ fontSize:10, color:'rgba(255,255,255,0.7)', marginTop:2 }}>UX + SEO Audit Report</div>
-              {hasAudit && <div style={{ fontSize:9, color:'rgba(255,255,255,0.5)', marginTop:4 }}>{currentUrl}</div>}
+              {hasAudit && <div style={{ fontSize:9, color:'rgba(255,255,255,0.5)', marginTop:2 }}>{currentUrl}</div>}
+              {logo && (
+                <img src={logo} alt="logo" style={{ position:'absolute', top:10, right:14,
+                  height:24, maxWidth:60, objectFit:'contain', background:'rgba(255,255,255,0.15)',
+                  borderRadius:4, padding:2 }} />
+              )}
             </div>
             {hasAudit && score ? (
               <>
@@ -1024,8 +1106,11 @@ function WhiteLabelView({ audits, currentUrl, score, results, onSelect, onDelete
                   }}>{a.score.weighted}</div>
                   <div style={{ flex:1, minWidth:0 }}>
                     <div style={{ fontSize:13, fontWeight:600, color:C.text, overflow:'hidden',
-                      textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{a.url}</div>
+                      textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                      {a.clientName || a.url}
+                    </div>
                     <div style={{ fontSize:11, color:C.muted, marginTop:2 }}>
+                      {a.clientName && <span style={{ color:C.muted }}>{a.url} · </span>}
                       {dateStr} at {timeStr} — Grade {a.score.grade}
                     </div>
                   </div>
@@ -1059,29 +1144,36 @@ function saveAudits(audits) {
 // ─── APP ──────────────────────────────────────────────────────────────────────
 
 function App() {
-  const [page, setPage]         = useState('dashboard');
-  const [score, setScore]       = useState(null);
-  const [issues, setIssues]     = useState([]);
-  const [auditUrl, setUrl]      = useState('');
-  const [results, setResults]   = useState({});
-  const [audits, setAudits]     = useState([]);
-  const [editMode, setEditMode] = useState(false);
+  const [page, setPage]               = useState('dashboard');
+  const [score, setScore]             = useState(null);
+  const [issues, setIssues]           = useState([]);
+  const [auditUrl, setUrl]            = useState('');
+  const [clientName, setClientName]   = useState('');
+  const [results, setResults]         = useState({});
+  const [audits, setAudits]           = useState([]);
+  const [editMode, setEditMode]       = useState(false);
 
   useEffect(() => {
     const saved = loadAudits();
     setAudits(saved);
     if (saved.length > 0) {
       const latest = saved[0];
-      setUrl(latest.url); setResults(latest.results);
-      setScore(latest.score); setIssues(getTopIssues(latest.results));
+      setUrl(latest.url);
+      setClientName(latest.clientName || '');
+      setResults(latest.results);
+      setScore(latest.score);
+      setIssues(getTopIssues(latest.results));
     }
   }, []);
 
-  const handleComplete = (url, res, sc) => {
-    setUrl(url); setScore(sc); setResults(res); setIssues(getTopIssues(res));
-    setPage('dashboard'); setEditMode(false);
-    const newAudit = { id: `${Date.now()}`, url, results: res, score: sc, date: new Date().toISOString() };
-    const updated = [newAudit, ...audits.filter(a => a.url !== url)];
+  const handleComplete = (url, cn, res, sc) => {
+    setUrl(url); setClientName(cn || ''); setScore(sc); setResults(res);
+    setIssues(getTopIssues(res)); setPage('dashboard'); setEditMode(false);
+    const newAudit = {
+      id: `${Date.now()}`, url, clientName: cn || '',
+      results: res, score: sc, date: new Date().toISOString(),
+    };
+    const updated = [newAudit, ...audits.filter(a => a.id !== (audits.find(a2 => a2.url === url && !editMode)?.id))];
     setAudits(updated); saveAudits(updated);
   };
 
@@ -1096,8 +1188,11 @@ function App() {
   };
 
   const handleSelectAudit = (audit) => {
-    setUrl(audit.url); setResults(audit.results);
-    setScore(audit.score); setIssues(getTopIssues(audit.results));
+    setUrl(audit.url);
+    setClientName(audit.clientName || '');
+    setResults(audit.results);
+    setScore(audit.score);
+    setIssues(getTopIssues(audit.results));
   };
 
   const handleDeleteAudit = (id) => {
@@ -1117,10 +1212,12 @@ function App() {
         {page === 'audit'      && <div style={{ flex:1, display:'flex', overflowY:'auto' }}>
           <AuditView onComplete={handleComplete}
             initialUrl={editMode ? auditUrl : ''}
+            initialClientName={editMode ? clientName : ''}
             initialResults={editMode ? results : {}}
             isEditing={editMode} />
         </div>}
-        {page === 'whitelabel' && <WhiteLabelView audits={audits} currentUrl={auditUrl} score={score} results={results}
+        {page === 'whitelabel' && <WhiteLabelView audits={audits} currentUrl={auditUrl}
+          currentClientName={clientName} score={score} results={results}
           onSelect={handleSelectAudit} onDelete={handleDeleteAudit} />}
       </div>
     </div>

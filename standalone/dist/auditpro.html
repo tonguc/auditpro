@@ -30608,6 +30608,8 @@ function downloadPDF(config, auditUrl, score, results) {
     M = 15;
   const brandRgb = hexToRgb(config.brandColor);
   const brandLight = lighten(brandRgb, 0.92);
+  const clientName = config.clientName || '';
+  const logoBase64 = config.logoBase64 || null;
   let y = 0;
   function addPage() {
     doc.addPage();
@@ -30617,7 +30619,8 @@ function downloadPDF(config, auditUrl, score, results) {
   function drawFooter() {
     doc.setFontSize(8);
     doc.setTextColor(150, 150, 150);
-    doc.text(`${config.agencyName} — UX + SEO Audit Report`, M, H - 8);
+    const footerLeft = clientName ? `${config.agencyName} → ${clientName}` : `${config.agencyName} — UX + SEO Audit Report`;
+    doc.text(footerLeft, M, H - 8);
     doc.text(auditUrl, W - M, H - 8, {
       align: 'right'
     });
@@ -30625,18 +30628,41 @@ function downloadPDF(config, auditUrl, score, results) {
   function checkPageBreak(needed) {
     if (y + needed > H - 20) addPage();
   }
+
+  // ── Cover header bar ────────────────────────────────────────────────────────
+  const headerH = logoBase64 ? 72 : 60;
   doc.setFillColor(...brandRgb);
-  doc.rect(0, 0, W, 60, 'F');
+  doc.rect(0, 0, W, headerH, 'F');
+
+  // Agency name (top-left)
   doc.setTextColor(255, 255, 255);
-  doc.setFontSize(28);
-  doc.setFont('helvetica', 'bold');
-  doc.text(config.agencyName, M, 30);
-  doc.setFontSize(13);
+  doc.setFontSize(11);
   doc.setFont('helvetica', 'normal');
-  doc.text('UX + SEO Audit Report', M, 42);
-  doc.setFontSize(10);
-  doc.text(auditUrl, M, 52);
-  y = 75;
+  doc.text(config.agencyName, M, 14);
+
+  // Client logo (top-right, if provided)
+  if (logoBase64) {
+    try {
+      const fmt = logoBase64.includes('image/png') ? 'PNG' : 'JPEG';
+      const imgData = logoBase64.split(',')[1];
+      doc.addImage(imgData, fmt, W - M - 40, 6, 40, 20);
+    } catch (e) {/* skip logo if it fails */}
+  }
+
+  // Client name — big heading
+  doc.setFontSize(clientName ? 22 : 26);
+  doc.setFont('helvetica', 'bold');
+  doc.text(clientName || config.agencyName, M, clientName ? 38 : 32);
+  doc.setFontSize(11);
+  doc.setFont('helvetica', 'normal');
+  doc.text('UX + SEO Audit Report', M, clientName ? 50 : 44);
+  doc.setFontSize(9);
+  doc.text(auditUrl, M, clientName ? 60 : 54);
+  if (logoBase64 && clientName) {
+    doc.setFontSize(8);
+    doc.setTextColor(255, 255, 255, 0.6);
+  }
+  y = headerH + 14;
   doc.setTextColor(100, 100, 100);
   doc.setFontSize(10);
   doc.text(`Report Date: ${new Date().toLocaleDateString('en-US', {
@@ -30821,8 +30847,8 @@ function downloadPDF(config, auditUrl, score, results) {
   doc.setTextColor(...brandRgb);
   doc.text(`Prepared by ${config.agencyName}`, M, y);
   drawFooter();
-  const safeName = auditUrl.replace(/https?:\/\//, '').replace(/[^a-zA-Z0-9.-]/g, '_');
-  doc.save(`${config.agencyName.replace(/\s+/g, '_')}_Audit_${safeName}.pdf`);
+  const safeClient = (clientName || auditUrl).replace(/https?:\/\//, '').replace(/[^a-zA-Z0-9.-]/g, '_');
+  doc.save(`${config.agencyName.replace(/\s+/g, '_')}_Audit_${safeClient}.pdf`);
 }
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
@@ -31550,10 +31576,12 @@ function DashboardView({
 function AuditView({
   onComplete,
   initialUrl = '',
+  initialClientName = '',
   initialResults = {},
   isEditing = false
 }) {
   const [url, setUrl] = useState(initialUrl);
+  const [clientName, setClientName] = useState(initialClientName);
   const [results, setResults] = useState(initialResults);
   const [activeCat, setActiveCat] = useState('technical');
   const totalItems = AUDIT_CATEGORIES.flatMap(c => c.sections.flatMap(s => s.items)).length;
@@ -31596,13 +31624,13 @@ function AuditView({
   }, "All ", totalItems, " items reviewed \u2713"))), /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
-      gap: 10,
+      gap: 8,
       alignItems: 'center'
     }
   }, /*#__PURE__*/React.createElement("input", {
-    value: url,
-    onChange: e => setUrl(e.target.value),
-    placeholder: "https://yoursite.com (optional)",
+    value: clientName,
+    onChange: e => setClientName(e.target.value),
+    placeholder: "Client name (e.g. Acme Corp)",
     style: {
       background: C.surface,
       border: `1px solid ${C.border}`,
@@ -31610,10 +31638,23 @@ function AuditView({
       padding: '9px 14px',
       color: C.text,
       fontSize: 13,
-      width: 260
+      width: 190
+    }
+  }), /*#__PURE__*/React.createElement("input", {
+    value: url,
+    onChange: e => setUrl(e.target.value),
+    placeholder: "https://yoursite.com",
+    style: {
+      background: C.surface,
+      border: `1px solid ${C.border}`,
+      borderRadius: 8,
+      padding: '9px 14px',
+      color: C.text,
+      fontSize: 13,
+      width: 220
     }
   }), /*#__PURE__*/React.createElement("button", {
-    onClick: () => onComplete(url || 'Manual Audit', results, calculateScore(results)),
+    onClick: () => onComplete(url || clientName || 'Manual Audit', clientName, results, calculateScore(results)),
     style: {
       background: C.green,
       border: 'none',
@@ -31733,6 +31774,7 @@ function AuditView({
 function WhiteLabelView({
   audits,
   currentUrl,
+  currentClientName,
   score,
   results,
   onSelect,
@@ -31740,6 +31782,7 @@ function WhiteLabelView({
 }) {
   const [name, setName] = useState('My Agency');
   const [color, setColor] = useState('#0EA5E9');
+  const [logo, setLogo] = useState(null); // base64 data URL
   const [saved, setSaved] = useState(false);
   const [downloading, setDownloading] = useState(false);
   useEffect(() => {
@@ -31749,13 +31792,22 @@ function WhiteLabelView({
         const cfg = JSON.parse(raw);
         setName(cfg.agencyName);
         setColor(cfg.brandColor);
+        if (cfg.logoBase64) setLogo(cfg.logoBase64);
       }
     } catch {}
   }, []);
+  const handleLogoUpload = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => setLogo(ev.target.result);
+    reader.readAsDataURL(file);
+  };
   const handleSave = () => {
     localStorage.setItem('auditpro_whitelabel', JSON.stringify({
       agencyName: name,
-      brandColor: color
+      brandColor: color,
+      logoBase64: logo || null
     }));
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
@@ -31770,7 +31822,9 @@ function WhiteLabelView({
     try {
       downloadPDF({
         agencyName: name,
-        brandColor: color
+        brandColor: color,
+        clientName: currentClientName,
+        logoBase64: logo
       }, currentUrl, score, results);
     } catch (e) {
       alert('PDF error: ' + (e && e.message ? e.message : String(e)));
@@ -31844,7 +31898,7 @@ function WhiteLabelView({
     }
   })), /*#__PURE__*/React.createElement("div", {
     style: {
-      marginBottom: 24
+      marginBottom: 16
     }
   }, /*#__PURE__*/React.createElement("label", {
     style: {
@@ -31878,7 +31932,75 @@ function WhiteLabelView({
       fontSize: 13,
       color: C.muted
     }
-  }, color))), /*#__PURE__*/React.createElement("button", {
+  }, color))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: 24
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    style: {
+      fontSize: 11,
+      color: C.muted,
+      fontWeight: 600,
+      textTransform: 'uppercase',
+      letterSpacing: '0.08em',
+      display: 'block',
+      marginBottom: 8
+    }
+  }, "Client Logo (PDF Cover)"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      gap: 10,
+      alignItems: 'center'
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    style: {
+      background: C.bg,
+      border: `1px dashed ${C.border}`,
+      borderRadius: 8,
+      padding: '8px 16px',
+      color: C.muted,
+      fontSize: 12,
+      cursor: 'pointer',
+      display: 'flex',
+      alignItems: 'center',
+      gap: 6
+    }
+  }, "\uD83D\uDCCE Upload PNG / JPG", /*#__PURE__*/React.createElement("input", {
+    type: "file",
+    accept: "image/png,image/jpeg,image/jpg",
+    onChange: handleLogoUpload,
+    style: {
+      display: 'none'
+    }
+  })), logo && /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 8
+    }
+  }, /*#__PURE__*/React.createElement("img", {
+    src: logo,
+    alt: "logo",
+    style: {
+      height: 32,
+      maxWidth: 80,
+      objectFit: 'contain',
+      borderRadius: 4,
+      background: '#fff',
+      padding: 2
+    }
+  }), /*#__PURE__*/React.createElement("button", {
+    onClick: () => setLogo(null),
+    style: {
+      background: 'transparent',
+      border: `1px solid ${C.border}`,
+      borderRadius: 6,
+      padding: '4px 8px',
+      color: C.muted,
+      fontSize: 11,
+      cursor: 'pointer'
+    }
+  }, "\u2715")))), /*#__PURE__*/React.createElement("button", {
     onClick: handleSave,
     style: {
       background: color,
@@ -31933,15 +32055,22 @@ function WhiteLabelView({
       background: color,
       borderRadius: 8,
       padding: '16px 20px',
-      marginBottom: 14
+      marginBottom: 14,
+      position: 'relative'
     }
   }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 10,
+      color: 'rgba(255,255,255,0.7)',
+      marginBottom: 4
+    }
+  }, name || 'Agency Name'), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 14,
       fontWeight: 800,
       color: '#fff'
     }
-  }, name || 'Agency Name'), /*#__PURE__*/React.createElement("div", {
+  }, currentClientName || hasAudit ? currentClientName || currentUrl : 'Client Name'), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 10,
       color: 'rgba(255,255,255,0.7)',
@@ -31951,9 +32080,23 @@ function WhiteLabelView({
     style: {
       fontSize: 9,
       color: 'rgba(255,255,255,0.5)',
-      marginTop: 4
+      marginTop: 2
     }
-  }, currentUrl)), hasAudit && score ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+  }, currentUrl), logo && /*#__PURE__*/React.createElement("img", {
+    src: logo,
+    alt: "logo",
+    style: {
+      position: 'absolute',
+      top: 10,
+      right: 14,
+      height: 24,
+      maxWidth: 60,
+      objectFit: 'contain',
+      background: 'rgba(255,255,255,0.15)',
+      borderRadius: 4,
+      padding: 2
+    }
+  })), hasAudit && score ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     style: {
       textAlign: 'center',
       marginBottom: 12
@@ -32103,13 +32246,17 @@ function WhiteLabelView({
         textOverflow: 'ellipsis',
         whiteSpace: 'nowrap'
       }
-    }, a.url), /*#__PURE__*/React.createElement("div", {
+    }, a.clientName || a.url), /*#__PURE__*/React.createElement("div", {
       style: {
         fontSize: 11,
         color: C.muted,
         marginTop: 2
       }
-    }, dateStr, " at ", timeStr, " \u2014 Grade ", a.score.grade)), /*#__PURE__*/React.createElement("div", {
+    }, a.clientName && /*#__PURE__*/React.createElement("span", {
+      style: {
+        color: C.muted
+      }
+    }, a.url, " \xB7 "), dateStr, " at ", timeStr, " \u2014 Grade ", a.score.grade)), /*#__PURE__*/React.createElement("div", {
       style: {
         display: 'flex',
         gap: 8,
@@ -32165,6 +32312,7 @@ function App() {
   const [score, setScore] = useState(null);
   const [issues, setIssues] = useState([]);
   const [auditUrl, setUrl] = useState('');
+  const [clientName, setClientName] = useState('');
   const [results, setResults] = useState({});
   const [audits, setAudits] = useState([]);
   const [editMode, setEditMode] = useState(false);
@@ -32174,13 +32322,15 @@ function App() {
     if (saved.length > 0) {
       const latest = saved[0];
       setUrl(latest.url);
+      setClientName(latest.clientName || '');
       setResults(latest.results);
       setScore(latest.score);
       setIssues(getTopIssues(latest.results));
     }
   }, []);
-  const handleComplete = (url, res, sc) => {
+  const handleComplete = (url, cn, res, sc) => {
     setUrl(url);
+    setClientName(cn || '');
     setScore(sc);
     setResults(res);
     setIssues(getTopIssues(res));
@@ -32189,11 +32339,12 @@ function App() {
     const newAudit = {
       id: `${Date.now()}`,
       url,
+      clientName: cn || '',
       results: res,
       score: sc,
       date: new Date().toISOString()
     };
-    const updated = [newAudit, ...audits.filter(a => a.url !== url)];
+    const updated = [newAudit, ...audits.filter(a => a.id !== audits.find(a2 => a2.url === url && !editMode)?.id)];
     setAudits(updated);
     saveAudits(updated);
   };
@@ -32207,6 +32358,7 @@ function App() {
   };
   const handleSelectAudit = audit => {
     setUrl(audit.url);
+    setClientName(audit.clientName || '');
     setResults(audit.results);
     setScore(audit.score);
     setIssues(getTopIssues(audit.results));
@@ -32260,11 +32412,13 @@ function App() {
   }, /*#__PURE__*/React.createElement(AuditView, {
     onComplete: handleComplete,
     initialUrl: editMode ? auditUrl : '',
+    initialClientName: editMode ? clientName : '',
     initialResults: editMode ? results : {},
     isEditing: editMode
   })), page === 'whitelabel' && /*#__PURE__*/React.createElement(WhiteLabelView, {
     audits: audits,
     currentUrl: auditUrl,
+    currentClientName: clientName,
     score: score,
     results: results,
     onSelect: handleSelectAudit,
