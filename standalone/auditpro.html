@@ -30618,8 +30618,8 @@ function downloadPDF(config, auditUrl, score, results) {
     drawFooter();
   }
   function drawFooter() {
-    doc.setFontSize(8);
-    doc.setTextColor(150, 150, 150);
+    doc.setFontSize(7.5);
+    doc.setTextColor(160, 160, 160);
     doc.text(auditUrl, W - M, H - 8, {
       align: 'right'
     });
@@ -30627,122 +30627,163 @@ function downloadPDF(config, auditUrl, score, results) {
   function checkPageBreak(needed) {
     if (y + needed > H - 20) addPage();
   }
-  function addLogoToDoc(b64, x, yPos, maxW, maxH) {
+
+  // Aspect-ratio-preserving image helper — returns actual {w,h} drawn
+  function addLogoToDoc(b64, x, yPos, maxW, maxH, alignRight) {
     try {
       const fmt = b64.includes('image/png') ? 'PNG' : 'JPEG';
-      const imgData = b64.split(',')[1];
-      doc.addImage(imgData, fmt, x, yPos, maxW, maxH);
-    } catch (e) {/* skip if invalid */}
+      const data = b64.split(',')[1];
+      const props = doc.getImageProperties(b64);
+      const ratio = props.width / props.height;
+      let w = maxW,
+        h = maxW / ratio;
+      if (h > maxH) {
+        h = maxH;
+        w = maxH * ratio;
+      }
+      const drawX = alignRight ? x - w : x;
+      doc.addImage(data, fmt, drawX, yPos, w, h);
+      return {
+        w,
+        h
+      };
+    } catch {
+      return {
+        w: 0,
+        h: 0
+      };
+    }
   }
 
-  // ── Cover header bar — client name + "Powered by" agency ─────────────────────
-  const headerH = 76;
+  // ── Cover header bar ──────────────────────────────────────────────────────────
+  const headerH = 50;
   doc.setFillColor(...brandRgb);
   doc.rect(0, 0, W, headerH, 'F');
 
-  // Client logo — top-right
+  // Client logo — right side, preserved aspect ratio, max 36×14mm
   if (clientLogo) {
-    addLogoToDoc(clientLogo, W - M - 40, 6, 40, 18);
+    addLogoToDoc(clientLogo, W - M, 5, 36, 14, true);
   }
 
-  // Client name — big heading
+  // Client name
   doc.setTextColor(255, 255, 255);
-  doc.setFontSize(clientName ? 22 : 26);
+  doc.setFontSize(clientName ? 17 : 19);
   doc.setFont('helvetica', 'bold');
-  doc.text(clientName || config.agencyName, M, clientName ? 34 : 28);
-  doc.setFontSize(11);
-  doc.setFont('helvetica', 'normal');
-  doc.text('UX + SEO Audit Report', M, clientName ? 46 : 40);
-  doc.setFontSize(9);
-  doc.text(auditUrl, M, clientName ? 56 : 50);
+  doc.text(clientName || config.agencyName, M, 15);
 
-  // "Powered by" — bottom of cover header, first page only
+  // Subtitle + URL
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'normal');
+  doc.text('UX + SEO Audit Report', M, 24);
   doc.setFontSize(7);
-  doc.setTextColor(255, 255, 255, 0.55);
-  doc.text('Powered by', M, 70);
+  doc.setTextColor(200, 215, 235);
+  doc.text(auditUrl, M, 31);
+
+  // Thin separator
+  doc.setDrawColor(255, 255, 255);
+  doc.setLineWidth(0.15);
+  doc.line(M, 36, W - M, 36);
+
+  // Powered by — agency logo or name
+  doc.setFontSize(6);
+  doc.setTextColor(185, 205, 225);
+  doc.text('Powered by', M, 42);
+  doc.setFont('helvetica', 'bold');
   if (agencyLogo) {
-    addLogoToDoc(agencyLogo, M + 22, 63, 28, 11);
+    addLogoToDoc(agencyLogo, M + 22, 37, 28, 9, false);
   } else {
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'bold');
-    doc.text(config.agencyName, M + 22, 70);
-    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7);
+    doc.setTextColor(220, 230, 245);
+    doc.text(config.agencyName, M + 22, 42);
   }
-  y = headerH + 14;
-  doc.setTextColor(100, 100, 100);
-  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+
+  // ── Cover body ───────────────────────────────────────────────────────────────
+  y = headerH + 9;
+  doc.setTextColor(130, 130, 130);
+  doc.setFontSize(8);
   doc.text(`Report Date: ${new Date().toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric'
   })}`, M, y);
-  y = 95;
+
+  // Overall score box
+  y += 8;
   doc.setFillColor(...brandLight);
-  doc.roundedRect(M, y, W - 2 * M, 45, 4, 4, 'F');
+  doc.roundedRect(M, y, W - 2 * M, 36, 3, 3, 'F');
   doc.setDrawColor(...brandRgb);
-  doc.roundedRect(M, y, W - 2 * M, 45, 4, 4, 'S');
-  doc.setFontSize(36);
+  doc.setLineWidth(0.4);
+  doc.roundedRect(M, y, W - 2 * M, 36, 3, 3, 'S');
+  doc.setFontSize(32);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(...brandRgb);
-  doc.text(`${score.weighted}`, M + 20, y + 28);
-  doc.setFontSize(14);
-  doc.text('/100', M + 45, y + 28);
-  doc.setFontSize(16);
-  doc.setTextColor(60, 60, 60);
-  doc.text(`Grade: ${score.grade}`, M + 75, y + 22);
-  doc.setFontSize(11);
+  doc.text(`${score.weighted}`, M + 16, y + 24);
+  doc.setFontSize(12);
+  doc.setTextColor(...brandRgb);
+  doc.text('/100', M + 40, y + 24);
+  doc.setFontSize(15);
+  doc.setTextColor(55, 55, 55);
+  doc.text(`Grade ${score.grade}`, M + 72, y + 18);
+  doc.setFontSize(10);
   doc.setTextColor(100, 100, 100);
-  doc.text(score.rating, M + 75, y + 32);
-  y += 60;
-  doc.setFontSize(16);
+  doc.setFont('helvetica', 'normal');
+  doc.text(score.rating, M + 72, y + 28);
+
+  // Category scores
+  y += 44;
+  doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(30, 30, 30);
   doc.text('Category Scores', M, y);
-  y += 10;
+  y += 7;
   const numCats = score.categories.length;
-  const catGap = 4;
+  const catGap = 3;
   const catBoxW = (W - 2 * M - catGap * (numCats - 1)) / numCats;
   score.categories.forEach((cat, i) => {
     const x = M + i * (catBoxW + catGap);
-    const catColorRgb = hexToRgb(cat.color);
-    const catLight = lighten(catColorRgb, 0.92);
+    const catRgb = hexToRgb(cat.color);
+    const catLight = lighten(catRgb, 0.92);
     doc.setFillColor(...catLight);
-    doc.roundedRect(x, y, catBoxW, 40, 3, 3, 'F');
-    doc.setDrawColor(...catColorRgb);
-    doc.roundedRect(x, y, catBoxW, 40, 3, 3, 'S');
-    doc.setFontSize(22);
+    doc.roundedRect(x, y, catBoxW, 32, 2, 2, 'F');
+    doc.setDrawColor(...catRgb);
+    doc.setLineWidth(0.3);
+    doc.roundedRect(x, y, catBoxW, 32, 2, 2, 'S');
+    doc.setFontSize(19);
     doc.setFont('helvetica', 'bold');
-    doc.setTextColor(...catColorRgb);
-    doc.text(`${cat.score}`, x + catBoxW / 2, y + 18, {
+    doc.setTextColor(...catRgb);
+    doc.text(`${cat.score}`, x + catBoxW / 2, y + 14, {
       align: 'center'
     });
-    doc.setFontSize(7);
+    doc.setFontSize(6.5);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(80, 80, 80);
-    const lbl = cat.label.replace('Technical SEO', 'Tech SEO').replace('On-Page & Content', 'On-Page').replace('UX Heuristics', 'UX').replace('Conversion & CTA', 'CRO');
-    doc.text(lbl, x + catBoxW / 2, y + 27, {
+    const lbl = cat.label.replace('Technical SEO', 'Tech SEO').replace('On-Page & Content', 'On-Page').replace('UX Heuristics', 'UX').replace('Conversion & CTA', 'CRO').replace('AI & SERP Visibility', 'AI/SERP');
+    doc.text(lbl, x + catBoxW / 2, y + 22, {
       align: 'center'
     });
-    doc.setFontSize(10);
+    doc.setFontSize(8);
     doc.setFont('helvetica', 'bold');
-    doc.text(`Grade ${cat.grade}`, x + catBoxW / 2, y + 35, {
+    doc.text(`Grade ${cat.grade}`, x + catBoxW / 2, y + 29, {
       align: 'center'
     });
   });
-  y += 55;
-  doc.setFontSize(16);
+
+  // Summary stats
+  y += 40;
+  doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(30, 30, 30);
   doc.text('Summary', M, y);
-  y += 10;
+  y += 7;
   const totalPass = score.categories.reduce((s, c) => s + c.passed, 0);
   const totalFail = score.categories.reduce((s, c) => s + c.failed, 0);
   const totalPartial = score.categories.reduce((s, c) => s + c.partial, 0);
   const totalItems = score.categories.reduce((s, c) => s + c.total, 0);
   const stats = [{
-    label: 'Total Items Checked',
+    label: 'Total Checked',
     value: `${totalItems}`,
-    color: [30, 30, 30]
+    color: [40, 40, 40]
   }, {
     label: 'Passed',
     value: `${totalPass}`,
@@ -30756,21 +30797,21 @@ function downloadPDF(config, auditUrl, score, results) {
     value: `${totalFail}`,
     color: STATUS_COLORS_PDF.Fail
   }];
-  const statW = (W - 2 * M - 12) / 4;
+  const statW = (W - 2 * M - 9) / 4;
   stats.forEach((stat, i) => {
-    const x = M + i * (statW + 4);
+    const x = M + i * (statW + 3);
     doc.setFillColor(245, 247, 250);
-    doc.roundedRect(x, y, statW, 22, 3, 3, 'F');
-    doc.setFontSize(16);
+    doc.roundedRect(x, y, statW, 20, 2, 2, 'F');
+    doc.setFontSize(15);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...stat.color);
-    doc.text(stat.value, x + statW / 2, y + 12, {
+    doc.text(stat.value, x + statW / 2, y + 11, {
       align: 'center'
     });
-    doc.setFontSize(7);
+    doc.setFontSize(6.5);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(120, 120, 120);
-    doc.text(stat.label, x + statW / 2, y + 19, {
+    doc.text(stat.label, x + statW / 2, y + 17, {
       align: 'center'
     });
   });
