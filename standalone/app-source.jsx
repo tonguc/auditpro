@@ -374,18 +374,10 @@ function downloadPDF(config, auditUrl, score, results) {
 
   function addPage() { doc.addPage(); y = M; drawFooter(); }
   function drawFooter() {
-    doc.setFontSize(7); doc.setTextColor(170,170,170);
-    doc.text('Prepared by', M, H - 16);
-    if (agencyLogo) {
-      addLogoToDoc(agencyLogo, M, H - 14, 26, 10);
-    } else {
-      doc.setFontSize(8); doc.setTextColor(130,130,130);
-      doc.text(config.agencyName, M, H - 8);
-    }
     doc.setFontSize(8); doc.setTextColor(150,150,150);
     doc.text(auditUrl, W - M, H - 8, { align: 'right' });
   }
-  function checkPageBreak(needed) { if (y + needed > H - 24) addPage(); }
+  function checkPageBreak(needed) { if (y + needed > H - 20) addPage(); }
 
   function addLogoToDoc(b64, x, yPos, maxW, maxH) {
     try {
@@ -395,8 +387,8 @@ function downloadPDF(config, auditUrl, score, results) {
     } catch (e) { /* skip if invalid */ }
   }
 
-  // ── Cover header bar — client-focused ────────────────────────────────────────
-  const headerH = 64;
+  // ── Cover header bar — client name + "Powered by" agency ─────────────────────
+  const headerH = 76;
   doc.setFillColor(...brandRgb);
   doc.rect(0, 0, W, headerH, 'F');
 
@@ -414,6 +406,17 @@ function downloadPDF(config, auditUrl, score, results) {
   doc.text('UX + SEO Audit Report', M, clientName ? 46 : 40);
   doc.setFontSize(9);
   doc.text(auditUrl, M, clientName ? 56 : 50);
+
+  // "Powered by" — bottom of cover header, first page only
+  doc.setFontSize(7); doc.setTextColor(255,255,255,0.55);
+  doc.text('Powered by', M, 70);
+  if (agencyLogo) {
+    addLogoToDoc(agencyLogo, M + 22, 63, 28, 11);
+  } else {
+    doc.setFontSize(8); doc.setFont('helvetica','bold');
+    doc.text(config.agencyName, M + 22, 70);
+    doc.setFont('helvetica','normal');
+  }
 
   y = headerH + 14;
   doc.setTextColor(100,100,100); doc.setFontSize(10);
@@ -1097,7 +1100,7 @@ function WhiteLabelView({ audits, currentUrl, currentClientName, score, results,
         <div style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:12, padding:24 }}>
           <div style={{ fontSize:13, fontWeight:700, color:C.text, marginBottom:20 }}>PDF Preview</div>
           <div style={{ background:C.bg, borderRadius:10, padding:20, border:`1px solid ${C.border}` }}>
-            <div style={{ background:color, borderRadius:8, padding:'14px 18px', marginBottom:10, position:'relative' }}>
+            <div style={{ background:color, borderRadius:8, padding:'14px 18px 10px', marginBottom:10, position:'relative' }}>
               <div style={{ fontSize:14, fontWeight:800, color:'#fff' }}>
                 {activeClient || (hasAudit ? activeUrl : 'Client Name')}
               </div>
@@ -1108,6 +1111,15 @@ function WhiteLabelView({ audits, currentUrl, currentClientName, score, results,
                   height:22, maxWidth:55, objectFit:'contain', background:'rgba(255,255,255,0.15)',
                   borderRadius:4, padding:2 }} />
               )}
+              <div style={{ marginTop:8, paddingTop:6, borderTop:'1px solid rgba(255,255,255,0.2)',
+                display:'flex', alignItems:'center', gap:6 }}>
+                <span style={{ fontSize:8, color:'rgba(255,255,255,0.5)' }}>Powered by</span>
+                {agencyLogo
+                  ? <img src={agencyLogo} alt="agency" style={{ height:12, maxWidth:36, objectFit:'contain',
+                      opacity:0.75 }} />
+                  : <span style={{ fontSize:9, fontWeight:700, color:'rgba(255,255,255,0.65)' }}>{name || 'Agency Name'}</span>
+                }
+              </div>
             </div>
             {hasAudit && activeScore ? (
               <>
@@ -1140,13 +1152,6 @@ function WhiteLabelView({ audits, currentUrl, currentClientName, score, results,
                 ))}
               </div>
             )}
-          </div>
-          <div style={{ marginTop:10, paddingTop:8, borderTop:`1px solid ${C.border}`,
-            display:'flex', alignItems:'center', gap:8 }}>
-            {agencyLogo
-              ? <img src={agencyLogo} alt="agency" style={{ height:14, maxWidth:40, objectFit:'contain' }} />
-              : null}
-            <span style={{ fontSize:9, color:C.muted }}>Prepared by {name || 'Agency Name'}</span>
           </div>
           {!hasAudit && (
             <div style={{ marginTop:8, fontSize:11, color:C.amber, textAlign:'center' }}>
