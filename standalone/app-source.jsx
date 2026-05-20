@@ -368,7 +368,8 @@ function downloadPDF(config, auditUrl, score, results) {
   const brandRgb = hexToRgb(config.brandColor);
   const brandLight = lighten(brandRgb, 0.92);
   const clientName = config.clientName || '';
-  const logoBase64 = config.logoBase64 || null;
+  const agencyLogo = config.agencyLogo || null;
+  const clientLogo = config.clientLogo || null;
   let y = 0;
 
   function addPage() { doc.addPage(); y = M; drawFooter(); }
@@ -382,23 +383,32 @@ function downloadPDF(config, auditUrl, score, results) {
   }
   function checkPageBreak(needed) { if (y + needed > H - 20) addPage(); }
 
+  function addLogoToDoc(b64, x, yPos, maxW, maxH) {
+    try {
+      const fmt = b64.includes('image/png') ? 'PNG' : 'JPEG';
+      const imgData = b64.split(',')[1];
+      doc.addImage(imgData, fmt, x, yPos, maxW, maxH);
+    } catch (e) { /* skip if invalid */ }
+  }
+
   // ── Cover header bar ────────────────────────────────────────────────────────
-  const headerH = logoBase64 ? 72 : 60;
+  const headerH = 72;
   doc.setFillColor(...brandRgb);
   doc.rect(0, 0, W, headerH, 'F');
 
-  // Agency name (top-left)
+  // Agency logo — top-left (below agency name), or agency name text only
   doc.setTextColor(255,255,255);
   doc.setFontSize(11); doc.setFont('helvetica','normal');
-  doc.text(config.agencyName, M, 14);
+  if (agencyLogo) {
+    doc.addImage || void 0;
+    addLogoToDoc(agencyLogo, M, 5, 30, 14);
+  } else {
+    doc.text(config.agencyName, M, 14);
+  }
 
-  // Client logo (top-right, if provided)
-  if (logoBase64) {
-    try {
-      const fmt = logoBase64.includes('image/png') ? 'PNG' : 'JPEG';
-      const imgData = logoBase64.split(',')[1];
-      doc.addImage(imgData, fmt, W - M - 40, 6, 40, 20);
-    } catch (e) { /* skip logo if it fails */ }
+  // Client logo — top-right
+  if (clientLogo) {
+    addLogoToDoc(clientLogo, W - M - 38, 5, 38, 18);
   }
 
   // Client name — big heading
@@ -409,9 +419,6 @@ function downloadPDF(config, auditUrl, score, results) {
   doc.text('UX + SEO Audit Report', M, clientName ? 50 : 44);
   doc.setFontSize(9);
   doc.text(auditUrl, M, clientName ? 60 : 54);
-  if (logoBase64 && clientName) {
-    doc.setFontSize(8); doc.setTextColor(255,255,255,0.6);
-  }
 
   y = headerH + 14;
   doc.setTextColor(100,100,100); doc.setFontSize(10);
@@ -913,7 +920,8 @@ function AuditView({ onComplete, initialUrl = '', initialClientName = '', initia
 function WhiteLabelView({ audits, currentUrl, currentClientName, score, results, onSelect, onDelete }) {
   const [name, setName]               = useState('My Agency');
   const [color, setColor]             = useState('#0EA5E9');
-  const [logo, setLogo]               = useState(null); // base64 data URL
+  const [agencyLogo, setAgencyLogo]   = useState(null);
+  const [clientLogo, setClientLogo]   = useState(null);
   const [saved, setSaved]             = useState(false);
   const [downloading, setDownloading] = useState(false);
 
@@ -924,22 +932,25 @@ function WhiteLabelView({ audits, currentUrl, currentClientName, score, results,
         const cfg = JSON.parse(raw);
         setName(cfg.agencyName);
         setColor(cfg.brandColor);
-        if (cfg.logoBase64) setLogo(cfg.logoBase64);
+        if (cfg.agencyLogo) setAgencyLogo(cfg.agencyLogo);
+        if (cfg.clientLogo) setClientLogo(cfg.clientLogo);
       }
     } catch {}
   }, []);
 
-  const handleLogoUpload = (e) => {
+  const makeLogoUploader = (setter) => (e) => {
     const file = e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = (ev) => setLogo(ev.target.result);
+    reader.onload = (ev) => setter(ev.target.result);
     reader.readAsDataURL(file);
   };
 
   const handleSave = () => {
     localStorage.setItem('auditpro_whitelabel', JSON.stringify({
-      agencyName: name, brandColor: color, logoBase64: logo || null,
+      agencyName: name, brandColor: color,
+      agencyLogo: agencyLogo || null,
+      clientLogo: clientLogo || null,
     }));
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
@@ -954,7 +965,8 @@ function WhiteLabelView({ audits, currentUrl, currentClientName, score, results,
     setDownloading(true);
     try {
       downloadPDF(
-        { agencyName: name, brandColor: color, clientName: currentClientName, logoBase64: logo },
+        { agencyName: name, brandColor: color, clientName: currentClientName,
+          agencyLogo, clientLogo },
         currentUrl, score, results
       );
     } catch (e) {
@@ -991,29 +1003,37 @@ function WhiteLabelView({ audits, currentUrl, currentClientName, score, results,
               <span style={{ fontSize:13, color:C.muted }}>{color}</span>
             </div>
           </div>
-          <div style={{ marginBottom:24 }}>
-            <label style={{ fontSize:11, color:C.muted, fontWeight:600, textTransform:'uppercase',
-              letterSpacing:'0.08em', display:'block', marginBottom:8 }}>Client Logo (PDF Cover)</label>
-            <div style={{ display:'flex', gap:10, alignItems:'center' }}>
-              <label style={{ background:C.bg, border:`1px dashed ${C.border}`, borderRadius:8,
-                padding:'8px 16px', color:C.muted, fontSize:12, cursor:'pointer',
-                display:'flex', alignItems:'center', gap:6 }}>
-                📎 Upload PNG / JPG
-                <input type="file" accept="image/png,image/jpeg,image/jpg"
-                  onChange={handleLogoUpload}
-                  style={{ display:'none' }} />
-              </label>
-              {logo && (
-                <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-                  <img src={logo} alt="logo" style={{ height:32, maxWidth:80, objectFit:'contain',
-                    borderRadius:4, background:'#fff', padding:2 }} />
-                  <button onClick={() => setLogo(null)} style={{ background:'transparent',
-                    border:`1px solid ${C.border}`, borderRadius:6, padding:'4px 8px',
-                    color:C.muted, fontSize:11, cursor:'pointer' }}>✕</button>
-                </div>
-              )}
+          {[
+            { label:'Agency Logo', state: agencyLogo, setter: setAgencyLogo },
+            { label:'Client Logo', state: clientLogo, setter: setClientLogo },
+          ].map(({ label, state, setter }) => (
+            <div key={label} style={{ marginBottom:16 }}>
+              <label style={{ fontSize:11, color:C.muted, fontWeight:600, textTransform:'uppercase',
+                letterSpacing:'0.08em', display:'block', marginBottom:8 }}>{label}</label>
+              <div style={{ display:'flex', gap:10, alignItems:'center' }}>
+                <label style={{ background:C.bg, border:`1px dashed ${C.border}`, borderRadius:8,
+                  padding:'7px 14px', color:C.muted, fontSize:12, cursor:'pointer',
+                  display:'flex', alignItems:'center', gap:6, flexShrink:0 }}>
+                  📎 Upload PNG / JPG
+                  <input type="file" accept="image/png,image/jpeg,image/jpg"
+                    onChange={makeLogoUploader(setter)}
+                    style={{ display:'none' }} />
+                </label>
+                {state ? (
+                  <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                    <img src={state} alt={label} style={{ height:30, maxWidth:72, objectFit:'contain',
+                      borderRadius:4, background:'#fff', padding:2 }} />
+                    <button onClick={() => setter(null)} style={{ background:'transparent',
+                      border:`1px solid ${C.border}`, borderRadius:6, padding:'3px 8px',
+                      color:C.muted, fontSize:11, cursor:'pointer' }}>✕</button>
+                  </div>
+                ) : (
+                  <span style={{ fontSize:11, color:C.muted }}>No logo uploaded</span>
+                )}
+              </div>
             </div>
-          </div>
+          ))}
+          <div style={{ marginBottom:8 }} />
           <button onClick={handleSave} style={{ background:color, border:'none', borderRadius:8,
             padding:'11px 20px', color:'#fff', fontWeight:600, fontSize:13, width:'100%',
             cursor:'pointer', marginBottom:10 }}>
@@ -1031,14 +1051,18 @@ function WhiteLabelView({ audits, currentUrl, currentClientName, score, results,
           <div style={{ fontSize:13, fontWeight:700, color:C.text, marginBottom:20 }}>PDF Preview</div>
           <div style={{ background:C.bg, borderRadius:10, padding:20, border:`1px solid ${C.border}` }}>
             <div style={{ background:color, borderRadius:8, padding:'16px 20px', marginBottom:14, position:'relative' }}>
-              <div style={{ fontSize:10, color:'rgba(255,255,255,0.7)', marginBottom:4 }}>{name || 'Agency Name'}</div>
+              {agencyLogo
+                ? <img src={agencyLogo} alt="agency" style={{ height:18, maxWidth:56, objectFit:'contain',
+                    background:'rgba(255,255,255,0.15)', borderRadius:3, padding:2, marginBottom:4, display:'block' }} />
+                : <div style={{ fontSize:10, color:'rgba(255,255,255,0.7)', marginBottom:4 }}>{name || 'Agency Name'}</div>
+              }
               <div style={{ fontSize:14, fontWeight:800, color:'#fff' }}>
                 {currentClientName || hasAudit ? (currentClientName || currentUrl) : 'Client Name'}
               </div>
               <div style={{ fontSize:10, color:'rgba(255,255,255,0.7)', marginTop:2 }}>UX + SEO Audit Report</div>
               {hasAudit && <div style={{ fontSize:9, color:'rgba(255,255,255,0.5)', marginTop:2 }}>{currentUrl}</div>}
-              {logo && (
-                <img src={logo} alt="logo" style={{ position:'absolute', top:10, right:14,
+              {clientLogo && (
+                <img src={clientLogo} alt="client" style={{ position:'absolute', top:10, right:14,
                   height:24, maxWidth:60, objectFit:'contain', background:'rgba(255,255,255,0.15)',
                   borderRadius:4, padding:2 }} />
               )}
