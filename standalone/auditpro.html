@@ -30618,16 +30618,24 @@ function downloadPDF(config, auditUrl, score, results) {
     drawFooter();
   }
   function drawFooter() {
+    doc.setFontSize(7);
+    doc.setTextColor(170, 170, 170);
+    doc.text('Prepared by', M, H - 16);
+    if (agencyLogo) {
+      addLogoToDoc(agencyLogo, M, H - 14, 26, 10);
+    } else {
+      doc.setFontSize(8);
+      doc.setTextColor(130, 130, 130);
+      doc.text(config.agencyName, M, H - 8);
+    }
     doc.setFontSize(8);
     doc.setTextColor(150, 150, 150);
-    const footerLeft = clientName ? `${config.agencyName} → ${clientName}` : `${config.agencyName} — UX + SEO Audit Report`;
-    doc.text(footerLeft, M, H - 8);
     doc.text(auditUrl, W - M, H - 8, {
       align: 'right'
     });
   }
   function checkPageBreak(needed) {
-    if (y + needed > H - 20) addPage();
+    if (y + needed > H - 24) addPage();
   }
   function addLogoToDoc(b64, x, yPos, maxW, maxH) {
     try {
@@ -30637,36 +30645,26 @@ function downloadPDF(config, auditUrl, score, results) {
     } catch (e) {/* skip if invalid */}
   }
 
-  // ── Cover header bar ────────────────────────────────────────────────────────
-  const headerH = 72;
+  // ── Cover header bar — client-focused ────────────────────────────────────────
+  const headerH = 64;
   doc.setFillColor(...brandRgb);
   doc.rect(0, 0, W, headerH, 'F');
 
-  // Agency logo — top-left (below agency name), or agency name text only
-  doc.setTextColor(255, 255, 255);
-  doc.setFontSize(11);
-  doc.setFont('helvetica', 'normal');
-  if (agencyLogo) {
-    doc.addImage || void 0;
-    addLogoToDoc(agencyLogo, M, 5, 30, 14);
-  } else {
-    doc.text(config.agencyName, M, 14);
-  }
-
   // Client logo — top-right
   if (clientLogo) {
-    addLogoToDoc(clientLogo, W - M - 38, 5, 38, 18);
+    addLogoToDoc(clientLogo, W - M - 40, 6, 40, 18);
   }
 
   // Client name — big heading
+  doc.setTextColor(255, 255, 255);
   doc.setFontSize(clientName ? 22 : 26);
   doc.setFont('helvetica', 'bold');
-  doc.text(clientName || config.agencyName, M, clientName ? 38 : 32);
+  doc.text(clientName || config.agencyName, M, clientName ? 34 : 28);
   doc.setFontSize(11);
   doc.setFont('helvetica', 'normal');
-  doc.text('UX + SEO Audit Report', M, clientName ? 50 : 44);
+  doc.text('UX + SEO Audit Report', M, clientName ? 46 : 40);
   doc.setFontSize(9);
-  doc.text(auditUrl, M, clientName ? 60 : 54);
+  doc.text(auditUrl, M, clientName ? 56 : 50);
   y = headerH + 14;
   doc.setTextColor(100, 100, 100);
   doc.setFontSize(10);
@@ -31783,15 +31781,18 @@ function WhiteLabelView({
   score,
   results,
   onSelect,
-  onDelete
+  onDelete,
+  onUpdateAudit
 }) {
   const [name, setName] = useState('My Agency');
   const [color, setColor] = useState('#0EA5E9');
   const [agencyLogo, setAgencyLogo] = useState(null);
-  const [clientLogo, setClientLogo] = useState(null);
   const [saved, setSaved] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [selectedAudit, setSelectedAudit] = useState(null);
+
+  // Client logo lives on the audit object, not in agency settings
+  const clientLogo = selectedAudit?.clientLogo || null;
 
   // Derive active audit data from local selection or current props
   const activeScore = selectedAudit ? selectedAudit.score : score;
@@ -31821,7 +31822,6 @@ function WhiteLabelView({
         setName(cfg.agencyName);
         setColor(cfg.brandColor);
         if (cfg.agencyLogo) setAgencyLogo(cfg.agencyLogo);
-        if (cfg.clientLogo) setClientLogo(cfg.clientLogo);
       }
     } catch {}
   }, []);
@@ -31832,12 +31832,38 @@ function WhiteLabelView({
     reader.onload = ev => setter(ev.target.result);
     reader.readAsDataURL(file);
   };
+  const handleClientLogoUpload = e => {
+    const file = e.target.files[0];
+    if (!file || !selectedAudit) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      const b64 = ev.target.result;
+      const updated = {
+        ...selectedAudit,
+        clientLogo: b64
+      };
+      setSelectedAudit(updated);
+      onUpdateAudit(selectedAudit.id, {
+        clientLogo: b64
+      });
+    };
+    reader.readAsDataURL(file);
+  };
+  const handleClientLogoClear = () => {
+    const updated = {
+      ...selectedAudit,
+      clientLogo: null
+    };
+    setSelectedAudit(updated);
+    onUpdateAudit(selectedAudit.id, {
+      clientLogo: null
+    });
+  };
   const handleSave = () => {
     localStorage.setItem('auditpro_whitelabel', JSON.stringify({
       agencyName: name,
       brandColor: color,
-      agencyLogo: agencyLogo || null,
-      clientLogo: clientLogo || null
+      agencyLogo: agencyLogo || null
     }));
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
@@ -31964,20 +31990,7 @@ function WhiteLabelView({
       fontSize: 13,
       color: C.muted
     }
-  }, color))), [{
-    label: 'Agency Logo',
-    state: agencyLogo,
-    setter: setAgencyLogo
-  }, {
-    label: 'Client Logo',
-    state: clientLogo,
-    setter: setClientLogo
-  }].map(({
-    label,
-    state,
-    setter
-  }) => /*#__PURE__*/React.createElement("div", {
-    key: label,
+  }, color))), /*#__PURE__*/React.createElement("div", {
     style: {
       marginBottom: 16
     }
@@ -31991,7 +32004,7 @@ function WhiteLabelView({
       display: 'block',
       marginBottom: 8
     }
-  }, label), /*#__PURE__*/React.createElement("div", {
+  }, "Agency Logo"), /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
       gap: 10,
@@ -32014,19 +32027,19 @@ function WhiteLabelView({
   }, "\uD83D\uDCCE Upload PNG / JPG", /*#__PURE__*/React.createElement("input", {
     type: "file",
     accept: "image/png,image/jpeg,image/jpg",
-    onChange: makeLogoUploader(setter),
+    onChange: makeLogoUploader(setAgencyLogo),
     style: {
       display: 'none'
     }
-  })), state ? /*#__PURE__*/React.createElement("div", {
+  })), agencyLogo ? /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
       alignItems: 'center',
       gap: 8
     }
   }, /*#__PURE__*/React.createElement("img", {
-    src: state,
-    alt: label,
+    src: agencyLogo,
+    alt: "agency",
     style: {
       height: 30,
       maxWidth: 72,
@@ -32036,7 +32049,7 @@ function WhiteLabelView({
       padding: 2
     }
   }), /*#__PURE__*/React.createElement("button", {
-    onClick: () => setter(null),
+    onClick: () => setAgencyLogo(null),
     style: {
       background: 'transparent',
       border: `1px solid ${C.border}`,
@@ -32051,11 +32064,89 @@ function WhiteLabelView({
       fontSize: 11,
       color: C.muted
     }
-  }, "No logo uploaded")))), /*#__PURE__*/React.createElement("div", {
+  }, "No logo uploaded"))), /*#__PURE__*/React.createElement("div", {
     style: {
+      borderTop: `1px solid ${C.border}`,
+      paddingTop: 16,
+      marginBottom: 16
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    style: {
+      fontSize: 11,
+      color: C.muted,
+      fontWeight: 600,
+      textTransform: 'uppercase',
+      letterSpacing: '0.08em',
+      display: 'block',
+      marginBottom: 6
+    }
+  }, "Client Logo"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: C.muted,
       marginBottom: 8
     }
+  }, selectedAudit ? selectedAudit.clientName || selectedAudit.url : 'Select an audit below to upload a client logo'), selectedAudit && /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      gap: 10,
+      alignItems: 'center'
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    style: {
+      background: C.bg,
+      border: `1px dashed ${C.border}`,
+      borderRadius: 8,
+      padding: '7px 14px',
+      color: C.muted,
+      fontSize: 12,
+      cursor: 'pointer',
+      display: 'flex',
+      alignItems: 'center',
+      gap: 6,
+      flexShrink: 0
+    }
+  }, "\uD83D\uDCCE Upload PNG / JPG", /*#__PURE__*/React.createElement("input", {
+    type: "file",
+    accept: "image/png,image/jpeg,image/jpg",
+    onChange: handleClientLogoUpload,
+    style: {
+      display: 'none'
+    }
+  })), clientLogo ? /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 8
+    }
+  }, /*#__PURE__*/React.createElement("img", {
+    src: clientLogo,
+    alt: "client",
+    style: {
+      height: 30,
+      maxWidth: 72,
+      objectFit: 'contain',
+      borderRadius: 4,
+      background: '#fff',
+      padding: 2
+    }
   }), /*#__PURE__*/React.createElement("button", {
+    onClick: handleClientLogoClear,
+    style: {
+      background: 'transparent',
+      border: `1px solid ${C.border}`,
+      borderRadius: 6,
+      padding: '3px 8px',
+      color: C.muted,
+      fontSize: 11,
+      cursor: 'pointer'
+    }
+  }, "\u2715")) : /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 11,
+      color: C.muted
+    }
+  }, "No logo uploaded"))), /*#__PURE__*/React.createElement("button", {
     onClick: handleSave,
     style: {
       background: color,
@@ -32066,25 +32157,9 @@ function WhiteLabelView({
       fontWeight: 600,
       fontSize: 13,
       width: '100%',
-      cursor: 'pointer',
-      marginBottom: 10
+      cursor: 'pointer'
     }
-  }, saved ? '✓ Saved!' : 'Save Settings'), /*#__PURE__*/React.createElement("button", {
-    onClick: handleDownload,
-    disabled: !hasAudit || downloading,
-    style: {
-      background: hasAudit ? C.green : C.border,
-      border: 'none',
-      borderRadius: 8,
-      padding: '11px 20px',
-      color: '#fff',
-      fontWeight: 600,
-      fontSize: 13,
-      width: '100%',
-      cursor: hasAudit && !downloading ? 'pointer' : 'not-allowed',
-      opacity: hasAudit ? 1 : 0.5
-    }
-  }, downloading ? 'Generating PDF...' : hasAudit ? '↓ Download PDF Report' : 'Complete an audit first')), /*#__PURE__*/React.createElement("div", {
+  }, saved ? '✓ Saved!' : 'Save Settings')), /*#__PURE__*/React.createElement("div", {
     style: {
       background: C.surface,
       border: `1px solid ${C.border}`,
@@ -32109,30 +32184,11 @@ function WhiteLabelView({
     style: {
       background: color,
       borderRadius: 8,
-      padding: '16px 20px',
-      marginBottom: 14,
+      padding: '14px 18px',
+      marginBottom: 10,
       position: 'relative'
     }
-  }, agencyLogo ? /*#__PURE__*/React.createElement("img", {
-    src: agencyLogo,
-    alt: "agency",
-    style: {
-      height: 18,
-      maxWidth: 56,
-      objectFit: 'contain',
-      background: 'rgba(255,255,255,0.15)',
-      borderRadius: 3,
-      padding: 2,
-      marginBottom: 4,
-      display: 'block'
-    }
-  }) : /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 10,
-      color: 'rgba(255,255,255,0.7)',
-      marginBottom: 4
-    }
-  }, name || 'Agency Name'), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 14,
       fontWeight: 800,
@@ -32155,10 +32211,10 @@ function WhiteLabelView({
     alt: "client",
     style: {
       position: 'absolute',
-      top: 10,
-      right: 14,
-      height: 24,
-      maxWidth: 60,
+      top: 8,
+      right: 12,
+      height: 22,
+      maxWidth: 55,
       objectFit: 'contain',
       background: 'rgba(255,255,255,0.15)',
       borderRadius: 4,
@@ -32237,9 +32293,31 @@ function WhiteLabelView({
       color: C.muted,
       marginTop: 2
     }
-  }, cat.label.replace('Technical SEO', 'Tech SEO').replace('On-Page & Content', 'On-Page').replace('UX Heuristics', 'UX').replace('Conversion & CTA', 'CRO').replace('AI & SERP Visibility', 'AI/SERP')))))), !hasAudit && /*#__PURE__*/React.createElement("div", {
+  }, cat.label.replace('Technical SEO', 'Tech SEO').replace('On-Page & Content', 'On-Page').replace('UX Heuristics', 'UX').replace('Conversion & CTA', 'CRO').replace('AI & SERP Visibility', 'AI/SERP')))))), /*#__PURE__*/React.createElement("div", {
     style: {
-      marginTop: 12,
+      marginTop: 10,
+      paddingTop: 8,
+      borderTop: `1px solid ${C.border}`,
+      display: 'flex',
+      alignItems: 'center',
+      gap: 8
+    }
+  }, agencyLogo ? /*#__PURE__*/React.createElement("img", {
+    src: agencyLogo,
+    alt: "agency",
+    style: {
+      height: 14,
+      maxWidth: 40,
+      objectFit: 'contain'
+    }
+  }) : null, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 9,
+      color: C.muted
+    }
+  }, "Prepared by ", name || 'Agency Name')), !hasAudit && /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 8,
       fontSize: 11,
       color: C.amber,
       textAlign: 'center'
@@ -32458,6 +32536,14 @@ function App() {
       setIssues([]);
     }
   };
+  const handleUpdateAudit = (id, patch) => {
+    const updated = audits.map(a => a.id === id ? {
+      ...a,
+      ...patch
+    } : a);
+    setAudits(updated);
+    saveAudits(updated);
+  };
   return /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
@@ -32506,7 +32592,8 @@ function App() {
     score: score,
     results: results,
     onSelect: handleSelectAudit,
-    onDelete: handleDeleteAudit
+    onDelete: handleDeleteAudit,
+    onUpdateAudit: handleUpdateAudit
   })));
 }
 const root = ReactDOM.createRoot(document.getElementById('root'));

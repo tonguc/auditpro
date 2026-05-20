@@ -374,14 +374,18 @@ function downloadPDF(config, auditUrl, score, results) {
 
   function addPage() { doc.addPage(); y = M; drawFooter(); }
   function drawFooter() {
+    doc.setFontSize(7); doc.setTextColor(170,170,170);
+    doc.text('Prepared by', M, H - 16);
+    if (agencyLogo) {
+      addLogoToDoc(agencyLogo, M, H - 14, 26, 10);
+    } else {
+      doc.setFontSize(8); doc.setTextColor(130,130,130);
+      doc.text(config.agencyName, M, H - 8);
+    }
     doc.setFontSize(8); doc.setTextColor(150,150,150);
-    const footerLeft = clientName
-      ? `${config.agencyName} → ${clientName}`
-      : `${config.agencyName} — UX + SEO Audit Report`;
-    doc.text(footerLeft, M, H - 8);
     doc.text(auditUrl, W - M, H - 8, { align: 'right' });
   }
-  function checkPageBreak(needed) { if (y + needed > H - 20) addPage(); }
+  function checkPageBreak(needed) { if (y + needed > H - 24) addPage(); }
 
   function addLogoToDoc(b64, x, yPos, maxW, maxH) {
     try {
@@ -391,34 +395,25 @@ function downloadPDF(config, auditUrl, score, results) {
     } catch (e) { /* skip if invalid */ }
   }
 
-  // ── Cover header bar ────────────────────────────────────────────────────────
-  const headerH = 72;
+  // ── Cover header bar — client-focused ────────────────────────────────────────
+  const headerH = 64;
   doc.setFillColor(...brandRgb);
   doc.rect(0, 0, W, headerH, 'F');
 
-  // Agency logo — top-left (below agency name), or agency name text only
-  doc.setTextColor(255,255,255);
-  doc.setFontSize(11); doc.setFont('helvetica','normal');
-  if (agencyLogo) {
-    doc.addImage || void 0;
-    addLogoToDoc(agencyLogo, M, 5, 30, 14);
-  } else {
-    doc.text(config.agencyName, M, 14);
-  }
-
   // Client logo — top-right
   if (clientLogo) {
-    addLogoToDoc(clientLogo, W - M - 38, 5, 38, 18);
+    addLogoToDoc(clientLogo, W - M - 40, 6, 40, 18);
   }
 
   // Client name — big heading
+  doc.setTextColor(255,255,255);
   doc.setFontSize(clientName ? 22 : 26); doc.setFont('helvetica','bold');
-  doc.text(clientName || config.agencyName, M, clientName ? 38 : 32);
+  doc.text(clientName || config.agencyName, M, clientName ? 34 : 28);
 
   doc.setFontSize(11); doc.setFont('helvetica','normal');
-  doc.text('UX + SEO Audit Report', M, clientName ? 50 : 44);
+  doc.text('UX + SEO Audit Report', M, clientName ? 46 : 40);
   doc.setFontSize(9);
-  doc.text(auditUrl, M, clientName ? 60 : 54);
+  doc.text(auditUrl, M, clientName ? 56 : 50);
 
   y = headerH + 14;
   doc.setTextColor(100,100,100); doc.setFontSize(10);
@@ -917,14 +912,16 @@ function AuditView({ onComplete, initialUrl = '', initialClientName = '', initia
   );
 }
 
-function WhiteLabelView({ audits, currentUrl, currentClientName, score, results, onSelect, onDelete }) {
+function WhiteLabelView({ audits, currentUrl, currentClientName, score, results, onSelect, onDelete, onUpdateAudit }) {
   const [name, setName]               = useState('My Agency');
   const [color, setColor]             = useState('#0EA5E9');
   const [agencyLogo, setAgencyLogo]   = useState(null);
-  const [clientLogo, setClientLogo]   = useState(null);
   const [saved, setSaved]             = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [selectedAudit, setSelectedAudit] = useState(null);
+
+  // Client logo lives on the audit object, not in agency settings
+  const clientLogo = selectedAudit?.clientLogo || null;
 
   // Derive active audit data from local selection or current props
   const activeScore   = selectedAudit ? selectedAudit.score   : score;
@@ -950,7 +947,6 @@ function WhiteLabelView({ audits, currentUrl, currentClientName, score, results,
         setName(cfg.agencyName);
         setColor(cfg.brandColor);
         if (cfg.agencyLogo) setAgencyLogo(cfg.agencyLogo);
-        if (cfg.clientLogo) setClientLogo(cfg.clientLogo);
       }
     } catch {}
   }, []);
@@ -963,11 +959,29 @@ function WhiteLabelView({ audits, currentUrl, currentClientName, score, results,
     reader.readAsDataURL(file);
   };
 
+  const handleClientLogoUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file || !selectedAudit) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const b64 = ev.target.result;
+      const updated = { ...selectedAudit, clientLogo: b64 };
+      setSelectedAudit(updated);
+      onUpdateAudit(selectedAudit.id, { clientLogo: b64 });
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleClientLogoClear = () => {
+    const updated = { ...selectedAudit, clientLogo: null };
+    setSelectedAudit(updated);
+    onUpdateAudit(selectedAudit.id, { clientLogo: null });
+  };
+
   const handleSave = () => {
     localStorage.setItem('auditpro_whitelabel', JSON.stringify({
       agencyName: name, brandColor: color,
       agencyLogo: agencyLogo || null,
-      clientLogo: clientLogo || null,
     }));
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
@@ -1022,67 +1036,76 @@ function WhiteLabelView({ audits, currentUrl, currentClientName, score, results,
               <span style={{ fontSize:13, color:C.muted }}>{color}</span>
             </div>
           </div>
-          {[
-            { label:'Agency Logo', state: agencyLogo, setter: setAgencyLogo },
-            { label:'Client Logo', state: clientLogo, setter: setClientLogo },
-          ].map(({ label, state, setter }) => (
-            <div key={label} style={{ marginBottom:16 }}>
-              <label style={{ fontSize:11, color:C.muted, fontWeight:600, textTransform:'uppercase',
-                letterSpacing:'0.08em', display:'block', marginBottom:8 }}>{label}</label>
+          <div style={{ marginBottom:16 }}>
+            <label style={{ fontSize:11, color:C.muted, fontWeight:600, textTransform:'uppercase',
+              letterSpacing:'0.08em', display:'block', marginBottom:8 }}>Agency Logo</label>
+            <div style={{ display:'flex', gap:10, alignItems:'center' }}>
+              <label style={{ background:C.bg, border:`1px dashed ${C.border}`, borderRadius:8,
+                padding:'7px 14px', color:C.muted, fontSize:12, cursor:'pointer',
+                display:'flex', alignItems:'center', gap:6, flexShrink:0 }}>
+                📎 Upload PNG / JPG
+                <input type="file" accept="image/png,image/jpeg,image/jpg"
+                  onChange={makeLogoUploader(setAgencyLogo)} style={{ display:'none' }} />
+              </label>
+              {agencyLogo ? (
+                <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                  <img src={agencyLogo} alt="agency" style={{ height:30, maxWidth:72, objectFit:'contain',
+                    borderRadius:4, background:'#fff', padding:2 }} />
+                  <button onClick={() => setAgencyLogo(null)} style={{ background:'transparent',
+                    border:`1px solid ${C.border}`, borderRadius:6, padding:'3px 8px',
+                    color:C.muted, fontSize:11, cursor:'pointer' }}>✕</button>
+                </div>
+              ) : <span style={{ fontSize:11, color:C.muted }}>No logo uploaded</span>}
+            </div>
+          </div>
+          <div style={{ borderTop:`1px solid ${C.border}`, paddingTop:16, marginBottom:16 }}>
+            <label style={{ fontSize:11, color:C.muted, fontWeight:600, textTransform:'uppercase',
+              letterSpacing:'0.08em', display:'block', marginBottom:6 }}>Client Logo</label>
+            <div style={{ fontSize:11, color:C.muted, marginBottom:8 }}>
+              {selectedAudit
+                ? (selectedAudit.clientName || selectedAudit.url)
+                : 'Select an audit below to upload a client logo'}
+            </div>
+            {selectedAudit && (
               <div style={{ display:'flex', gap:10, alignItems:'center' }}>
                 <label style={{ background:C.bg, border:`1px dashed ${C.border}`, borderRadius:8,
                   padding:'7px 14px', color:C.muted, fontSize:12, cursor:'pointer',
                   display:'flex', alignItems:'center', gap:6, flexShrink:0 }}>
                   📎 Upload PNG / JPG
                   <input type="file" accept="image/png,image/jpeg,image/jpg"
-                    onChange={makeLogoUploader(setter)}
-                    style={{ display:'none' }} />
+                    onChange={handleClientLogoUpload} style={{ display:'none' }} />
                 </label>
-                {state ? (
+                {clientLogo ? (
                   <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-                    <img src={state} alt={label} style={{ height:30, maxWidth:72, objectFit:'contain',
+                    <img src={clientLogo} alt="client" style={{ height:30, maxWidth:72, objectFit:'contain',
                       borderRadius:4, background:'#fff', padding:2 }} />
-                    <button onClick={() => setter(null)} style={{ background:'transparent',
+                    <button onClick={handleClientLogoClear} style={{ background:'transparent',
                       border:`1px solid ${C.border}`, borderRadius:6, padding:'3px 8px',
                       color:C.muted, fontSize:11, cursor:'pointer' }}>✕</button>
                   </div>
-                ) : (
-                  <span style={{ fontSize:11, color:C.muted }}>No logo uploaded</span>
-                )}
+                ) : <span style={{ fontSize:11, color:C.muted }}>No logo uploaded</span>}
               </div>
-            </div>
-          ))}
-          <div style={{ marginBottom:8 }} />
+            )}
+          </div>
           <button onClick={handleSave} style={{ background:color, border:'none', borderRadius:8,
             padding:'11px 20px', color:'#fff', fontWeight:600, fontSize:13, width:'100%',
-            cursor:'pointer', marginBottom:10 }}>
+            cursor:'pointer' }}>
             {saved ? '✓ Saved!' : 'Save Settings'}
-          </button>
-          <button onClick={handleDownload} disabled={!hasAudit || downloading}
-            style={{ background: hasAudit ? C.green : C.border, border:'none', borderRadius:8,
-              padding:'11px 20px', color:'#fff', fontWeight:600, fontSize:13, width:'100%',
-              cursor: hasAudit && !downloading ? 'pointer' : 'not-allowed', opacity: hasAudit ? 1 : 0.5 }}>
-            {downloading ? 'Generating PDF...' : hasAudit ? '↓ Download PDF Report' : 'Complete an audit first'}
           </button>
         </div>
 
         <div style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:12, padding:24 }}>
           <div style={{ fontSize:13, fontWeight:700, color:C.text, marginBottom:20 }}>PDF Preview</div>
           <div style={{ background:C.bg, borderRadius:10, padding:20, border:`1px solid ${C.border}` }}>
-            <div style={{ background:color, borderRadius:8, padding:'16px 20px', marginBottom:14, position:'relative' }}>
-              {agencyLogo
-                ? <img src={agencyLogo} alt="agency" style={{ height:18, maxWidth:56, objectFit:'contain',
-                    background:'rgba(255,255,255,0.15)', borderRadius:3, padding:2, marginBottom:4, display:'block' }} />
-                : <div style={{ fontSize:10, color:'rgba(255,255,255,0.7)', marginBottom:4 }}>{name || 'Agency Name'}</div>
-              }
+            <div style={{ background:color, borderRadius:8, padding:'14px 18px', marginBottom:10, position:'relative' }}>
               <div style={{ fontSize:14, fontWeight:800, color:'#fff' }}>
                 {activeClient || (hasAudit ? activeUrl : 'Client Name')}
               </div>
               <div style={{ fontSize:10, color:'rgba(255,255,255,0.7)', marginTop:2 }}>UX + SEO Audit Report</div>
               {hasAudit && <div style={{ fontSize:9, color:'rgba(255,255,255,0.5)', marginTop:2 }}>{activeUrl}</div>}
               {clientLogo && (
-                <img src={clientLogo} alt="client" style={{ position:'absolute', top:10, right:14,
-                  height:24, maxWidth:60, objectFit:'contain', background:'rgba(255,255,255,0.15)',
+                <img src={clientLogo} alt="client" style={{ position:'absolute', top:8, right:12,
+                  height:22, maxWidth:55, objectFit:'contain', background:'rgba(255,255,255,0.15)',
                   borderRadius:4, padding:2 }} />
               )}
             </div>
@@ -1118,8 +1141,15 @@ function WhiteLabelView({ audits, currentUrl, currentClientName, score, results,
               </div>
             )}
           </div>
+          <div style={{ marginTop:10, paddingTop:8, borderTop:`1px solid ${C.border}`,
+            display:'flex', alignItems:'center', gap:8 }}>
+            {agencyLogo
+              ? <img src={agencyLogo} alt="agency" style={{ height:14, maxWidth:40, objectFit:'contain' }} />
+              : null}
+            <span style={{ fontSize:9, color:C.muted }}>Prepared by {name || 'Agency Name'}</span>
+          </div>
           {!hasAudit && (
-            <div style={{ marginTop:12, fontSize:11, color:C.amber, textAlign:'center' }}>
+            <div style={{ marginTop:8, fontSize:11, color:C.amber, textAlign:'center' }}>
               Complete an audit to see real scores in the preview
             </div>
           )}
@@ -1249,6 +1279,11 @@ function App() {
     else { setUrl(''); setResults({}); setScore(null); setIssues([]); }
   };
 
+  const handleUpdateAudit = (id, patch) => {
+    const updated = audits.map(a => a.id === id ? { ...a, ...patch } : a);
+    setAudits(updated); saveAudits(updated);
+  };
+
   return (
     <div style={{ display:'flex', minHeight:'100vh', background:C.bg, color:C.text,
       fontFamily:'-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }}>
@@ -1265,7 +1300,7 @@ function App() {
         </div>}
         {page === 'whitelabel' && <WhiteLabelView audits={audits} currentUrl={auditUrl}
           currentClientName={clientName} score={score} results={results}
-          onSelect={handleSelectAudit} onDelete={handleDeleteAudit} />}
+          onSelect={handleSelectAudit} onDelete={handleDeleteAudit} onUpdateAudit={handleUpdateAudit} />}
       </div>
     </div>
   );
