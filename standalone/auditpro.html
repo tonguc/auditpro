@@ -30599,19 +30599,17 @@ const STATUS_COLORS_PDF = {
   'N/A': [107, 122, 153]
 };
 
-// Flatten any image (PNG with transparency / indexed colour) to JPEG via canvas
-// so jsPDF always gets clean RGB data. Calls callback(jpegDataUrl).
-function normalizeToJpeg(b64, callback) {
+// Normalise image through canvas — fixes indexed-colour PNG issues while
+// preserving transparency. Always outputs PNG so logos on coloured backgrounds
+// remain transparent in the PDF.
+function normalizeImage(b64, callback) {
   const img = new Image();
   img.onload = () => {
     const c = document.createElement('canvas');
     c.width = img.width;
     c.height = img.height;
-    const ctx = c.getContext('2d');
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, c.width, c.height);
-    ctx.drawImage(img, 0, 0);
-    callback(c.toDataURL('image/jpeg', 0.92));
+    c.getContext('2d').drawImage(img, 0, 0); // no white fill — keep alpha
+    callback(c.toDataURL('image/png'));
   };
   img.src = b64;
 }
@@ -30645,7 +30643,7 @@ function downloadPDF(config, auditUrl, score, results) {
     if (y + needed > H - 20) addPage();
   }
 
-  // Aspect-ratio-preserving image helper — images must be JPEG data URLs
+  // Aspect-ratio-preserving image helper — accepts normalised PNG data URLs
   function addLogoToDoc(b64, x, yPos, maxW, maxH, alignRight) {
     try {
       const props = doc.getImageProperties(b64);
@@ -30657,7 +30655,7 @@ function downloadPDF(config, auditUrl, score, results) {
         w = maxH * ratio;
       }
       const drawX = alignRight ? x - w : x;
-      doc.addImage(b64.split(',')[1], 'JPEG', drawX, yPos, w, h);
+      doc.addImage(b64.split(',')[1], 'PNG', drawX, yPos, w, h);
       return {
         w,
         h
@@ -31307,12 +31305,15 @@ function DashboardView({
   auditUrl,
   results,
   setPage,
-  onEdit
+  onEdit,
+  audits,
+  onSelectAudit
 }) {
   const [detailCat, setDetailCat] = useState(null);
   const totalItems = AUDIT_CATEGORIES.flatMap(c => c.sections.flatMap(s => s.items)).length;
   const filledItems = Object.keys(results).filter(k => results[k] !== null && results[k] !== undefined).length;
   const missingCount = totalItems - filledItems;
+  const activeId = audits?.find(a => a.url === auditUrl)?.id;
   if (!score) return /*#__PURE__*/React.createElement("div", {
     style: {
       flex: 1,
@@ -31368,7 +31369,35 @@ function DashboardView({
       alignItems: 'flex-start',
       marginBottom: 28
     }
-  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
+    style: {
+      fontSize: 26,
+      fontWeight: 800,
+      color: C.text,
+      marginBottom: 10
+    }
+  }, "Audit Dashboard"), audits && audits.length > 1 && /*#__PURE__*/React.createElement("select", {
+    value: activeId || '',
+    onChange: e => {
+      const a = audits.find(x => x.id === e.target.value);
+      if (a) onSelectAudit(a);
+    },
+    style: {
+      background: C.surface,
+      border: `1px solid ${C.border}`,
+      borderRadius: 8,
+      padding: '8px 12px',
+      color: C.text,
+      fontSize: 13,
+      cursor: 'pointer',
+      marginBottom: 8,
+      maxWidth: 340,
+      outline: 'none'
+    }
+  }, audits.map(a => /*#__PURE__*/React.createElement("option", {
+    key: a.id,
+    value: a.id
+  }, a.clientName ? `${a.clientName} — ` : '', a.url, "  (Grade ", a.score.grade, ")"))), audits && audits.length <= 1 && /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 11,
       color: C.muted,
@@ -31377,19 +31406,12 @@ function DashboardView({
       letterSpacing: '0.08em',
       marginBottom: 6
     }
-  }, auditUrl), /*#__PURE__*/React.createElement("h1", {
+  }, auditUrl), missingCount > 0 && /*#__PURE__*/React.createElement("div", {
     style: {
-      fontSize: 26,
-      fontWeight: 800,
-      color: C.text
-    }
-  }, "Audit Dashboard"), missingCount > 0 && /*#__PURE__*/React.createElement("div", {
-    style: {
-      marginTop: 6,
       fontSize: 12,
       color: C.amber
     }
-  }, "\u26A0 ", missingCount, " items not yet reviewed \u2014", ' ', /*#__PURE__*/React.createElement("span", {
+  }, "\u26A0 ", missingCount, " of ", totalItems, " items not yet reviewed \u2014", ' ', /*#__PURE__*/React.createElement("span", {
     onClick: onEdit,
     style: {
       cursor: 'pointer',
@@ -31564,9 +31586,14 @@ function DashboardView({
   }, "\uD83C\uDFAF Top Priority Issues"), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 11,
-      color: C.muted
+      color: C.muted,
+      textAlign: 'right'
     }
-  }, issues.length, " issues")), issues.slice(0, 10).map((issue, i) => {
+  }, issues.length, " found", filledItems < totalItems && /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: C.amber
+    }
+  }, " \xB7 based on ", filledItems, "/", totalItems, " reviewed"))), issues.slice(0, 10).map((issue, i) => {
     const howTo = AUDIT_CATEGORIES.flatMap(c => c.sections.flatMap(s => s.items)).find(it => it.id === issue.id)?.howTo;
     return /*#__PURE__*/React.createElement("div", {
       key: issue.id,
@@ -31856,7 +31883,8 @@ function WhiteLabelView({
   results,
   onSelect,
   onDelete,
-  onUpdateAudit
+  onUpdateAudit,
+  onEditAudit
 }) {
   const [name, setName] = useState('My Agency');
   const [color, setColor] = useState('#0EA5E9');
@@ -31903,7 +31931,7 @@ function WhiteLabelView({
     const file = e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = ev => normalizeToJpeg(ev.target.result, setter);
+    reader.onload = ev => normalizeImage(ev.target.result, setter);
     reader.readAsDataURL(file);
   };
   const handleClientLogoUpload = e => {
@@ -31911,7 +31939,7 @@ function WhiteLabelView({
     if (!file || !selectedAudit) return;
     const reader = new FileReader();
     reader.onload = ev => {
-      normalizeToJpeg(ev.target.result, jpeg => {
+      normalizeImage(ev.target.result, jpeg => {
         const updated = {
           ...selectedAudit,
           clientLogo: jpeg
@@ -32537,6 +32565,20 @@ function WhiteLabelView({
     }, "\u2193 PDF"), /*#__PURE__*/React.createElement("button", {
       onClick: e => {
         e.stopPropagation();
+        onEditAudit(a);
+      },
+      style: {
+        background: 'transparent',
+        border: `1px solid ${C.accent}`,
+        borderRadius: 6,
+        padding: '4px 10px',
+        color: C.accent,
+        fontSize: 12,
+        cursor: 'pointer'
+      }
+    }, "\u270E Edit"), /*#__PURE__*/React.createElement("button", {
+      onClick: e => {
+        e.stopPropagation();
         onDelete(a.id);
       },
       style: {
@@ -32644,6 +32686,11 @@ function App() {
     setAudits(updated);
     saveAudits(updated);
   };
+  const handleEditAudit = audit => {
+    handleSelectAudit(audit);
+    setEditMode(true);
+    setPage('audit');
+  };
   return /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
@@ -32672,7 +32719,9 @@ function App() {
     auditUrl: auditUrl,
     results: results,
     setPage: handleNewAudit,
-    onEdit: handleEdit
+    onEdit: handleEdit,
+    audits: audits,
+    onSelectAudit: handleSelectAudit
   }), page === 'audit' && /*#__PURE__*/React.createElement("div", {
     style: {
       flex: 1,
@@ -32693,7 +32742,8 @@ function App() {
     results: results,
     onSelect: handleSelectAudit,
     onDelete: handleDeleteAudit,
-    onUpdateAudit: handleUpdateAudit
+    onUpdateAudit: handleUpdateAudit,
+    onEditAudit: handleEditAudit
   })));
 }
 const root = ReactDOM.createRoot(document.getElementById('root'));

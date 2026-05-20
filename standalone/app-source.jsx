@@ -361,18 +361,16 @@ const STATUS_COLORS_PDF = {
   Pass: [16,185,129], Partial: [245,158,11], Fail: [239,68,68], 'N/A': [107,122,153],
 };
 
-// Flatten any image (PNG with transparency / indexed colour) to JPEG via canvas
-// so jsPDF always gets clean RGB data. Calls callback(jpegDataUrl).
-function normalizeToJpeg(b64, callback) {
+// Normalise image through canvas — fixes indexed-colour PNG issues while
+// preserving transparency. Always outputs PNG so logos on coloured backgrounds
+// remain transparent in the PDF.
+function normalizeImage(b64, callback) {
   const img = new Image();
   img.onload = () => {
     const c = document.createElement('canvas');
     c.width = img.width; c.height = img.height;
-    const ctx = c.getContext('2d');
-    ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, c.width, c.height);
-    ctx.drawImage(img, 0, 0);
-    callback(c.toDataURL('image/jpeg', 0.92));
+    c.getContext('2d').drawImage(img, 0, 0); // no white fill — keep alpha
+    callback(c.toDataURL('image/png'));
   };
   img.src = b64;
 }
@@ -395,7 +393,7 @@ function downloadPDF(config, auditUrl, score, results) {
   }
   function checkPageBreak(needed) { if (y + needed > H - 20) addPage(); }
 
-  // Aspect-ratio-preserving image helper — images must be JPEG data URLs
+  // Aspect-ratio-preserving image helper — accepts normalised PNG data URLs
   function addLogoToDoc(b64, x, yPos, maxW, maxH, alignRight) {
     try {
       const props = doc.getImageProperties(b64);
@@ -403,7 +401,7 @@ function downloadPDF(config, auditUrl, score, results) {
       let w = maxW, h = maxW / ratio;
       if (h > maxH) { h = maxH; w = maxH * ratio; }
       const drawX = alignRight ? x - w : x;
-      doc.addImage(b64.split(',')[1], 'JPEG', drawX, yPos, w, h);
+      doc.addImage(b64.split(',')[1], 'PNG', drawX, yPos, w, h);
       return { w, h };
     } catch { return { w: 0, h: 0 }; }
   }
@@ -738,12 +736,13 @@ function CategoryDetail({ catId, results, onClose }) {
   );
 }
 
-function DashboardView({ score, issues, auditUrl, results, setPage, onEdit }) {
+function DashboardView({ score, issues, auditUrl, results, setPage, onEdit, audits, onSelectAudit }) {
   const [detailCat, setDetailCat] = useState(null);
 
   const totalItems = AUDIT_CATEGORIES.flatMap(c => c.sections.flatMap(s => s.items)).length;
   const filledItems = Object.keys(results).filter(k => results[k] !== null && results[k] !== undefined).length;
   const missingCount = totalItems - filledItems;
+  const activeId = audits?.find(a => a.url === auditUrl)?.id;
 
   if (!score) return (
     <div style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column', gap:16 }}>
@@ -761,12 +760,28 @@ function DashboardView({ score, issues, auditUrl, results, setPage, onEdit }) {
       {detailCat && <CategoryDetail catId={detailCat} results={results} onClose={() => setDetailCat(null)} />}
       <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:28 }}>
         <div>
-          <div style={{ fontSize:11, color:C.muted, fontWeight:600, textTransform:'uppercase',
-            letterSpacing:'0.08em', marginBottom:6 }}>{auditUrl}</div>
-          <h1 style={{ fontSize:26, fontWeight:800, color:C.text }}>Audit Dashboard</h1>
+          <h1 style={{ fontSize:26, fontWeight:800, color:C.text, marginBottom:10 }}>Audit Dashboard</h1>
+          {audits && audits.length > 1 && (
+            <select
+              value={activeId || ''}
+              onChange={e => { const a = audits.find(x => x.id === e.target.value); if (a) onSelectAudit(a); }}
+              style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:8,
+                padding:'8px 12px', color:C.text, fontSize:13, cursor:'pointer', marginBottom:8,
+                maxWidth:340, outline:'none' }}>
+              {audits.map(a => (
+                <option key={a.id} value={a.id}>
+                  {a.clientName ? `${a.clientName} — ` : ''}{a.url}  (Grade {a.score.grade})
+                </option>
+              ))}
+            </select>
+          )}
+          {audits && audits.length <= 1 && (
+            <div style={{ fontSize:11, color:C.muted, fontWeight:600, textTransform:'uppercase',
+              letterSpacing:'0.08em', marginBottom:6 }}>{auditUrl}</div>
+          )}
           {missingCount > 0 && (
-            <div style={{ marginTop:6, fontSize:12, color:C.amber }}>
-              ⚠ {missingCount} items not yet reviewed —{' '}
+            <div style={{ fontSize:12, color:C.amber }}>
+              ⚠ {missingCount} of {totalItems} items not yet reviewed —{' '}
               <span onClick={onEdit} style={{ cursor:'pointer', textDecoration:'underline' }}>
                 continue audit
               </span>
@@ -827,7 +842,12 @@ function DashboardView({ score, issues, auditUrl, results, setPage, onEdit }) {
         <div style={{ padding:'16px 24px', borderBottom:`1px solid ${C.border}`,
           display:'flex', justifyContent:'space-between' }}>
           <div style={{ fontSize:13, fontWeight:700, color:C.text }}>🎯 Top Priority Issues</div>
-          <div style={{ fontSize:11, color:C.muted }}>{issues.length} issues</div>
+          <div style={{ fontSize:11, color:C.muted, textAlign:'right' }}>
+            {issues.length} found
+            {filledItems < totalItems && (
+              <span style={{ color:C.amber }}> · based on {filledItems}/{totalItems} reviewed</span>
+            )}
+          </div>
         </div>
         {issues.slice(0, 10).map((issue, i) => {
           const howTo = AUDIT_CATEGORIES.flatMap(c => c.sections.flatMap(s => s.items)).find(it => it.id === issue.id)?.howTo;
@@ -954,7 +974,7 @@ function AuditView({ onComplete, initialUrl = '', initialClientName = '', initia
   );
 }
 
-function WhiteLabelView({ audits, currentUrl, currentClientName, score, results, onSelect, onDelete, onUpdateAudit }) {
+function WhiteLabelView({ audits, currentUrl, currentClientName, score, results, onSelect, onDelete, onUpdateAudit, onEditAudit }) {
   const [name, setName]               = useState('My Agency');
   const [color, setColor]             = useState('#0EA5E9');
   const [agencyLogo, setAgencyLogo]   = useState(null);
@@ -997,7 +1017,7 @@ function WhiteLabelView({ audits, currentUrl, currentClientName, score, results,
     const file = e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = (ev) => normalizeToJpeg(ev.target.result, setter);
+    reader.onload = (ev) => normalizeImage(ev.target.result, setter);
     reader.readAsDataURL(file);
   };
 
@@ -1006,7 +1026,7 @@ function WhiteLabelView({ audits, currentUrl, currentClientName, score, results,
     if (!file || !selectedAudit) return;
     const reader = new FileReader();
     reader.onload = (ev) => {
-      normalizeToJpeg(ev.target.result, (jpeg) => {
+      normalizeImage(ev.target.result, (jpeg) => {
         const updated = { ...selectedAudit, clientLogo: jpeg };
         setSelectedAudit(updated);
         onUpdateAudit(selectedAudit.id, { clientLogo: jpeg });
@@ -1249,6 +1269,9 @@ function WhiteLabelView({ audits, currentUrl, currentClientName, score, results,
                       style={{ background:color, border:'none', borderRadius:6,
                         padding:'4px 12px', color:'#fff', fontSize:12, fontWeight:600, cursor:'pointer',
                         whiteSpace:'nowrap' }}>↓ PDF</button>
+                    <button onClick={e => { e.stopPropagation(); onEditAudit(a); }}
+                      style={{ background:'transparent', border:`1px solid ${C.accent}`, borderRadius:6,
+                        padding:'4px 10px', color:C.accent, fontSize:12, cursor:'pointer' }}>✎ Edit</button>
                     <button onClick={e => { e.stopPropagation(); onDelete(a.id); }}
                       style={{ background:'transparent', border:`1px solid ${C.border}`, borderRadius:6,
                         padding:'4px 10px', color:C.muted, fontSize:12, cursor:'pointer' }}>✕</button>
@@ -1339,13 +1362,19 @@ function App() {
     setAudits(updated); saveAudits(updated);
   };
 
+  const handleEditAudit = (audit) => {
+    handleSelectAudit(audit);
+    setEditMode(true);
+    setPage('audit');
+  };
+
   return (
     <div style={{ display:'flex', minHeight:'100vh', background:C.bg, color:C.text,
       fontFamily:'-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }}>
       <Sidebar page={page} setPage={p => { if (p === 'audit') { setEditMode(false); } setPage(p); }} />
       <div style={{ flex:1, display:'flex', overflow:'hidden' }}>
         {page === 'dashboard'  && <DashboardView score={score} issues={issues} auditUrl={auditUrl} results={results}
-          setPage={handleNewAudit} onEdit={handleEdit} />}
+          setPage={handleNewAudit} onEdit={handleEdit} audits={audits} onSelectAudit={handleSelectAudit} />}
         {page === 'audit'      && <div style={{ flex:1, display:'flex', overflowY:'auto' }}>
           <AuditView onComplete={handleComplete}
             initialUrl={editMode ? auditUrl : ''}
@@ -1355,7 +1384,7 @@ function App() {
         </div>}
         {page === 'whitelabel' && <WhiteLabelView audits={audits} currentUrl={auditUrl}
           currentClientName={clientName} score={score} results={results}
-          onSelect={handleSelectAudit} onDelete={handleDeleteAudit} onUpdateAudit={handleUpdateAudit} />}
+          onSelect={handleSelectAudit} onDelete={handleDeleteAudit} onUpdateAudit={handleUpdateAudit} onEditAudit={handleEditAudit} />}
       </div>
     </div>
   );
