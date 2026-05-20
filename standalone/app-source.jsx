@@ -924,6 +924,23 @@ function WhiteLabelView({ audits, currentUrl, currentClientName, score, results,
   const [clientLogo, setClientLogo]   = useState(null);
   const [saved, setSaved]             = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const [selectedAudit, setSelectedAudit] = useState(null);
+
+  // Derive active audit data from local selection or current props
+  const activeScore   = selectedAudit ? selectedAudit.score   : score;
+  const activeResults = selectedAudit ? selectedAudit.results : results;
+  const activeUrl     = selectedAudit ? selectedAudit.url     : currentUrl;
+  const activeClient  = selectedAudit ? (selectedAudit.clientName || '') : (currentClientName || '');
+  const activeId      = selectedAudit ? selectedAudit.id      : null;
+  const hasAudit      = !!activeScore;
+
+  // Seed selection from current props on first load
+  useEffect(() => {
+    if (score && !selectedAudit) {
+      setSelectedAudit({ url: currentUrl, clientName: currentClientName, score, results,
+        id: audits.find(a => a.url === currentUrl)?.id ?? null });
+    }
+  }, [score]);
 
   useEffect(() => {
     try {
@@ -956,29 +973,31 @@ function WhiteLabelView({ audits, currentUrl, currentClientName, score, results,
     setTimeout(() => setSaved(false), 2000);
   };
 
-  const handleDownload = () => {
-    if (!score) return;
+  const triggerPDF = (auditScore, auditResults, auditUrl, auditClient) => {
     if (!window.jspdf || !window.jspdf.jsPDF) {
       alert('jsPDF library not loaded. Please reload the page and try again.');
       return;
     }
-    setDownloading(true);
     try {
       downloadPDF(
-        { agencyName: name, brandColor: color, clientName: currentClientName,
+        { agencyName: name, brandColor: color, clientName: auditClient,
           agencyLogo, clientLogo },
-        currentUrl, score, results
+        auditUrl, auditScore, auditResults
       );
     } catch (e) {
       alert('PDF error: ' + (e && e.message ? e.message : String(e)));
       console.error('PDF generation failed:', e);
-    } finally {
-      setDownloading(false);
     }
   };
 
-  const catScores = score?.categories ?? [];
-  const hasAudit = !!score;
+  const handleDownload = () => {
+    if (!activeScore) return;
+    setDownloading(true);
+    triggerPDF(activeScore, activeResults, activeUrl, activeClient);
+    setDownloading(false);
+  };
+
+  const catScores = activeScore?.categories ?? [];
 
   return (
     <div style={{ padding:'32px 36px', flex:1, overflowY:'auto' }}>
@@ -1057,21 +1076,21 @@ function WhiteLabelView({ audits, currentUrl, currentClientName, score, results,
                 : <div style={{ fontSize:10, color:'rgba(255,255,255,0.7)', marginBottom:4 }}>{name || 'Agency Name'}</div>
               }
               <div style={{ fontSize:14, fontWeight:800, color:'#fff' }}>
-                {currentClientName || hasAudit ? (currentClientName || currentUrl) : 'Client Name'}
+                {activeClient || (hasAudit ? activeUrl : 'Client Name')}
               </div>
               <div style={{ fontSize:10, color:'rgba(255,255,255,0.7)', marginTop:2 }}>UX + SEO Audit Report</div>
-              {hasAudit && <div style={{ fontSize:9, color:'rgba(255,255,255,0.5)', marginTop:2 }}>{currentUrl}</div>}
+              {hasAudit && <div style={{ fontSize:9, color:'rgba(255,255,255,0.5)', marginTop:2 }}>{activeUrl}</div>}
               {clientLogo && (
                 <img src={clientLogo} alt="client" style={{ position:'absolute', top:10, right:14,
                   height:24, maxWidth:60, objectFit:'contain', background:'rgba(255,255,255,0.15)',
                   borderRadius:4, padding:2 }} />
               )}
             </div>
-            {hasAudit && score ? (
+            {hasAudit && activeScore ? (
               <>
                 <div style={{ textAlign:'center', marginBottom:12 }}>
-                  <div style={{ fontSize:28, fontWeight:800, color, lineHeight:1 }}>{score.weighted}</div>
-                  <div style={{ fontSize:9, color:C.muted, marginTop:2 }}>Weighted Score — Grade {score.grade}</div>
+                  <div style={{ fontSize:28, fontWeight:800, color, lineHeight:1 }}>{activeScore.weighted}</div>
+                  <div style={{ fontSize:9, color:C.muted, marginTop:2 }}>Weighted Score — Grade {activeScore.grade}</div>
                 </div>
                 <div style={{ display:'flex', gap:6 }}>
                   {catScores.map(cat => (
@@ -1114,15 +1133,15 @@ function WhiteLabelView({ audits, currentUrl, currentClientName, score, results,
           </div>
           <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
             {audits.map(a => {
-              const isActive = a.url === currentUrl;
+              const isSelected = selectedAudit ? a.id === activeId : a.url === currentUrl;
               const d = new Date(a.date);
               const dateStr = d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
               const timeStr = d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'});
               return (
-                <div key={a.id} onClick={() => onSelect(a)} style={{
+                <div key={a.id} onClick={() => setSelectedAudit(a)} style={{
                   display:'flex', alignItems:'center', gap:14, padding:'12px 18px',
-                  background: isActive ? `${C.accent}15` : C.surface,
-                  border:`1px solid ${isActive ? C.accent : C.border}`, borderRadius:10, cursor:'pointer' }}>
+                  background: isSelected ? `${C.accent}15` : C.surface,
+                  border:`1px solid ${isSelected ? C.accent : C.border}`, borderRadius:10, cursor:'pointer' }}>
                   <div style={{ width:44, height:44, borderRadius:10, display:'flex', alignItems:'center',
                     justifyContent:'center', fontWeight:800, fontSize:16,
                     background:`${a.score.weighted >= 70 ? C.green : a.score.weighted >= 50 ? C.amber : C.red}22`,
@@ -1139,8 +1158,12 @@ function WhiteLabelView({ audits, currentUrl, currentClientName, score, results,
                     </div>
                   </div>
                   <div style={{ display:'flex', gap:8, alignItems:'center', flexShrink:0 }}>
-                    {isActive && <span style={{ fontSize:10, color:C.accent, fontWeight:700,
-                      background:`${C.accent}22`, padding:'3px 10px', borderRadius:12 }}>ACTIVE</span>}
+                    {isSelected && <span style={{ fontSize:10, color:C.accent, fontWeight:700,
+                      background:`${C.accent}22`, padding:'3px 10px', borderRadius:12 }}>SELECTED</span>}
+                    <button onClick={e => { e.stopPropagation(); triggerPDF(a.score, a.results, a.url, a.clientName || ''); }}
+                      style={{ background:color, border:'none', borderRadius:6,
+                        padding:'4px 12px', color:'#fff', fontSize:12, fontWeight:600, cursor:'pointer',
+                        whiteSpace:'nowrap' }}>↓ PDF</button>
                     <button onClick={e => { e.stopPropagation(); onDelete(a.id); }}
                       style={{ background:'transparent', border:`1px solid ${C.border}`, borderRadius:6,
                         padding:'4px 10px', color:C.muted, fontSize:12, cursor:'pointer' }}>✕</button>

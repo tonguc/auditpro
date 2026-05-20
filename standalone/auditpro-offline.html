@@ -31791,6 +31791,28 @@ function WhiteLabelView({
   const [clientLogo, setClientLogo] = useState(null);
   const [saved, setSaved] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const [selectedAudit, setSelectedAudit] = useState(null);
+
+  // Derive active audit data from local selection or current props
+  const activeScore = selectedAudit ? selectedAudit.score : score;
+  const activeResults = selectedAudit ? selectedAudit.results : results;
+  const activeUrl = selectedAudit ? selectedAudit.url : currentUrl;
+  const activeClient = selectedAudit ? selectedAudit.clientName || '' : currentClientName || '';
+  const activeId = selectedAudit ? selectedAudit.id : null;
+  const hasAudit = !!activeScore;
+
+  // Seed selection from current props on first load
+  useEffect(() => {
+    if (score && !selectedAudit) {
+      setSelectedAudit({
+        url: currentUrl,
+        clientName: currentClientName,
+        score,
+        results,
+        id: audits.find(a => a.url === currentUrl)?.id ?? null
+      });
+    }
+  }, [score]);
   useEffect(() => {
     try {
       const raw = localStorage.getItem('auditpro_whitelabel');
@@ -31820,30 +31842,31 @@ function WhiteLabelView({
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
-  const handleDownload = () => {
-    if (!score) return;
+  const triggerPDF = (auditScore, auditResults, auditUrl, auditClient) => {
     if (!window.jspdf || !window.jspdf.jsPDF) {
       alert('jsPDF library not loaded. Please reload the page and try again.');
       return;
     }
-    setDownloading(true);
     try {
       downloadPDF({
         agencyName: name,
         brandColor: color,
-        clientName: currentClientName,
+        clientName: auditClient,
         agencyLogo,
         clientLogo
-      }, currentUrl, score, results);
+      }, auditUrl, auditScore, auditResults);
     } catch (e) {
       alert('PDF error: ' + (e && e.message ? e.message : String(e)));
       console.error('PDF generation failed:', e);
-    } finally {
-      setDownloading(false);
     }
   };
-  const catScores = score?.categories ?? [];
-  const hasAudit = !!score;
+  const handleDownload = () => {
+    if (!activeScore) return;
+    setDownloading(true);
+    triggerPDF(activeScore, activeResults, activeUrl, activeClient);
+    setDownloading(false);
+  };
+  const catScores = activeScore?.categories ?? [];
   return /*#__PURE__*/React.createElement("div", {
     style: {
       padding: '32px 36px',
@@ -32115,7 +32138,7 @@ function WhiteLabelView({
       fontWeight: 800,
       color: '#fff'
     }
-  }, currentClientName || hasAudit ? currentClientName || currentUrl : 'Client Name'), /*#__PURE__*/React.createElement("div", {
+  }, activeClient || (hasAudit ? activeUrl : 'Client Name')), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 10,
       color: 'rgba(255,255,255,0.7)',
@@ -32127,7 +32150,7 @@ function WhiteLabelView({
       color: 'rgba(255,255,255,0.5)',
       marginTop: 2
     }
-  }, currentUrl), clientLogo && /*#__PURE__*/React.createElement("img", {
+  }, activeUrl), clientLogo && /*#__PURE__*/React.createElement("img", {
     src: clientLogo,
     alt: "client",
     style: {
@@ -32141,7 +32164,7 @@ function WhiteLabelView({
       borderRadius: 4,
       padding: 2
     }
-  })), hasAudit && score ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+  })), hasAudit && activeScore ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     style: {
       textAlign: 'center',
       marginBottom: 12
@@ -32153,13 +32176,13 @@ function WhiteLabelView({
       color,
       lineHeight: 1
     }
-  }, score.weighted), /*#__PURE__*/React.createElement("div", {
+  }, activeScore.weighted), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 9,
       color: C.muted,
       marginTop: 2
     }
-  }, "Weighted Score \u2014 Grade ", score.grade)), /*#__PURE__*/React.createElement("div", {
+  }, "Weighted Score \u2014 Grade ", activeScore.grade)), /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
       gap: 6
@@ -32240,7 +32263,7 @@ function WhiteLabelView({
       gap: 8
     }
   }, audits.map(a => {
-    const isActive = a.url === currentUrl;
+    const isSelected = selectedAudit ? a.id === activeId : a.url === currentUrl;
     const d = new Date(a.date);
     const dateStr = d.toLocaleDateString('en-US', {
       month: 'short',
@@ -32253,14 +32276,14 @@ function WhiteLabelView({
     });
     return /*#__PURE__*/React.createElement("div", {
       key: a.id,
-      onClick: () => onSelect(a),
+      onClick: () => setSelectedAudit(a),
       style: {
         display: 'flex',
         alignItems: 'center',
         gap: 14,
         padding: '12px 18px',
-        background: isActive ? `${C.accent}15` : C.surface,
-        border: `1px solid ${isActive ? C.accent : C.border}`,
+        background: isSelected ? `${C.accent}15` : C.surface,
+        border: `1px solid ${isSelected ? C.accent : C.border}`,
         borderRadius: 10,
         cursor: 'pointer'
       }
@@ -32308,7 +32331,7 @@ function WhiteLabelView({
         alignItems: 'center',
         flexShrink: 0
       }
-    }, isActive && /*#__PURE__*/React.createElement("span", {
+    }, isSelected && /*#__PURE__*/React.createElement("span", {
       style: {
         fontSize: 10,
         color: C.accent,
@@ -32317,7 +32340,23 @@ function WhiteLabelView({
         padding: '3px 10px',
         borderRadius: 12
       }
-    }, "ACTIVE"), /*#__PURE__*/React.createElement("button", {
+    }, "SELECTED"), /*#__PURE__*/React.createElement("button", {
+      onClick: e => {
+        e.stopPropagation();
+        triggerPDF(a.score, a.results, a.url, a.clientName || '');
+      },
+      style: {
+        background: color,
+        border: 'none',
+        borderRadius: 6,
+        padding: '4px 12px',
+        color: '#fff',
+        fontSize: 12,
+        fontWeight: 600,
+        cursor: 'pointer',
+        whiteSpace: 'nowrap'
+      }
+    }, "\u2193 PDF"), /*#__PURE__*/React.createElement("button", {
       onClick: e => {
         e.stopPropagation();
         onDelete(a.id);
