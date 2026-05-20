@@ -361,6 +361,22 @@ const STATUS_COLORS_PDF = {
   Pass: [16,185,129], Partial: [245,158,11], Fail: [239,68,68], 'N/A': [107,122,153],
 };
 
+// Flatten any image (PNG with transparency / indexed colour) to JPEG via canvas
+// so jsPDF always gets clean RGB data. Calls callback(jpegDataUrl).
+function normalizeToJpeg(b64, callback) {
+  const img = new Image();
+  img.onload = () => {
+    const c = document.createElement('canvas');
+    c.width = img.width; c.height = img.height;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#ffffff';
+    ctx.fillRect(0, 0, c.width, c.height);
+    ctx.drawImage(img, 0, 0);
+    callback(c.toDataURL('image/jpeg', 0.92));
+  };
+  img.src = b64;
+}
+
 function downloadPDF(config, auditUrl, score, results) {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF('p', 'mm', 'a4');
@@ -379,57 +395,53 @@ function downloadPDF(config, auditUrl, score, results) {
   }
   function checkPageBreak(needed) { if (y + needed > H - 20) addPage(); }
 
-  // Aspect-ratio-preserving image helper — returns actual {w,h} drawn
+  // Aspect-ratio-preserving image helper — images must be JPEG data URLs
   function addLogoToDoc(b64, x, yPos, maxW, maxH, alignRight) {
     try {
-      const fmt  = b64.includes('image/png') ? 'PNG' : 'JPEG';
-      const data = b64.split(',')[1];
       const props = doc.getImageProperties(b64);
       const ratio = props.width / props.height;
       let w = maxW, h = maxW / ratio;
       if (h > maxH) { h = maxH; w = maxH * ratio; }
       const drawX = alignRight ? x - w : x;
-      doc.addImage(data, fmt, drawX, yPos, w, h);
+      doc.addImage(b64.split(',')[1], 'JPEG', drawX, yPos, w, h);
       return { w, h };
     } catch { return { w: 0, h: 0 }; }
   }
 
-  // ── Cover header bar ──────────────────────────────────────────────────────────
+  // ── Cover header bar (two-tone) ───────────────────────────────────────────────
   const headerH = 50;
+  // Top zone — main brand colour
   doc.setFillColor(...brandRgb);
-  doc.rect(0, 0, W, headerH, 'F');
+  doc.rect(0, 0, W, 36, 'F');
+  // Bottom zone — 25% darker for "Powered by" strip
+  const darkRgb = brandRgb.map(v => Math.max(0, Math.round(v * 0.72)));
+  doc.setFillColor(...darkRgb);
+  doc.rect(0, 36, W, headerH - 36, 'F');
 
-  // Client logo — right side, preserved aspect ratio, max 36×14mm
+  // Client logo — right side of top zone, aspect-ratio-preserved, max 36×13mm
   if (clientLogo) {
-    addLogoToDoc(clientLogo, W - M, 5, 36, 14, true);
+    addLogoToDoc(clientLogo, W - M, 4, 36, 13, true);
   }
 
-  // Client name
+  // Client name + subtitle + URL (top zone)
   doc.setTextColor(255, 255, 255);
-  doc.setFontSize(clientName ? 17 : 19); doc.setFont('helvetica', 'bold');
-  doc.text(clientName || config.agencyName, M, 15);
-
-  // Subtitle + URL
-  doc.setFontSize(9); doc.setFont('helvetica', 'normal');
-  doc.text('UX + SEO Audit Report', M, 24);
-  doc.setFontSize(7); doc.setTextColor(200, 215, 235);
+  doc.setFontSize(clientName ? 16 : 18); doc.setFont('helvetica', 'bold');
+  doc.text(clientName || config.agencyName, M, 14);
+  doc.setFontSize(8.5); doc.setFont('helvetica', 'normal');
+  doc.text('UX + SEO Audit Report', M, 23);
+  doc.setFontSize(7); doc.setTextColor(210, 225, 240);
   doc.text(auditUrl, M, 31);
 
-  // Thin separator
-  doc.setDrawColor(255, 255, 255); doc.setLineWidth(0.15);
-  doc.line(M, 36, W - M, 36);
-
-  // Powered by — agency logo or name
-  doc.setFontSize(6); doc.setTextColor(185, 205, 225);
-  doc.text('Powered by', M, 42);
-  doc.setFont('helvetica', 'bold');
+  // "Powered by" — bottom zone
+  doc.setFontSize(6); doc.setTextColor(180, 200, 220);
+  doc.text('Powered by', M, 43);
   if (agencyLogo) {
-    addLogoToDoc(agencyLogo, M + 22, 37, 28, 9, false);
+    addLogoToDoc(agencyLogo, M + 22, 38, 30, 9, false);
   } else {
-    doc.setFontSize(7); doc.setTextColor(220, 230, 245);
-    doc.text(config.agencyName, M + 22, 42);
+    doc.setFontSize(7.5); doc.setFont('helvetica', 'bold'); doc.setTextColor(230, 238, 248);
+    doc.text(config.agencyName, M + 22, 43);
+    doc.setFont('helvetica', 'normal');
   }
-  doc.setFont('helvetica', 'normal');
 
   // ── Cover body ───────────────────────────────────────────────────────────────
   y = headerH + 9;
@@ -985,7 +997,7 @@ function WhiteLabelView({ audits, currentUrl, currentClientName, score, results,
     const file = e.target.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = (ev) => setter(ev.target.result);
+    reader.onload = (ev) => normalizeToJpeg(ev.target.result, setter);
     reader.readAsDataURL(file);
   };
 
@@ -994,10 +1006,11 @@ function WhiteLabelView({ audits, currentUrl, currentClientName, score, results,
     if (!file || !selectedAudit) return;
     const reader = new FileReader();
     reader.onload = (ev) => {
-      const b64 = ev.target.result;
-      const updated = { ...selectedAudit, clientLogo: b64 };
-      setSelectedAudit(updated);
-      onUpdateAudit(selectedAudit.id, { clientLogo: b64 });
+      normalizeToJpeg(ev.target.result, (jpeg) => {
+        const updated = { ...selectedAudit, clientLogo: jpeg };
+        setSelectedAudit(updated);
+        onUpdateAudit(selectedAudit.id, { clientLogo: jpeg });
+      });
     };
     reader.readAsDataURL(file);
   };
@@ -1090,30 +1103,40 @@ function WhiteLabelView({ audits, currentUrl, currentClientName, score, results,
           </div>
           <div style={{ borderTop:`1px solid ${C.border}`, paddingTop:16, marginBottom:16 }}>
             <label style={{ fontSize:11, color:C.muted, fontWeight:600, textTransform:'uppercase',
-              letterSpacing:'0.08em', display:'block', marginBottom:6 }}>Client Logo</label>
-            <div style={{ fontSize:11, color:C.muted, marginBottom:8 }}>
-              {selectedAudit
-                ? (selectedAudit.clientName || selectedAudit.url)
-                : 'Select an audit below to upload a client logo'}
-            </div>
-            {selectedAudit && (
-              <div style={{ display:'flex', gap:10, alignItems:'center' }}>
-                <label style={{ background:C.bg, border:`1px dashed ${C.border}`, borderRadius:8,
-                  padding:'7px 14px', color:C.muted, fontSize:12, cursor:'pointer',
-                  display:'flex', alignItems:'center', gap:6, flexShrink:0 }}>
-                  📎 Upload PNG / JPG
-                  <input type="file" accept="image/png,image/jpeg,image/jpg"
-                    onChange={handleClientLogoUpload} style={{ display:'none' }} />
-                </label>
+              letterSpacing:'0.08em', display:'block', marginBottom:10 }}>Client Logo</label>
+            {selectedAudit ? (
+              <div style={{ display:'flex', alignItems:'center', gap:10 }}>
                 {clientLogo ? (
-                  <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-                    <img src={clientLogo} alt="client" style={{ height:30, maxWidth:72, objectFit:'contain',
-                      borderRadius:4, background:'#fff', padding:2 }} />
-                    <button onClick={handleClientLogoClear} style={{ background:'transparent',
-                      border:`1px solid ${C.border}`, borderRadius:6, padding:'3px 8px',
-                      color:C.muted, fontSize:11, cursor:'pointer' }}>✕</button>
+                  <img src={clientLogo} alt="client" style={{ height:34, maxWidth:80, objectFit:'contain',
+                    borderRadius:6, background:'#fff', padding:3, flexShrink:0 }} />
+                ) : (
+                  <div style={{ width:56, height:34, borderRadius:6, background:C.bg,
+                    border:`1px dashed ${C.border}`, flexShrink:0 }} />
+                )}
+                <div style={{ flex:1, minWidth:0 }}>
+                  <div style={{ fontSize:12, fontWeight:600, color:C.text, overflow:'hidden',
+                    textOverflow:'ellipsis', whiteSpace:'nowrap', marginBottom:6 }}>
+                    {selectedAudit.clientName || selectedAudit.url}
                   </div>
-                ) : <span style={{ fontSize:11, color:C.muted }}>No logo uploaded</span>}
+                  <div style={{ display:'flex', gap:8 }}>
+                    <label style={{ background:C.bg, border:`1px dashed ${C.border}`, borderRadius:6,
+                      padding:'4px 10px', color:C.muted, fontSize:11, cursor:'pointer',
+                      display:'flex', alignItems:'center', gap:5 }}>
+                      📎 Upload
+                      <input type="file" accept="image/png,image/jpeg,image/jpg"
+                        onChange={handleClientLogoUpload} style={{ display:'none' }} />
+                    </label>
+                    {clientLogo && (
+                      <button onClick={handleClientLogoClear} style={{ background:'transparent',
+                        border:`1px solid ${C.border}`, borderRadius:6, padding:'4px 10px',
+                        color:C.muted, fontSize:11, cursor:'pointer' }}>✕ Remove</button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div style={{ fontSize:11, color:C.muted, fontStyle:'italic' }}>
+                Select an audit below to upload its client logo
               </div>
             )}
           </div>
