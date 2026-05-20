@@ -1173,7 +1173,7 @@ function App() {
       id: `${Date.now()}`, url, clientName: cn || '',
       results: res, score: sc, date: new Date().toISOString(),
     };
-    const updated = [newAudit, ...audits.filter(a => a.id !== (audits.find(a2 => a2.url === url && !editMode)?.id))];
+    const updated = [newAudit, ...audits.filter(a => a.url !== url)];
     setAudits(updated); saveAudits(updated);
   };
 
