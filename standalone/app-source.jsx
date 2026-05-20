@@ -836,49 +836,57 @@ function AuditView({ onComplete, initialUrl = '', initialClientName = '', initia
   const filledItems = Object.keys(results).filter(k => results[k] !== null && results[k] !== undefined).length;
   const remaining = totalItems - filledItems;
 
+  const canComplete = filledItems > 0;
   const cat = AUDIT_CATEGORIES.find(c => c.id === activeCat);
   return (
-    <div style={{ padding:'32px 36px', flex:1, overflowY:'auto' }}>
-      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:24 }}>
-        <div>
-          <h1 style={{ fontSize:22, fontWeight:800, color:C.text }}>
-            {isEditing ? '✎ Edit Audit' : 'New Audit'}
-          </h1>
-          <div style={{ fontSize:13, color:C.muted, marginTop:4 }}>
-            {remaining > 0
-              ? <span style={{ color:C.amber }}>{remaining} items remaining — mark Pass / Partial / Fail / N/A</span>
-              : <span style={{ color:C.green }}>All {totalItems} items reviewed ✓</span>
-            }
+    <div style={{ flex:1, overflowY:'auto', display:'flex', flexDirection:'column' }}>
+      <div style={{ position:'sticky', top:0, zIndex:20, background:C.bg,
+        borderBottom:`1px solid ${C.border}`, padding:'20px 36px 14px' }}>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
+          <div>
+            <h1 style={{ fontSize:22, fontWeight:800, color:C.text }}>
+              {isEditing ? '✎ Edit Audit' : 'New Audit'}
+            </h1>
+            <div style={{ fontSize:13, color:C.muted, marginTop:4 }}>
+              {remaining > 0
+                ? <span style={{ color:C.amber }}>{remaining} items remaining — mark Pass / Partial / Fail / N/A</span>
+                : <span style={{ color:C.green }}>All {totalItems} items reviewed ✓</span>
+              }
+            </div>
+          </div>
+          <div style={{ display:'flex', gap:8, alignItems:'center' }}>
+            <input value={clientName} onChange={e => setClientName(e.target.value)}
+              placeholder="Client name (e.g. Acme Corp)"
+              style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:8,
+                padding:'9px 14px', color:C.text, fontSize:13, width:190 }} />
+            <input value={url} onChange={e => setUrl(e.target.value)}
+              placeholder="https://yoursite.com"
+              style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:8,
+                padding:'9px 14px', color:C.text, fontSize:13, width:220 }} />
+            <button
+              onClick={() => canComplete && onComplete(url || clientName || 'Manual Audit', clientName, results, calculateScore(results))}
+              disabled={!canComplete}
+              style={{ background: canComplete ? C.green : C.border, border:'none', borderRadius:8,
+                padding:'10px 20px', color:'#fff', fontWeight:600, fontSize:13, whiteSpace:'nowrap',
+                cursor: canComplete ? 'pointer' : 'not-allowed', opacity: canComplete ? 1 : 0.45 }}>
+              {isEditing ? 'Save Changes →' : 'Complete Audit →'}
+            </button>
           </div>
         </div>
-        <div style={{ display:'flex', gap:8, alignItems:'center' }}>
-          <input value={clientName} onChange={e => setClientName(e.target.value)}
-            placeholder="Client name (e.g. Acme Corp)"
-            style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:8,
-              padding:'9px 14px', color:C.text, fontSize:13, width:190 }} />
-          <input value={url} onChange={e => setUrl(e.target.value)}
-            placeholder="https://yoursite.com"
-            style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:8,
-              padding:'9px 14px', color:C.text, fontSize:13, width:220 }} />
-          <button onClick={() => onComplete(url || clientName || 'Manual Audit', clientName, results, calculateScore(results))}
-            style={{ background:C.green, border:'none', borderRadius:8, padding:'10px 20px',
-              color:'#fff', fontWeight:600, fontSize:13, cursor:'pointer', whiteSpace:'nowrap' }}>
-            {isEditing ? 'Save Changes →' : 'Complete Audit →'}
-          </button>
+        <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
+          {AUDIT_CATEGORIES.map(c => (
+            <button key={c.id} onClick={() => setActiveCat(c.id)} style={{
+              background: activeCat === c.id ? c.color : C.surface,
+              border:`1px solid ${activeCat === c.id ? c.color : C.border}`,
+              borderRadius:8, padding:'8px 16px',
+              color: activeCat === c.id ? '#fff' : C.muted,
+              fontSize:12, fontWeight: activeCat === c.id ? 700 : 400, cursor:'pointer' }}>
+              {c.icon} {c.label}
+            </button>
+          ))}
         </div>
       </div>
-      <div style={{ display:'flex', gap:8, marginBottom:20, flexWrap:'wrap' }}>
-        {AUDIT_CATEGORIES.map(c => (
-          <button key={c.id} onClick={() => setActiveCat(c.id)} style={{
-            background: activeCat === c.id ? c.color : C.surface,
-            border:`1px solid ${activeCat === c.id ? c.color : C.border}`,
-            borderRadius:8, padding:'8px 16px',
-            color: activeCat === c.id ? '#fff' : C.muted,
-            fontSize:12, fontWeight: activeCat === c.id ? 700 : 400, cursor:'pointer' }}>
-            {c.icon} {c.label}
-          </button>
-        ))}
-      </div>
+      <div style={{ padding:'20px 36px', flex:1 }}>
       {cat.sections.map(sec => (
         <div key={sec.id} style={{ marginBottom:16 }}>
           <div style={{ padding:'10px 16px', background:cat.color, borderRadius:'8px 8px 0 0',
@@ -911,6 +919,7 @@ function AuditView({ onComplete, initialUrl = '', initialClientName = '', initia
           })}
         </div>
       ))}
+      </div>
     </div>
   );
 }

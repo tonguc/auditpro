@@ -31593,19 +31593,30 @@ function AuditView({
   const totalItems = AUDIT_CATEGORIES.flatMap(c => c.sections.flatMap(s => s.items)).length;
   const filledItems = Object.keys(results).filter(k => results[k] !== null && results[k] !== undefined).length;
   const remaining = totalItems - filledItems;
+  const canComplete = filledItems > 0;
   const cat = AUDIT_CATEGORIES.find(c => c.id === activeCat);
   return /*#__PURE__*/React.createElement("div", {
     style: {
-      padding: '32px 36px',
       flex: 1,
-      overflowY: 'auto'
+      overflowY: 'auto',
+      display: 'flex',
+      flexDirection: 'column'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: 'sticky',
+      top: 0,
+      zIndex: 20,
+      background: C.bg,
+      borderBottom: `1px solid ${C.border}`,
+      padding: '20px 36px 14px'
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginBottom: 24
+      marginBottom: 12
     }
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
     style: {
@@ -31660,23 +31671,24 @@ function AuditView({
       width: 220
     }
   }), /*#__PURE__*/React.createElement("button", {
-    onClick: () => onComplete(url || clientName || 'Manual Audit', clientName, results, calculateScore(results)),
+    onClick: () => canComplete && onComplete(url || clientName || 'Manual Audit', clientName, results, calculateScore(results)),
+    disabled: !canComplete,
     style: {
-      background: C.green,
+      background: canComplete ? C.green : C.border,
       border: 'none',
       borderRadius: 8,
       padding: '10px 20px',
       color: '#fff',
       fontWeight: 600,
       fontSize: 13,
-      cursor: 'pointer',
-      whiteSpace: 'nowrap'
+      whiteSpace: 'nowrap',
+      cursor: canComplete ? 'pointer' : 'not-allowed',
+      opacity: canComplete ? 1 : 0.45
     }
   }, isEditing ? 'Save Changes →' : 'Complete Audit →'))), /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
       gap: 8,
-      marginBottom: 20,
       flexWrap: 'wrap'
     }
   }, AUDIT_CATEGORIES.map(c => /*#__PURE__*/React.createElement("button", {
@@ -31692,7 +31704,12 @@ function AuditView({
       fontWeight: activeCat === c.id ? 700 : 400,
       cursor: 'pointer'
     }
-  }, c.icon, " ", c.label))), cat.sections.map(sec => /*#__PURE__*/React.createElement("div", {
+  }, c.icon, " ", c.label)))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: '20px 36px',
+      flex: 1
+    }
+  }, cat.sections.map(sec => /*#__PURE__*/React.createElement("div", {
     key: sec.id,
     style: {
       marginBottom: 16
@@ -31775,7 +31792,7 @@ function AuditView({
         color: s === v ? STATUS_COLOR[v] : C.muted
       }
     }, v))));
-  }))));
+  })))));
 }
 function WhiteLabelView({
   audits,
