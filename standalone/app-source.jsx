@@ -2035,44 +2035,90 @@ function DashboardView({ score, auditUrl, results, setPage, onEdit, audits, onSe
           ? evaluated.reduce((a, b) => b.score < a.score ? b : a).id
           : null;
         return (
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(5, 1fr)', gap:12, marginBottom:20 }}>
-            {score.categories.map(cat => {
-              const isWeakest = cat.id === weakestId;
-              return (
-                <div key={cat.id} onClick={() => setDetailCat(cat.id)}
-                  onMouseEnter={e => e.currentTarget.style.borderColor = cat.color}
-                  onMouseLeave={e => e.currentTarget.style.borderColor = isWeakest ? C.red : C.border}
-                  style={{ background:C.surface,
-                    border:`1px solid ${isWeakest ? C.red : C.border}`,
-                    borderRadius:12, padding:'14px 16px', cursor:'pointer',
-                    transition:'border-color 0.15s',
-                    boxShadow: isWeakest ? `0 0 0 2px ${C.red}33` : 'none' }}>
-                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:8 }}>
-                    <div style={{ fontSize:10, color:C.muted, fontWeight:700, textTransform:'uppercase', flex:1, lineHeight:1.3 }}>
-                      {cat.icon} {cat.label.replace('Technical SEO','Tech SEO').replace('On-Page & Content','On-Page').replace('UX Heuristics','UX').replace('Conversion & CTA','CRO').replace('AI & SERP Visibility','AI/SERP')}
+          <>
+            {/* Section header */}
+            <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:12 }}>
+              <div style={{ fontSize:13, fontWeight:700, color:C.text }}>Performance by Section</div>
+              <div style={{ flex:1, height:1, background:C.border }} />
+              <div style={{ fontSize:11, color:C.muted }}>click any card to see details</div>
+            </div>
+
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(5, 1fr)', gap:10, marginBottom:20 }}>
+              {score.categories.map(cat => {
+                const isWeakest = cat.id === weakestId;
+                const catScoreColor = cat.evaluated > 0
+                  ? (cat.score >= 70 ? C.green : cat.score >= 50 ? C.amber : C.red)
+                  : C.muted;
+                const shortLabel = cat.label
+                  .replace('Technical SEO','Tech SEO')
+                  .replace('On-Page & Content','On-Page')
+                  .replace('UX Heuristics','UX')
+                  .replace('Conversion & CTA','CRO')
+                  .replace('AI & SERP Visibility','AI/SERP');
+                return (
+                  <div key={cat.id} onClick={() => setDetailCat(cat.id)}
+                    onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
+                    onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
+                    style={{
+                      background: C.surface,
+                      border: `1.5px solid ${isWeakest ? C.red+'88' : C.border}`,
+                      borderTop: `3px solid ${isWeakest ? C.red : cat.color}`,
+                      borderRadius: 10, padding: '16px 14px', cursor: 'pointer',
+                      transition: 'transform 0.15s, box-shadow 0.15s',
+                      boxShadow: isWeakest ? `0 0 0 3px ${C.red}18` : 'none'
+                    }}>
+                    {/* Header row: icon + label + WEAKEST badge */}
+                    <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:12 }}>
+                      <div>
+                        <div style={{ fontSize:18, lineHeight:1, marginBottom:4 }}>{cat.icon}</div>
+                        <div style={{ fontSize:10, fontWeight:700, color:C.muted, textTransform:'uppercase',
+                          letterSpacing:'0.08em', lineHeight:1.3 }}>{shortLabel}</div>
+                      </div>
+                      <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:4 }}>
+                        {isWeakest && (
+                          <span style={{ fontSize:8, fontWeight:800, padding:'2px 6px', borderRadius:4,
+                            background:`${C.red}18`, color:C.red, letterSpacing:'0.5px', whiteSpace:'nowrap' }}>
+                            ⚠ WEAKEST
+                          </span>
+                        )}
+                        <span style={{ fontSize:12, fontWeight:800, padding:'2px 8px', borderRadius:6,
+                          background:`${cat.color}20`, color:cat.color }}>
+                          {cat.evaluated > 0 ? `Grade ${cat.grade}` : '—'}
+                        </span>
+                      </div>
                     </div>
-                    <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:3, flexShrink:0 }}>
-                      {isWeakest && (
-                        <span style={{ fontSize:8, fontWeight:800, padding:'1px 5px', borderRadius:3,
-                          background:`${C.red}22`, color:C.red, letterSpacing:'0.5px' }}>WEAKEST</span>
+                    {/* Score */}
+                    <div style={{ display:'flex', alignItems:'baseline', gap:2, marginBottom:8 }}>
+                      <span style={{ fontSize:30, fontWeight:900, color: cat.evaluated > 0 ? catScoreColor : C.muted,
+                        lineHeight:1, letterSpacing:'-1px' }}>
+                        {cat.evaluated > 0 ? cat.score : '—'}
+                      </span>
+                      {cat.evaluated > 0 && (
+                        <span style={{ fontSize:13, fontWeight:500, color:C.muted }}>/100</span>
                       )}
-                      <div style={{ background:`${cat.color}22`, borderRadius:6, padding:'2px 8px',
-                        fontSize:14, fontWeight:800, color:cat.color }}>{cat.grade}</div>
+                    </div>
+                    {/* Progress bar */}
+                    <div style={{ background:C.border, borderRadius:4, height:4, marginBottom:8, overflow:'hidden' }}>
+                      <div style={{ height:4, borderRadius:4, background: cat.evaluated > 0 ? catScoreColor : C.border,
+                        width:`${cat.evaluated > 0 ? cat.score : 0}%`, transition:'width 0.4s ease' }} />
+                    </div>
+                    {/* Stats */}
+                    <div style={{ display:'flex', gap:6 }}>
+                      {cat.evaluated > 0 ? (
+                        <>
+                          <span style={{ fontSize:10, color:C.green, fontWeight:600 }}>✓ {cat.passed}</span>
+                          <span style={{ fontSize:10, color:C.red, fontWeight:600 }}>✗ {cat.failed}</span>
+                          <span style={{ fontSize:10, color:C.muted, marginLeft:'auto' }}>{cat.evaluated} done</span>
+                        </>
+                      ) : (
+                        <span style={{ fontSize:10, color:C.muted, fontStyle:'italic' }}>Not started</span>
+                      )}
                     </div>
                   </div>
-                  <div style={{ fontSize:24, fontWeight:800, color:C.text, lineHeight:1, marginBottom:4 }}>
-                    {cat.evaluated > 0 ? cat.score : '—'}<span style={{ fontSize:11, color:C.muted }}>{cat.evaluated > 0 ? '/100' : ''}</span>
-                  </div>
-                  <div style={{ background:C.border, borderRadius:3, height:3, marginBottom:6 }}>
-                    <div style={{ height:3, borderRadius:3, background:cat.color, width:`${cat.score}%` }} />
-                  </div>
-                  <div style={{ fontSize:10, color:C.muted }}>
-                    {cat.evaluated > 0 ? `${cat.passed}✓ ${cat.failed}✗ ${cat.evaluated} reviewed` : 'Not started'}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          </>
         );
       })()}
 
