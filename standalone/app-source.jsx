@@ -1,5 +1,12 @@
 const { useState, useEffect, useRef } = React;
 
+// Inject keyframe for auto-advance progress bar
+(function() {
+  const s = document.createElement('style');
+  s.textContent = '@keyframes slideIn { from { transform: translateX(-100%); } to { transform: translateX(0); } }';
+  document.head.appendChild(s);
+})();
+
 // ─── AUDIT DATA ───────────────────────────────────────────────────────────────
 
 const technicalSEO = {
@@ -881,20 +888,50 @@ function AuditView({ onComplete, initialUrl = '', initialClientName = '', initia
   const [clientName, setClientName] = useState(initialClientName);
   const [results, setResults]       = useState(initialResults);
   const [activeCat, setActiveCat]   = useState(AUDIT_CATEGORIES[0].id);
-  const scrollRef = useRef(null);
+  const [advancing, setAdvancing]   = useState(false);
+  const scrollRef  = useRef(null);
+  const timerRef   = useRef(null);
+  const catIdxRef  = useRef(0);
 
-  // Scroll to top when switching categories
   const switchCat = (id) => {
     setActiveCat(id);
+    setAdvancing(false);
     if (scrollRef.current) scrollRef.current.scrollTop = 0;
   };
 
+  // Keep ref in sync so scroll handler always sees current index
   const totalItems = AUDIT_CATEGORIES.flatMap(c => c.sections.flatMap(s => s.items)).length;
   const filledItems = Object.keys(results).filter(k => results[k] !== null && results[k] !== undefined).length;
   const remaining = totalItems - filledItems;
   const canComplete = filledItems > 0;
   const cat = AUDIT_CATEGORIES.find(c => c.id === activeCat);
   const catIdx = AUDIT_CATEGORIES.findIndex(c => c.id === activeCat);
+  catIdxRef.current = catIdx;
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+    const onScroll = () => {
+      const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 40;
+      if (atBottom && catIdxRef.current < AUDIT_CATEGORIES.length - 1) {
+        if (!timerRef.current) {
+          setAdvancing(true);
+          timerRef.current = setTimeout(() => {
+            timerRef.current = null;
+            const nextId = AUDIT_CATEGORIES[catIdxRef.current + 1].id;
+            setActiveCat(nextId);
+            setAdvancing(false);
+            if (scrollRef.current) scrollRef.current.scrollTop = 0;
+          }, 600);
+        }
+      } else {
+        if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null; }
+        setAdvancing(false);
+      }
+    };
+    el.addEventListener('scroll', onScroll);
+    return () => { el.removeEventListener('scroll', onScroll); clearTimeout(timerRef.current); timerRef.current = null; };
+  }, [activeCat]);
 
   return (
     <div ref={scrollRef} style={{ flex:1, overflowY:'auto' }}>
@@ -993,8 +1030,18 @@ function AuditView({ onComplete, initialUrl = '', initialClientName = '', initia
           </div>
         ))}
 
+        {/* Auto-advance indicator */}
+        {advancing && catIdx < AUDIT_CATEGORIES.length - 1 && (
+          <div style={{ textAlign:'center', padding:'12px 0', fontSize:12, color:C.muted }}>
+            <span style={{ display:'inline-block', width:160, height:3, background:C.border, borderRadius:2, overflow:'hidden', verticalAlign:'middle', marginRight:8 }}>
+              <span style={{ display:'block', height:'100%', background:AUDIT_CATEGORIES[catIdx + 1].color,
+                animation:'slideIn 0.6s linear', width:'100%' }} />
+            </span>
+            {AUDIT_CATEGORIES[catIdx + 1].label} geçiliyor…
+          </div>
+        )}
         {/* Prev / Next navigation */}
-        <div style={{ display:'flex', justifyContent:'space-between', marginTop:24 }}>
+        <div style={{ display:'flex', justifyContent:'space-between', marginTop:16 }}>
           <button
             onClick={() => catIdx > 0 && switchCat(AUDIT_CATEGORIES[catIdx - 1].id)}
             disabled={catIdx === 0}
