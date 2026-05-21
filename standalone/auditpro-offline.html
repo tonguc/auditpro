@@ -33172,17 +33172,13 @@ function WhiteLabelView({
   }, "Saved Audits (", audits.length, ")"), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 11,
-      color: C.muted,
-      display: 'flex',
-      gap: 6,
-      alignItems: 'center'
+      color: C.muted
     }
   }, /*#__PURE__*/React.createElement("span", {
     style: {
-      fontSize: 10,
       opacity: 0.6
     }
-  }, "\u21BA hold 2s to reset \xA0\xB7\xA0 \u29C9 duplicate"))), /*#__PURE__*/React.createElement("div", {
+  }, "\u21BA Clear = hold 2s \xB7 keeps name & URL, clears answers"))), /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
       flexDirection: 'column',
@@ -33301,46 +33297,46 @@ function WhiteLabelView({
         e.stopPropagation();
         onDuplicateAudit(a);
       },
-      title: "Duplicate \u2014 copies project with blank results",
+      title: "Duplicate with blank results",
       style: {
         background: 'transparent',
         border: `1px solid ${C.border}`,
         borderRadius: 6,
         padding: '4px 10px',
         color: C.muted,
-        fontSize: 12,
+        fontSize: 11,
         cursor: 'pointer'
       }
-    }, "\u29C9"), /*#__PURE__*/React.createElement(HoldButton, {
+    }, "\u29C9 Copy"), /*#__PURE__*/React.createElement(HoldButton, {
       onConfirm: () => onResetAudit(a.id),
-      label: "\u21BA",
-      holdLabel: "\u21BA",
+      label: "\u21BA Clear",
+      holdLabel: "\u21BA \u2026",
       duration: 2000,
       style: {
         background: 'transparent',
-        border: `1px solid ${C.amber}55`,
+        border: `1px solid ${C.amber}66`,
         borderRadius: 6,
         padding: '4px 10px',
         color: C.amber,
-        fontSize: 12,
-        cursor: 'pointer',
-        title: 'Hold 2s to reset results'
+        fontSize: 11,
+        cursor: 'pointer'
       }
     }), /*#__PURE__*/React.createElement("button", {
       onClick: e => {
         e.stopPropagation();
         onDelete(a.id);
       },
+      title: "Delete project",
       style: {
         background: 'transparent',
         border: `1px solid ${C.border}`,
         borderRadius: 6,
         padding: '4px 10px',
         color: C.muted,
-        fontSize: 12,
+        fontSize: 11,
         cursor: 'pointer'
       }
-    }, "\u2715")));
+    }, "\u2715 Delete")));
   })), /*#__PURE__*/React.createElement("div", {
     style: {
       marginTop: 28,

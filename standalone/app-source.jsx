@@ -1593,8 +1593,8 @@ function WhiteLabelView({ audits, currentUrl, currentClientName, score, results,
         <div style={{ marginTop:28, maxWidth:720 }}>
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:14 }}>
             <div style={{ fontSize:16, fontWeight:700, color:C.text }}>Saved Audits ({audits.length})</div>
-            <div style={{ fontSize:11, color:C.muted, display:'flex', gap:6, alignItems:'center' }}>
-              <span style={{ fontSize:10, opacity:0.6 }}>↺ hold 2s to reset &nbsp;·&nbsp; ⧉ duplicate</span>
+            <div style={{ fontSize:11, color:C.muted }}>
+              <span style={{ opacity:0.6 }}>↺ Clear = hold 2s · keeps name &amp; URL, clears answers</span>
             </div>
           </div>
           <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
@@ -1634,20 +1634,20 @@ function WhiteLabelView({ audits, currentUrl, currentClientName, score, results,
                       style={{ background:'transparent', border:`1px solid ${C.accent}`, borderRadius:6,
                         padding:'4px 10px', color:C.accent, fontSize:12, cursor:'pointer' }}>✎ Edit</button>
                     <button onClick={e => { e.stopPropagation(); onDuplicateAudit(a); }}
-                      title="Duplicate — copies project with blank results"
+                      title="Duplicate with blank results"
                       style={{ background:'transparent', border:`1px solid ${C.border}`, borderRadius:6,
-                        padding:'4px 10px', color:C.muted, fontSize:12, cursor:'pointer' }}>⧉</button>
+                        padding:'4px 10px', color:C.muted, fontSize:11, cursor:'pointer' }}>⧉ Copy</button>
                     <HoldButton
                       onConfirm={() => onResetAudit(a.id)}
-                      label="↺"
-                      holdLabel="↺"
+                      label="↺ Clear"
+                      holdLabel="↺ …"
                       duration={2000}
-                      style={{ background:'transparent', border:`1px solid ${C.amber}55`, borderRadius:6,
-                        padding:'4px 10px', color:C.amber, fontSize:12, cursor:'pointer',
-                        title:'Hold 2s to reset results' }} />
+                      style={{ background:'transparent', border:`1px solid ${C.amber}66`, borderRadius:6,
+                        padding:'4px 10px', color:C.amber, fontSize:11, cursor:'pointer' }} />
                     <button onClick={e => { e.stopPropagation(); onDelete(a.id); }}
+                      title="Delete project"
                       style={{ background:'transparent', border:`1px solid ${C.border}`, borderRadius:6,
-                        padding:'4px 10px', color:C.muted, fontSize:12, cursor:'pointer' }}>✕</button>
+                        padding:'4px 10px', color:C.muted, fontSize:11, cursor:'pointer' }}>✕ Delete</button>
                   </div>
                 </div>
               );
