@@ -33077,36 +33077,52 @@ function DashboardView({
   }, confidence, " Confidence \xB7 ", completionPct, "% reviewed")), totalEval > 0 ? /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
-      alignItems: 'flex-end',
-      gap: 12
+      alignItems: 'center',
+      gap: 20
     }
-  }, /*#__PURE__*/React.createElement("span", {
+  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     style: {
-      fontSize: 56,
-      fontWeight: 800,
+      fontSize: 62,
+      fontWeight: 900,
       color: C.accent,
-      lineHeight: 1
+      lineHeight: 1,
+      letterSpacing: '-2px'
     }
   }, score.weighted), /*#__PURE__*/React.createElement("div", {
     style: {
-      paddingBottom: 6
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 15,
-      fontWeight: 500,
+      fontSize: 12,
+      fontWeight: 600,
       color: C.muted,
-      lineHeight: 1
+      letterSpacing: '1px',
+      marginTop: 2
     }
-  }, "/100"), /*#__PURE__*/React.createElement("div", {
+  }, "/100")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 1,
+      background: C.border,
+      alignSelf: 'stretch',
+      margin: '4px 0'
+    }
+  }), /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'inline-block',
+      background: `${C.accent}18`,
+      borderRadius: 8,
+      padding: '4px 12px',
+      marginBottom: 6
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 22,
+      fontWeight: 800,
+      color: C.accent
+    }
+  }, "Grade ", score.grade)), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 13,
-      fontWeight: 700,
-      color: C.text,
-      marginTop: 3,
-      whiteSpace: 'nowrap'
+      color: C.muted
     }
-  }, "Grade ", score.grade, " \xB7 ", score.rating))) : /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
+  }, score.rating))) : /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 36,
       fontWeight: 800,

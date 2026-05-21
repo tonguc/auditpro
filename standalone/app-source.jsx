@@ -1951,11 +1951,19 @@ function DashboardView({ score, auditUrl, results, setPage, onEdit, audits, onSe
             )}
           </div>
           {totalEval > 0 ? (
-            <div style={{ display:'flex', alignItems:'flex-end', gap:12 }}>
-              <span style={{ fontSize:56, fontWeight:800, color:C.accent, lineHeight:1 }}>{score.weighted}</span>
-              <div style={{ paddingBottom:6 }}>
-                <div style={{ fontSize:15, fontWeight:500, color:C.muted, lineHeight:1 }}>/100</div>
-                <div style={{ fontSize:13, fontWeight:700, color:C.text, marginTop:3, whiteSpace:'nowrap' }}>Grade {score.grade} · {score.rating}</div>
+            <div style={{ display:'flex', alignItems:'center', gap:20 }}>
+              {/* Score stacked: big number over /100 */}
+              <div>
+                <div style={{ fontSize:62, fontWeight:900, color:C.accent, lineHeight:1, letterSpacing:'-2px' }}>{score.weighted}</div>
+                <div style={{ fontSize:12, fontWeight:600, color:C.muted, letterSpacing:'1px', marginTop:2 }}>/100</div>
+              </div>
+              <div style={{ width:1, background:C.border, alignSelf:'stretch', margin:'4px 0' }} />
+              {/* Grade + rating */}
+              <div>
+                <div style={{ display:'inline-block', background:`${C.accent}18`, borderRadius:8, padding:'4px 12px', marginBottom:6 }}>
+                  <span style={{ fontSize:22, fontWeight:800, color:C.accent }}>Grade {score.grade}</span>
+                </div>
+                <div style={{ fontSize:13, color:C.muted }}>{score.rating}</div>
               </div>
             </div>
           ) : (
