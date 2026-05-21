@@ -31679,17 +31679,16 @@ function AuditView({
   const [clientName, setClientName] = useState(initialClientName);
   const [results, setResults] = useState(initialResults);
   const [activeCat, setActiveCat] = useState(AUDIT_CATEGORIES[0].id);
-  const [advancing, setAdvancing] = useState(false);
   const scrollRef = useRef(null);
-  const timerRef = useRef(null);
   const catIdxRef = useRef(0);
-  const switchCat = id => {
+  const lastSwitchRef = useRef(0);
+  const switchCat = (id, scrollToBottom) => {
     setActiveCat(id);
-    setAdvancing(false);
-    if (scrollRef.current) scrollRef.current.scrollTop = 0;
+    setTimeout(() => {
+      if (!scrollRef.current) return;
+      scrollRef.current.scrollTop = scrollToBottom ? scrollRef.current.scrollHeight : 0;
+    }, 0);
   };
-
-  // Keep ref in sync so scroll handler always sees current index
   const totalItems = AUDIT_CATEGORIES.flatMap(c => c.sections.flatMap(s => s.items)).length;
   const filledItems = Object.keys(results).filter(k => results[k] !== null && results[k] !== undefined).length;
   const remaining = totalItems - filledItems;
@@ -31700,34 +31699,33 @@ function AuditView({
   useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
-    const onScroll = () => {
-      const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 40;
-      if (atBottom && catIdxRef.current < AUDIT_CATEGORIES.length - 1) {
-        if (!timerRef.current) {
-          setAdvancing(true);
-          timerRef.current = setTimeout(() => {
-            timerRef.current = null;
-            const nextId = AUDIT_CATEGORIES[catIdxRef.current + 1].id;
-            setActiveCat(nextId);
-            setAdvancing(false);
-            if (scrollRef.current) scrollRef.current.scrollTop = 0;
-          }, 600);
-        }
-      } else {
-        if (timerRef.current) {
-          clearTimeout(timerRef.current);
-          timerRef.current = null;
-        }
-        setAdvancing(false);
+    const onWheel = e => {
+      const now = Date.now();
+      if (now - lastSwitchRef.current < 800) return;
+      const atBottom = el.scrollTop + el.clientHeight >= el.scrollHeight - 8;
+      const atTop = el.scrollTop <= 8;
+      const idx = catIdxRef.current;
+      if (e.deltaY > 0 && atBottom && idx < AUDIT_CATEGORIES.length - 1) {
+        lastSwitchRef.current = now;
+        const nextId = AUDIT_CATEGORIES[idx + 1].id;
+        setActiveCat(nextId);
+        setTimeout(() => {
+          if (scrollRef.current) scrollRef.current.scrollTop = 0;
+        }, 0);
+      } else if (e.deltaY < 0 && atTop && idx > 0) {
+        lastSwitchRef.current = now;
+        const prevId = AUDIT_CATEGORIES[idx - 1].id;
+        setActiveCat(prevId);
+        setTimeout(() => {
+          if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+        }, 0);
       }
     };
-    el.addEventListener('scroll', onScroll);
-    return () => {
-      el.removeEventListener('scroll', onScroll);
-      clearTimeout(timerRef.current);
-      timerRef.current = null;
-    };
-  }, [activeCat]);
+    el.addEventListener('wheel', onWheel, {
+      passive: true
+    });
+    return () => el.removeEventListener('wheel', onWheel);
+  }, []);
   return /*#__PURE__*/React.createElement("div", {
     ref: scrollRef,
     style: {
@@ -31943,33 +31941,7 @@ function AuditView({
         color: s === v ? STATUS_COLOR[v] : C.muted
       }
     }, v))));
-  }))), advancing && catIdx < AUDIT_CATEGORIES.length - 1 && /*#__PURE__*/React.createElement("div", {
-    style: {
-      textAlign: 'center',
-      padding: '12px 0',
-      fontSize: 12,
-      color: C.muted
-    }
-  }, /*#__PURE__*/React.createElement("span", {
-    style: {
-      display: 'inline-block',
-      width: 160,
-      height: 3,
-      background: C.border,
-      borderRadius: 2,
-      overflow: 'hidden',
-      verticalAlign: 'middle',
-      marginRight: 8
-    }
-  }, /*#__PURE__*/React.createElement("span", {
-    style: {
-      display: 'block',
-      height: '100%',
-      background: AUDIT_CATEGORIES[catIdx + 1].color,
-      animation: 'slideIn 0.6s linear',
-      width: '100%'
-    }
-  })), AUDIT_CATEGORIES[catIdx + 1].label, " ge\xE7iliyor\u2026"), /*#__PURE__*/React.createElement("div", {
+  }))), /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
       justifyContent: 'space-between',
