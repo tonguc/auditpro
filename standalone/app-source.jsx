@@ -1052,13 +1052,13 @@ function downloadPDF(config, auditUrl, score, results) {
   const rx = M + halfW + 6;
   doc.setFontSize(6); doc.setFont('helvetica','bold'); doc.setTextColor(155,160,178);
   doc.text('PREPARED FOR', rx, y + 6);
-  // Date right-aligned — short format, never wraps
-  doc.text(dateShort, W - M, y + 6, {align:'right'});
   doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.setTextColor(25,30,48);
   doc.text(st(clientName || '-'), rx, y + 12);
   doc.setFontSize(7.5); doc.setFont('helvetica','normal'); doc.setTextColor(90,95,115);
   const urlShort = auditUrl.replace(/https?:\/\/(www\.)?/, '').slice(0, 40);
   doc.text(urlShort, rx, y + 17);
+  doc.setFontSize(6); doc.setFont('helvetica','normal'); doc.setTextColor(155,160,178);
+  doc.text(dateShort, rx, y + 22);
 
   // ── Client Snapshot box ───────────────────────────────────────────────────
   y += 28;
@@ -1285,16 +1285,16 @@ function downloadPDF(config, auditUrl, score, results) {
       // Priority badge
       const bCol = item.priority==='Critical'?[214,45,60]:item.priority==='High'?[205,112,0]:item.priority==='Medium'?[12,145,210]:[14,172,118];
       doc.setFillColor(...bCol);
-      doc.roundedRect(M, y + 2, 26, 5, 1, 1, 'F');
+      doc.roundedRect(M, y + 2, 18, 5, 1, 1, 'F');
       doc.setFontSize(5.5); doc.setFont('helvetica','bold'); doc.setTextColor(255,255,255);
-      doc.text(item.priority.toUpperCase(), M + 13, y + 5.1, {align:'center'});
+      doc.text(item.priority.toUpperCase(), M + 9, y + 5.1, {align:'center'});
       // Category tag
       const shortCat = item.catLabel.replace('Technical SEO','Tech SEO').replace('On-Page & Content','On-Page')
         .replace('UX Heuristics','UX').replace('Conversion & CTA','CRO').replace('AI & SERP Visibility','AI/SERP');
       doc.setFontSize(5.5); doc.setFont('helvetica','normal'); doc.setTextColor(...item.catRgb);
-      doc.text(shortCat, M + 29, y + 5.1);
+      doc.text(shortCat, M + 21, y + 5.1);
       // Content starts below badge area
-      let ry = y + 9;
+      let ry = y + 11;
       // Title (up to 2 lines)
       doc.setFontSize(8); doc.setFont('helvetica','bold'); doc.setTextColor(22,28,48);
       doc.text(titleLines, M + 2, ry);
@@ -1342,7 +1342,7 @@ function downloadPDF(config, auditUrl, score, results) {
       doc.setFillColor(255,255,255);
       doc.roundedRect(W - M - 16, 5.5, 13, 5, 1, 1, 'F');
       doc.setFontSize(5); doc.setFont('helvetica','bold'); doc.setTextColor(...catColor);
-      doc.text('NEW', W - M - 9.5, 9.2, {align:'center'});
+      doc.text('NEW', W - M - 9.5, 8.6, {align:'center'});
     }
     // Score + evaluation state
     if (catScore) {
