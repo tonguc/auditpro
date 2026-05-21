@@ -31275,7 +31275,12 @@ function generateReportCopy(score, results) {
     sectionInsights,
     priorityIssues,
     weakestId: weakest.id,
-    weakestLabel: weakest.label.replace('AI & SERP Visibility','AI & SERP'),
+    weakestLabel: (() => {
+      const unevalCount = score.categories.filter(c => c.evaluated === 0).length;
+      return unevalCount > 0
+        ? `${unevalCount} section${unevalCount > 1 ? 's' : ''} not yet evaluated`
+        : weakest.label.replace('AI & SERP Visibility','AI & SERP');
+    })(),
     scoreLabel,
     isLowCov,
     isMedCov
@@ -31475,13 +31480,27 @@ function downloadPDF(config, auditUrl, score, results) {
   // ZONE 3 — Compact audit summary (no box, just text rows)
   y = hBarH + bStripH + 6;
 
-  const evalCats2  = score.categories.filter(c => c.evaluated > 0);
-  const weakest2   = evalCats2.length > 0 ? evalCats2.reduce((a, b) => b.score < a.score ? b : a) : null;
-  const totalItems2 = score.categories.reduce((s, c) => s + c.total, 0);
+  const evalCats2     = score.categories.filter(c => c.evaluated > 0);
+  const unevalCats2   = score.categories.filter(c => c.evaluated === 0);
+  const weakest2      = evalCats2.length > 0 ? evalCats2.reduce((a, b) => b.score < a.score ? b : a) : null;
+  const totalItems2   = score.categories.reduce((s, c) => s + c.total, 0);
   const critS = AUDIT_CATEGORIES.flatMap(cat => cat.sections.flatMap(sec => sec.items.filter(it => results[it.id] === 'Fail' && it.priority === 'Critical'))).length;
   const highS = AUDIT_CATEGORIES.flatMap(cat => cat.sections.flatMap(sec => sec.items.filter(it => results[it.id] === 'Fail' && it.priority === 'High'))).length;
   const urgencyStr = critS > 0 ? `${critS} Critical issue${critS > 1 ? 's' : ''}` : highS > 0 ? `${highS} High-priority issue${highS > 1 ? 's' : ''}` : 'No critical blockers';
-  const oppStr = weakest2 ? weakest2.label.replace('AI & SERP Visibility', 'AI & SERP') : 'N/A';
+
+  // Main Opportunity — show context if sections are unevaluated
+  let oppStr, oppColor;
+  if (unevalCats2.length > 0 && evalCats2.length < score.categories.length) {
+    const unevalNames = unevalCats2.map(c => c.label.replace('Technical SEO','Tech SEO').replace('On-Page & Content','On-Page').replace('UX Heuristics','UX').replace('Conversion & CTA','CRO').replace('AI & SERP Visibility','AI/SERP'));
+    oppStr = `${unevalCats2.length} section${unevalCats2.length > 1 ? 's' : ''} not yet evaluated`;
+    oppColor = [140, 80, 0];
+  } else if (weakest2) {
+    oppStr = weakest2.label.replace('AI & SERP Visibility', 'AI & SERP');
+    oppColor = [50, 55, 72];
+  } else {
+    oppStr = 'N/A';
+    oppColor = [120, 125, 145];
+  }
 
   // Row 1: Scope + Coverage
   doc.setFontSize(7.5);
@@ -31502,8 +31521,10 @@ function downloadPDF(config, auditUrl, score, results) {
   doc.setFont('helvetica', 'normal');
   doc.text(`Main Opportunity:`, M, y);
   doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...oppColor);
   doc.text(st(oppStr), M + 30, y);
   doc.setFont('helvetica', 'normal');
+  doc.setTextColor(50, 55, 72);
   doc.text(`Urgency:`, W / 2, y);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(critS > 0 ? 180 : highS > 0 ? 155 : 50, critS > 0 ? 30 : highS > 0 ? 80 : 55, critS > 0 ? 30 : highS > 0 ? 0 : 72);
