@@ -1889,15 +1889,7 @@ function DashboardView({ score, auditUrl, results, setPage, onEdit, audits, onSe
   const blankItems   = allItems.filter(it => !it.status);
   const filteredIssues = issueFilter === 'Fail' ? failItems : issueFilter === 'Partial' ? partialItems : issueFilter === 'Blank' ? blankItems : [];
 
-  const scoreColor   = totalEval > 0 ? (score.weighted >= 70 ? C.green : score.weighted >= 50 ? C.amber : C.red) : C.muted;
-  const criticalCount = failItems.filter(i => i.priority === 'Critical').length;
-  const perfLabel    = totalEval > 0
-    ? score.weighted >= 85 ? 'Strong performance — site is well optimised'
-    : score.weighted >= 70 ? 'Good performance with clear room to improve'
-    : score.weighted >= 50 ? 'Below average — key opportunities are being missed'
-    : 'Poor performance actively limiting growth'
-    : null;
-
+  const scrollToIssues = (filter) => { setIssueFilter(filter); setTimeout(() => issuesRef.current?.scrollIntoView({ behavior:'smooth', block:'start' }), 50); };
 
   const FILTER_TABS = [
     { key:'Fail',    label:`Fail`,    count: failItems.length,    color: C.red    },
@@ -1958,109 +1950,50 @@ function DashboardView({ score, auditUrl, results, setPage, onEdit, audits, onSe
         </div>
       )}
 
-      {/* ── Score Summary ──────────────────────────────────────────────────── */}
-      <div style={{
-        background: C.surface,
-        border: `1.5px solid ${C.border}`,
-        borderRadius: 14, overflow:'hidden', marginBottom: 20
-      }}>
-        {/* Top band */}
-        <div style={{ background: totalEval > 0 ? C.accent : C.muted, height: 4 }} />
-
-        <div style={{ padding:'24px 28px 20px' }}>
-          {/* Main row: score block (left) + confidence box (right) */}
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:24 }}>
-
-            {/* LEFT — score + grade stacked */}
-            <div>
-              <div style={{ fontSize:10, fontWeight:700, color:C.muted,
-                textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:10 }}>
-                Overall Score
-              </div>
-              {totalEval > 0 ? (
-                <>
-                  {/* Score line: 68px number + 36px /100 on same baseline */}
-                  <div style={{ display:'flex', alignItems:'baseline', gap:4, marginBottom:10 }}>
-                    <span style={{ fontSize:68, fontWeight:900, color:C.accent,
-                      lineHeight:1, letterSpacing:'-3px' }}>
-                      {score.weighted}
-                    </span>
-                    <span style={{ fontSize:36, fontWeight:400, color:C.muted, lineHeight:1 }}>/100</span>
-                  </div>
-                  {/* Grade + pill on same row */}
-                  <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:10 }}>
-                    <span style={{ fontSize:24, fontWeight:800, color:C.text }}>Grade {score.grade}</span>
-                    <span style={{ fontSize:12, fontWeight:700, padding:'4px 12px', borderRadius:20,
-                      background:`${scoreColor}22`, color:scoreColor, whiteSpace:'nowrap' }}>
-                      {score.rating}
-                    </span>
-                  </div>
-                  {/* Interpretation */}
-                  <div style={{ fontSize:13, color:C.muted, lineHeight:1.6, maxWidth:400 }}>
-                    {perfLabel}
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div style={{ fontSize:52, fontWeight:900, color:C.muted, lineHeight:1, marginBottom:8 }}>—</div>
-                  <div style={{ fontSize:13, color:C.muted }}>No items reviewed yet</div>
-                </>
-              )}
-            </div>
-
-            {/* RIGHT — confidence box */}
-            <div style={{
-              flexShrink: 0, minWidth: 200,
-              background: C.bg,
-              border: `1.5px solid ${confidenceColor}`,
-              borderRadius: 12, padding: '18px 20px'
-            }}>
-              <div style={{ fontSize:10, fontWeight:700, color:C.muted,
-                textTransform:'uppercase', letterSpacing:'0.1em', marginBottom:12 }}>
-                Audit Confidence
-              </div>
-              <div style={{ fontSize:28, fontWeight:800, color:confidenceColor, lineHeight:1, marginBottom:6 }}>
-                {confidence}
-              </div>
-              <div style={{ fontSize:13, color:C.text, fontWeight:600, marginBottom:4 }}>
-                {completionPct}% reviewed
-              </div>
-              <div style={{ fontSize:11, color:C.muted }}>{totalEval} / {totalAll} checkpoints</div>
-              <div style={{ marginTop:12, background:C.border, borderRadius:4, height:4 }}>
-                <div style={{ height:4, borderRadius:4, background:confidenceColor,
-                  width:`${completionPct}%`, transition:'width 0.4s' }} />
-              </div>
-            </div>
+      {/* Top metrics row */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:12, marginBottom:20 }}>
+        {/* Score */}
+        <div style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 20px' }}>
+          <div style={{ fontSize:10, color:C.muted, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:8 }}>Audit Score</div>
+          <div style={{ fontSize:36, fontWeight:800, color: totalEval > 0 ? C.accent : C.muted, lineHeight:1 }}>
+            {totalEval > 0 ? `${score.weighted}%` : '—'}
           </div>
-
-          {/* KPI row */}
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:10, marginTop:20 }}>
-            {[
-              { label:'Critical Issues', value: criticalCount,
-                color: criticalCount > 0 ? C.red : C.muted,
-                sub: criticalCount > 0 ? 'click to view ↓' : 'None found',
-                onClick: () => scrollToIssues('Fail') },
-              { label:'Total Failures', value: failItems.length,
-                color: failItems.length > 0 ? C.amber : C.muted,
-                sub: partialItems.length > 0 ? `+ ${partialItems.length} partial` : 'All clear',
-                onClick: () => scrollToIssues('Fail') },
-              { label:'Checklist Reviewed', value: `${completionPct}%`,
-                color: completionPct >= 80 ? C.green : C.accent,
-                sub: blankItems.length > 0 ? `${blankItems.length} remaining` : 'Fully reviewed',
-                onClick: () => scrollToIssues('Blank') },
-            ].map((kpi, i) => (
-              <div key={i} onClick={kpi.onClick}
-                style={{ background:C.bg, border:`1px solid ${C.border}`, borderRadius:10,
-                  padding:'14px 18px', cursor:'pointer' }}
-                onMouseEnter={e => { e.currentTarget.style.borderColor = kpi.color; e.currentTarget.style.background = `${kpi.color}0A`; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = C.border; e.currentTarget.style.background = C.bg; }}>
-                <div style={{ fontSize:28, fontWeight:900, color:kpi.color, lineHeight:1, marginBottom:4 }}>
-                  {kpi.value}
-                </div>
-                <div style={{ fontSize:12, fontWeight:600, color:C.text, marginBottom:2 }}>{kpi.label}</div>
-                <div style={{ fontSize:11, color:C.muted }}>{kpi.sub}</div>
-              </div>
-            ))}
+          <div style={{ fontSize:12, color:C.muted, marginTop:6 }}>
+            {totalEval > 0 ? `Grade ${score.grade} · ${score.rating}` : 'No items reviewed yet'}
+          </div>
+        </div>
+        {/* Completion — click to see blank items */}
+        <div onClick={() => scrollToIssues('Blank')}
+          style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 20px', cursor:'pointer' }}>
+          <div style={{ fontSize:10, color:C.muted, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:8 }}>Completion</div>
+          <div style={{ fontSize:36, fontWeight:800, color:C.text, lineHeight:1 }}>{completionPct}<span style={{ fontSize:18 }}>%</span></div>
+          <div style={{ marginTop:10, background:C.border, borderRadius:4, height:5 }}>
+            <div style={{ height:5, borderRadius:4, background:C.accent, width:`${completionPct}%`, transition:'width 0.4s ease' }} />
+          </div>
+          <div style={{ fontSize:11, color:C.muted, marginTop:5 }}>
+            {totalEval} / {totalAll} items
+            {blankItems.length > 0 && <span style={{ color:C.accent }}> · {blankItems.length} remaining ↓</span>}
+          </div>
+        </div>
+        {/* Issues Found — clickable + smooth scroll */}
+        <div onClick={() => scrollToIssues('Fail')}
+          style={{ background:C.surface, border:`1px solid ${failItems.length > 0 ? C.red+'44' : C.border}`,
+            borderRadius:12, padding:'18px 20px', cursor:'pointer', transition:'border-color 0.15s' }}>
+          <div style={{ fontSize:10, color:C.muted, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:8 }}>Issues Found</div>
+          <div style={{ fontSize:36, fontWeight:800, color: failItems.length > 0 ? C.red : C.muted, lineHeight:1 }}>{failItems.length}</div>
+          <div style={{ fontSize:11, color:C.muted, marginTop:6 }}>
+            {partialItems.length > 0 && <span style={{ color:C.amber }}>{partialItems.length} partial · </span>}
+            <span style={{ color:C.accent }}>view details ↓</span>
+          </div>
+        </div>
+        {/* Confidence */}
+        <div style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 20px' }}>
+          <div style={{ fontSize:10, color:C.muted, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:8 }}>Confidence</div>
+          <div style={{ fontSize:36, fontWeight:800, color:confidenceColor, lineHeight:1 }}>{confidence}</div>
+          <div style={{ fontSize:11, color:C.muted, marginTop:6 }}>
+            {confidence === 'Low' && 'Review more items for reliable results'}
+            {confidence === 'Medium' && 'Good coverage — keep going'}
+            {confidence === 'High' && 'Strong coverage — results are reliable'}
           </div>
         </div>
       </div>
@@ -2072,90 +2005,44 @@ function DashboardView({ score, auditUrl, results, setPage, onEdit, audits, onSe
           ? evaluated.reduce((a, b) => b.score < a.score ? b : a).id
           : null;
         return (
-          <>
-            {/* Section header */}
-            <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:12 }}>
-              <div style={{ fontSize:13, fontWeight:700, color:C.text }}>Performance by Section</div>
-              <div style={{ flex:1, height:1, background:C.border }} />
-              <div style={{ fontSize:11, color:C.muted }}>click any card to see details</div>
-            </div>
-
-            <div style={{ display:'grid', gridTemplateColumns:'repeat(5, 1fr)', gap:10, marginBottom:20 }}>
-              {score.categories.map(cat => {
-                const isWeakest = cat.id === weakestId;
-                const catScoreColor = cat.evaluated > 0
-                  ? (cat.score >= 70 ? C.green : cat.score >= 50 ? C.amber : C.red)
-                  : C.muted;
-                const shortLabel = cat.label
-                  .replace('Technical SEO','Tech SEO')
-                  .replace('On-Page & Content','On-Page')
-                  .replace('UX Heuristics','UX')
-                  .replace('Conversion & CTA','CRO')
-                  .replace('AI & SERP Visibility','AI/SERP');
-                return (
-                  <div key={cat.id} onClick={() => setDetailCat(cat.id)}
-                    onMouseEnter={e => e.currentTarget.style.transform = 'translateY(-2px)'}
-                    onMouseLeave={e => e.currentTarget.style.transform = 'translateY(0)'}
-                    style={{
-                      background: C.surface,
-                      border: `1.5px solid ${isWeakest ? C.red+'88' : C.border}`,
-                      borderTop: `3px solid ${isWeakest ? C.red : cat.color}`,
-                      borderRadius: 10, padding: '16px 14px', cursor: 'pointer',
-                      transition: 'transform 0.15s, box-shadow 0.15s',
-                      boxShadow: isWeakest ? `0 0 0 3px ${C.red}18` : 'none'
-                    }}>
-                    {/* Header row: icon + label + WEAKEST badge */}
-                    <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:12 }}>
-                      <div>
-                        <div style={{ fontSize:18, lineHeight:1, marginBottom:4 }}>{cat.icon}</div>
-                        <div style={{ fontSize:10, fontWeight:700, color:C.muted, textTransform:'uppercase',
-                          letterSpacing:'0.08em', lineHeight:1.3 }}>{shortLabel}</div>
-                      </div>
-                      <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:4 }}>
-                        {isWeakest && (
-                          <span style={{ fontSize:8, fontWeight:800, padding:'2px 6px', borderRadius:4,
-                            background:`${C.red}18`, color:C.red, letterSpacing:'0.5px', whiteSpace:'nowrap' }}>
-                            ⚠ WEAKEST
-                          </span>
-                        )}
-                        <span style={{ fontSize:12, fontWeight:800, padding:'2px 8px', borderRadius:6,
-                          background:`${cat.color}20`, color:cat.color }}>
-                          {cat.evaluated > 0 ? `Grade ${cat.grade}` : '—'}
-                        </span>
-                      </div>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(5, 1fr)', gap:12, marginBottom:20 }}>
+            {score.categories.map(cat => {
+              const isWeakest = cat.id === weakestId;
+              return (
+                <div key={cat.id} onClick={() => setDetailCat(cat.id)}
+                  onMouseEnter={e => e.currentTarget.style.borderColor = cat.color}
+                  onMouseLeave={e => e.currentTarget.style.borderColor = isWeakest ? C.red : C.border}
+                  style={{ background:C.surface,
+                    border:`1px solid ${isWeakest ? C.red : C.border}`,
+                    borderRadius:12, padding:'14px 16px', cursor:'pointer',
+                    transition:'border-color 0.15s',
+                    boxShadow: isWeakest ? `0 0 0 2px ${C.red}33` : 'none' }}>
+                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:8 }}>
+                    <div style={{ fontSize:10, color:C.muted, fontWeight:700, textTransform:'uppercase', flex:1, lineHeight:1.3 }}>
+                      {cat.icon} {cat.label.replace('Technical SEO','Tech SEO').replace('On-Page & Content','On-Page').replace('UX Heuristics','UX').replace('Conversion & CTA','CRO').replace('AI & SERP Visibility','AI/SERP')}
                     </div>
-                    {/* Score */}
-                    <div style={{ display:'flex', alignItems:'baseline', gap:2, marginBottom:8 }}>
-                      <span style={{ fontSize:30, fontWeight:900, color: cat.evaluated > 0 ? catScoreColor : C.muted,
-                        lineHeight:1, letterSpacing:'-1px' }}>
-                        {cat.evaluated > 0 ? cat.score : '—'}
-                      </span>
-                      {cat.evaluated > 0 && (
-                        <span style={{ fontSize:13, fontWeight:500, color:C.muted }}>/100</span>
+                    <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:3, flexShrink:0 }}>
+                      {isWeakest && (
+                        <span style={{ fontSize:8, fontWeight:800, padding:'1px 5px', borderRadius:3,
+                          background:`${C.red}22`, color:C.red, letterSpacing:'0.5px' }}>WEAKEST</span>
                       )}
-                    </div>
-                    {/* Progress bar */}
-                    <div style={{ background:C.border, borderRadius:4, height:4, marginBottom:8, overflow:'hidden' }}>
-                      <div style={{ height:4, borderRadius:4, background: cat.evaluated > 0 ? catScoreColor : C.border,
-                        width:`${cat.evaluated > 0 ? cat.score : 0}%`, transition:'width 0.4s ease' }} />
-                    </div>
-                    {/* Stats */}
-                    <div style={{ display:'flex', gap:6 }}>
-                      {cat.evaluated > 0 ? (
-                        <>
-                          <span style={{ fontSize:10, color:C.green, fontWeight:600 }}>✓ {cat.passed}</span>
-                          <span style={{ fontSize:10, color:C.red, fontWeight:600 }}>✗ {cat.failed}</span>
-                          <span style={{ fontSize:10, color:C.muted, marginLeft:'auto' }}>{cat.evaluated} done</span>
-                        </>
-                      ) : (
-                        <span style={{ fontSize:10, color:C.muted, fontStyle:'italic' }}>Not started</span>
-                      )}
+                      <div style={{ background:`${cat.color}22`, borderRadius:6, padding:'2px 8px',
+                        fontSize:14, fontWeight:800, color:cat.color }}>{cat.grade}</div>
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          </>
+                  <div style={{ fontSize:24, fontWeight:800, color:C.text, lineHeight:1, marginBottom:4 }}>
+                    {cat.evaluated > 0 ? cat.score : '—'}<span style={{ fontSize:11, color:C.muted }}>{cat.evaluated > 0 ? '/100' : ''}</span>
+                  </div>
+                  <div style={{ background:C.border, borderRadius:3, height:3, marginBottom:6 }}>
+                    <div style={{ height:3, borderRadius:3, background:cat.color, width:`${cat.score}%` }} />
+                  </div>
+                  <div style={{ fontSize:10, color:C.muted }}>
+                    {cat.evaluated > 0 ? `${cat.passed}✓ ${cat.failed}✗ ${cat.evaluated} reviewed` : 'Not started'}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         );
       })()}
 
