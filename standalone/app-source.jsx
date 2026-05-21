@@ -1102,21 +1102,39 @@ function downloadPDF(config, auditUrl, score, results) {
   }
 
   // ── Overall score box ─────────────────────────────────────────────────────
+  const boxH = 32;
   doc.setFillColor(...brandLight);
-  doc.roundedRect(M, y, W - 2*M, 28, 3, 3, 'F');
-  doc.setDrawColor(...brandRgb); doc.setLineWidth(0.35);
-  doc.roundedRect(M, y, W - 2*M, 28, 3, 3, 'S');
-  doc.setFontSize(28); doc.setFont('helvetica','bold'); doc.setTextColor(...brandRgb);
-  doc.text(`${score.weighted}`, M + 14, y + 20);
-  doc.setFontSize(10); doc.setTextColor(...brandRgb);
-  doc.text('/100', M + 36, y + 20);
-  doc.setFontSize(13); doc.setTextColor(50,55,65);
-  doc.text(`Grade ${score.grade}`, M + 72, y + 13);
-  doc.setFontSize(9); doc.setTextColor(95,100,115); doc.setFont('helvetica','normal');
-  doc.text(score.rating, M + 72, y + 21);
+  doc.roundedRect(M, y, W - 2*M, boxH, 3, 3, 'F');
+  doc.setDrawColor(...brandRgb); doc.setLineWidth(0.4);
+  doc.roundedRect(M, y, W - 2*M, boxH, 3, 3, 'S');
+
+  // Left: score number + /100 on same baseline, tight together
+  const scoreBaseY = y + 22;
+  doc.setFontSize(30); doc.setFont('helvetica','bold'); doc.setTextColor(...brandRgb);
+  doc.text(`${score.weighted}`, M + 12, scoreBaseY);
+  const numW = doc.getTextWidth(`${score.weighted}`);
+  doc.setFontSize(17); doc.setFont('helvetica','normal'); doc.setTextColor(...brandRgb);
+  doc.text('/100', M + 12 + numW + 1, scoreBaseY);
+  const slashW = doc.getTextWidth('/100');
+
+  // Vertical divider
+  const divX = M + 12 + numW + slashW + 7;
+  doc.setDrawColor(215, 220, 232); doc.setLineWidth(0.3);
+  doc.line(divX, y + 5, divX, y + boxH - 5);
+
+  // Center: Grade + rating
+  const gradeX = divX + 8;
+  doc.setFontSize(15); doc.setFont('helvetica','bold'); doc.setTextColor(28, 32, 48);
+  doc.text(`Grade ${score.grade}`, gradeX, y + 13);
+  doc.setFontSize(9); doc.setFont('helvetica','normal'); doc.setTextColor(90, 95, 115);
+  doc.text(st(score.rating), gradeX, y + 22);
+
+  // Right: confidence label + % reviewed stacked
   const confColor = score.confidence === 'High' ? [5,150,105] : score.confidence === 'Medium' ? [14,165,233] : [245,158,11];
-  doc.setFontSize(6.5); doc.setFont('helvetica','bold'); doc.setTextColor(...confColor);
-  doc.text(`${score.confidence} Confidence · ${score.completionPct}% reviewed`, W - M - 4, y + 7, {align:'right'});
+  doc.setFontSize(8); doc.setFont('helvetica','bold'); doc.setTextColor(...confColor);
+  doc.text(`${st(score.confidence)} Confidence`, W - M - 5, y + 11, {align:'right'});
+  doc.setFontSize(7.5); doc.setFont('helvetica','normal'); doc.setTextColor(115, 120, 138);
+  doc.text(`${score.completionPct}% reviewed`, W - M - 5, y + 21, {align:'right'});
 
   // ── Section Scores ────────────────────────────────────────────────────────
   y += 34;
