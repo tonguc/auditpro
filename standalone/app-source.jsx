@@ -2562,7 +2562,7 @@ function WhiteLabelView({ audits, currentUrl, currentClientName, score, results,
               </div>
             )}
           </div>
-          <button onClick={handleSave} style={{ background:color, border:'none', borderRadius:8,
+          <button onClick={handleSave} style={{ background: C.accent, border:'none', borderRadius:8,
             padding:'11px 20px', color:'#fff', fontWeight:600, fontSize:13, width:'100%',
             cursor:'pointer' }}>
             {saved ? '✓ Saved!' : 'Save Settings'}
@@ -2573,27 +2573,39 @@ function WhiteLabelView({ audits, currentUrl, currentClientName, score, results,
         <div style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:12, padding:24 }}>
           <div style={{ fontSize:13, fontWeight:700, color:C.text, marginBottom:20 }}>PDF Preview</div>
           <div style={{ background:C.bg, borderRadius:10, padding:20, border:`1px solid ${C.border}` }}>
-            <div style={{ background:color, borderRadius:8, padding:'14px 18px 10px', marginBottom:10, position:'relative' }}>
-              <div style={{ fontSize:14, fontWeight:800, color:'#fff' }}>
-                {activeClient || (hasAudit ? activeUrl : 'Client Name')}
-              </div>
-              <div style={{ fontSize:10, color:'rgba(255,255,255,0.7)', marginTop:2 }}>UX + SEO Audit Report</div>
-              {hasAudit && <div style={{ fontSize:9, color:'rgba(255,255,255,0.5)', marginTop:2 }}>{activeUrl}</div>}
-              {clientLogo && (
-                <img src={clientLogo} alt="client" style={{ position:'absolute', top:8, right:12,
-                  height:22, maxWidth:55, objectFit:'contain', background:'rgba(255,255,255,0.15)',
-                  borderRadius:4, padding:2 }} />
-              )}
-              <div style={{ marginTop:8, paddingTop:6, borderTop:'1px solid rgba(255,255,255,0.2)',
-                display:'flex', alignItems:'center', gap:6 }}>
-                <span style={{ fontSize:8, color:'rgba(255,255,255,0.5)' }}>Powered by</span>
-                {agencyLogo
-                  ? <img src={agencyLogo} alt="agency" style={{ height:12, maxWidth:36, objectFit:'contain',
-                      opacity:0.75 }} />
-                  : <span style={{ fontSize:9, fontWeight:700, color:'rgba(255,255,255,0.65)' }}>{name || 'Agency Name'}</span>
-                }
-              </div>
-            </div>
+            {/* Contrast-aware preview header — adapts when a light/white brand colour is chosen */}
+            {(() => {
+              const [r,g,b] = hexToRgb(color);
+              const lum = (0.299*r + 0.587*g + 0.114*b) / 255;
+              const isLight = lum > 0.55;
+              const pText   = isLight ? '#16181e' : '#ffffff';
+              const pMuted  = isLight ? 'rgba(20,25,50,0.62)' : 'rgba(255,255,255,0.70)';
+              const pFaint  = isLight ? 'rgba(20,25,50,0.40)' : 'rgba(255,255,255,0.50)';
+              const pBorder = isLight ? 'rgba(20,25,50,0.12)' : 'rgba(255,255,255,0.20)';
+              return (
+                <div style={{ background:color, borderRadius:8, padding:'14px 18px 10px', marginBottom:10, position:'relative',
+                  boxShadow: isLight ? '0 0 0 1px rgba(0,0,0,0.12)' : 'none' }}>
+                  <div style={{ fontSize:14, fontWeight:800, color:pText }}>
+                    {activeClient || (hasAudit ? activeUrl : 'Client Name')}
+                  </div>
+                  <div style={{ fontSize:10, color:pMuted, marginTop:2 }}>UX + SEO Audit Report</div>
+                  {hasAudit && <div style={{ fontSize:9, color:pFaint, marginTop:2 }}>{activeUrl}</div>}
+                  {clientLogo && (
+                    <img src={clientLogo} alt="client" style={{ position:'absolute', top:8, right:12,
+                      height:22, maxWidth:55, objectFit:'contain', background:'rgba(128,128,128,0.15)',
+                      borderRadius:4, padding:2 }} />
+                  )}
+                  <div style={{ marginTop:8, paddingTop:6, borderTop:`1px solid ${pBorder}`,
+                    display:'flex', alignItems:'center', gap:6 }}>
+                    <span style={{ fontSize:8, color:pFaint }}>Powered by</span>
+                    {agencyLogo
+                      ? <img src={agencyLogo} alt="agency" style={{ height:12, maxWidth:36, objectFit:'contain', opacity:0.75 }} />
+                      : <span style={{ fontSize:9, fontWeight:700, color:pMuted }}>{name || 'Agency Name'}</span>
+                    }
+                  </div>
+                </div>
+              );
+            })()}
             {hasAudit && activeScore ? (
               <>
                 <div style={{ textAlign:'center', marginBottom:12 }}>

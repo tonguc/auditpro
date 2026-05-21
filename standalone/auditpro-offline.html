@@ -34476,7 +34476,7 @@ function WhiteLabelView({
   }, "Select an audit below to upload its client logo")), /*#__PURE__*/React.createElement("button", {
     onClick: handleSave,
     style: {
-      background: color,
+      background: C.accent,
       border: 'none',
       borderRadius: 8,
       padding: '11px 20px',
@@ -34507,76 +34507,86 @@ function WhiteLabelView({
       padding: 20,
       border: `1px solid ${C.border}`
     }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      background: color,
-      borderRadius: 8,
-      padding: '14px 18px 10px',
-      marginBottom: 10,
-      position: 'relative'
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 14,
-      fontWeight: 800,
-      color: '#fff'
-    }
-  }, activeClient || (hasAudit ? activeUrl : 'Client Name')), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 10,
-      color: 'rgba(255,255,255,0.7)',
-      marginTop: 2
-    }
-  }, "UX + SEO Audit Report"), hasAudit && /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 9,
-      color: 'rgba(255,255,255,0.5)',
-      marginTop: 2
-    }
-  }, activeUrl), clientLogo && /*#__PURE__*/React.createElement("img", {
-    src: clientLogo,
-    alt: "client",
-    style: {
-      position: 'absolute',
-      top: 8,
-      right: 12,
-      height: 22,
-      maxWidth: 55,
-      objectFit: 'contain',
-      background: 'rgba(255,255,255,0.15)',
-      borderRadius: 4,
-      padding: 2
-    }
-  }), /*#__PURE__*/React.createElement("div", {
-    style: {
-      marginTop: 8,
-      paddingTop: 6,
-      borderTop: '1px solid rgba(255,255,255,0.2)',
-      display: 'flex',
-      alignItems: 'center',
-      gap: 6
-    }
-  }, /*#__PURE__*/React.createElement("span", {
-    style: {
-      fontSize: 8,
-      color: 'rgba(255,255,255,0.5)'
-    }
-  }, "Powered by"), agencyLogo ? /*#__PURE__*/React.createElement("img", {
-    src: agencyLogo,
-    alt: "agency",
-    style: {
-      height: 12,
-      maxWidth: 36,
-      objectFit: 'contain',
-      opacity: 0.75
-    }
-  }) : /*#__PURE__*/React.createElement("span", {
-    style: {
-      fontSize: 9,
-      fontWeight: 700,
-      color: 'rgba(255,255,255,0.65)'
-    }
-  }, name || 'Agency Name'))), hasAudit && activeScore ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
+  }, (() => {
+    const [r, g, b] = hexToRgb(color);
+    const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    const isLight = lum > 0.55;
+    const pText = isLight ? '#16181e' : '#ffffff';
+    const pMuted = isLight ? 'rgba(20,25,50,0.62)' : 'rgba(255,255,255,0.70)';
+    const pFaint = isLight ? 'rgba(20,25,50,0.40)' : 'rgba(255,255,255,0.50)';
+    const pBorder = isLight ? 'rgba(20,25,50,0.12)' : 'rgba(255,255,255,0.20)';
+    return /*#__PURE__*/React.createElement("div", {
+      style: {
+        background: color,
+        borderRadius: 8,
+        padding: '14px 18px 10px',
+        marginBottom: 10,
+        position: 'relative',
+        boxShadow: isLight ? '0 0 0 1px rgba(0,0,0,0.12)' : 'none'
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 14,
+        fontWeight: 800,
+        color: pText
+      }
+    }, activeClient || (hasAudit ? activeUrl : 'Client Name')), /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 10,
+        color: pMuted,
+        marginTop: 2
+      }
+    }, "UX + SEO Audit Report"), hasAudit && /*#__PURE__*/React.createElement("div", {
+      style: {
+        fontSize: 9,
+        color: pFaint,
+        marginTop: 2
+      }
+    }, activeUrl), clientLogo && /*#__PURE__*/React.createElement("img", {
+      src: clientLogo,
+      alt: "client",
+      style: {
+        position: 'absolute',
+        top: 8,
+        right: 12,
+        height: 22,
+        maxWidth: 55,
+        objectFit: 'contain',
+        background: 'rgba(128,128,128,0.15)',
+        borderRadius: 4,
+        padding: 2
+      }
+    }), /*#__PURE__*/React.createElement("div", {
+      style: {
+        marginTop: 8,
+        paddingTop: 6,
+        borderTop: `1px solid ${pBorder}`,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 6
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 8,
+        color: pFaint
+      }
+    }, "Powered by"), agencyLogo ? /*#__PURE__*/React.createElement("img", {
+      src: agencyLogo,
+      alt: "agency",
+      style: {
+        height: 12,
+        maxWidth: 36,
+        objectFit: 'contain',
+        opacity: 0.75
+      }
+    }) : /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 9,
+        fontWeight: 700,
+        color: pMuted
+      }
+    }, name || 'Agency Name')));
+  })(), hasAudit && activeScore ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     style: {
       textAlign: 'center',
       marginBottom: 12
