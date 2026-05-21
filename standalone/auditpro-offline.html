@@ -30728,94 +30728,477 @@ const SECTION_INSIGHTS = {
   cro: s => s >= 80 ? 'Conversion optimisation is solid. Clear CTAs and effective trust signals support user decision-making.' : s >= 60 ? 'Conversion performance has weaknesses. Unclear calls-to-action and missing trust signals are reducing the site\'s ability to convert visitors into customers.' : 'Conversion rate optimisation is significantly underperforming. The site is likely losing substantial revenue due to poor CTA design and weak trust signals.',
   serp: s => s >= 80 ? 'AI Visibility is well-established. The brand has strong signals for AI-driven search engines and content that supports citation and discovery.' : s >= 60 ? 'AI Visibility has gaps. While some signals are in place, the brand may be absent from AI-generated answers in key categories.' : 'AI Visibility is weak. The site is poorly positioned for AI-driven search (ChatGPT, Perplexity, Google AI Overviews) — a rapidly growing traffic channel.'
 };
-const IMPACT_MAP = [{
-  keys: ['lcp', 'loading speed', 'page speed', 'core web vitals', 'cls', 'fid', 'inp', 'slow'],
-  impact: 'Slow loading directly reduces search rankings and increases user drop-off. Google treats Core Web Vitals as a ranking signal.',
-  fix: 'Optimise images, defer unused JavaScript, and improve server response time. Target LCP under 2.5s.'
+const IMPACT_MAP = [
+// ── Technical SEO ──────────────────────────────────────────────────────────
+{
+  keys: ['robots.txt', 'robots txt', 'crawl blocked', 'crawling instructions'],
+  why: 'Search engines need clear crawling instructions to discover and process the right pages.',
+  biz: 'Incorrect rules can block important pages from being indexed entirely.',
+  fix: 'Review robots.txt and ensure important pages and assets are not accidentally blocked.'
 }, {
-  keys: ['https', 'ssl', 'mixed content', 'security', 'http'],
-  impact: 'Security issues reduce user trust and negatively impact SEO. Google marks non-HTTPS pages as "Not Secure".',
-  fix: 'Ensure all pages redirect to HTTPS and remove any mixed content references.'
+  keys: ['xml sitemap', 'sitemap missing', 'sitemap'],
+  why: 'A clean sitemap helps search engines discover important URLs faster.',
+  biz: 'Missing or outdated sitemaps slow discovery and weaken indexation coverage.',
+  fix: 'Generate an updated XML sitemap and submit it in Google Search Console.'
 }, {
-  keys: ['meta description', 'description missing'],
-  impact: 'Missing or duplicate meta descriptions reduce click-through rates from search results, lowering organic traffic.',
-  fix: 'Write unique, compelling meta descriptions (140–160 characters) for all key pages.'
+  keys: ['noindex', 'no-index', 'meta robots', 'indexable'],
+  why: 'Important pages must be indexable to appear in search results.',
+  biz: 'Accidental noindex tags can remove valuable pages from organic search entirely.',
+  fix: 'Check meta robots and HTTP headers to ensure key pages are indexable.'
 }, {
-  keys: ['title tag', 'page title', 'title missing', 'title duplicate'],
-  impact: 'Weak or missing title tags reduce search visibility and click-through rates from search results.',
-  fix: 'Write unique, keyword-rich title tags (50–60 characters) for every important page.'
+  keys: ['canonical', 'canonicalisation', 'canonical tag'],
+  why: 'Canonical tags help search engines understand the preferred version of a page.',
+  biz: 'Incorrect canonicals can split ranking signals or index the wrong URL.',
+  fix: 'Review canonical tags and point them to the correct primary page on each URL.'
 }, {
-  keys: ['schema', 'structured data', 'json-ld', 'markup'],
-  impact: 'Missing structured data reduces eligibility for rich search results, lowering visibility and CTR.',
-  fix: 'Implement appropriate Schema.org markup (Organization, Product, Article, FAQ) for key content types.'
+  keys: ['orphan page', 'orphaned', 'no internal links to'],
+  why: 'Pages without internal links are harder for users and search engines to discover.',
+  biz: 'Orphan pages receive less crawl attention and may rank lower or not at all.',
+  fix: 'Add contextual internal links from relevant pages and navigation areas.'
 }, {
-  keys: ['robots', 'ai crawler', 'gptbot', 'claudebot', 'perplexitybot', 'crawl blocked'],
-  impact: 'Blocking AI crawlers prevents the site from being indexed by AI-driven search engines — a fast-growing traffic source.',
-  fix: 'Review robots.txt and allow GPTBot, ClaudeBot, and PerplexityBot unless intentionally blocking them.'
+  keys: ['crawl error', 'crawl anomal', 'crawl issue', 'coverage error'],
+  why: 'Crawl errors indicate that search engines may struggle to access parts of the site.',
+  biz: 'Unresolved crawl issues can reduce indexation and organic visibility.',
+  fix: 'Check Google Search Console Coverage/Indexing reports and resolve errors.'
 }, {
-  keys: ['mobile', 'responsive', 'viewport', 'touch'],
-  impact: 'Poor mobile experience drives away the majority of web users and impacts Google\'s mobile-first ranking.',
-  fix: 'Ensure all pages are fully responsive with correct viewport settings and touch-friendly interactive elements.'
+  keys: ['javascript blocking', 'javascript rendered', 'js blocking', 'render'],
+  why: 'Search engines and users need key content available without JavaScript barriers.',
+  biz: 'Blocked or delayed content can reduce crawlability, visibility, and experience.',
+  fix: 'Use URL Inspection, test rendered HTML, and ensure primary content loads early.'
 }, {
-  keys: ['h1', 'heading structure', 'headings', 'h2', 'h3'],
-  impact: 'Poor heading structure confuses search engines and makes content harder to scan for users.',
-  fix: 'Use a clear heading hierarchy: one H1 per page, followed by descriptive H2 and H3 sub-sections.'
+  keys: ['url structure', 'url format', 'messy url', 'url slug'],
+  why: 'Clear URLs help users and search engines understand page topics at a glance.',
+  biz: 'Messy URLs can reduce clarity, trust, and organic click-through rates.',
+  fix: 'Use short, descriptive, keyword-relevant URLs without unnecessary parameters.'
 }, {
-  keys: ['canonical', 'duplicate content', 'duplicate url'],
-  impact: 'Duplicate content dilutes ranking signals and may cause search engines to index the wrong page version.',
-  fix: 'Add canonical tags to all pages and resolve duplicate content issues at the URL level.'
+  keys: ['lcp', 'largest contentful paint'],
+  why: 'Slow loading directly hurts user experience and reduces search performance.',
+  biz: 'Poor LCP increases bounce rate, reduces engagement time, and lowers conversions.',
+  fix: 'Optimise hero images, defer unused JS, improve server response time, target LCP < 2.5s.'
 }, {
-  keys: ['alt text', 'image alt', 'alt attribute'],
-  impact: 'Missing alt text harms accessibility and prevents images from appearing in image search results.',
-  fix: 'Add descriptive, keyword-relevant alt text to all meaningful images on the site.'
+  keys: ['inp', 'interaction to next paint', 'interaction delay'],
+  why: 'Interaction delay makes the site feel slow and frustrating to use.',
+  biz: 'Poor responsiveness can reduce engagement rates and form/checkout completion.',
+  fix: 'Reduce long JS tasks, optimise event handlers, and improve interaction responsiveness.'
 }, {
-  keys: ['author', 'byline', 'bio', 'authorship'],
-  impact: 'Missing author attribution weakens E-E-A-T signals, reducing trust with both users and AI search engines.',
-  fix: 'Add author names, credentials, and biographical information to all content and article pages.'
+  keys: ['cls', 'cumulative layout shift', 'layout shift'],
+  why: 'Layout shifts create a frustrating and unstable browsing experience.',
+  biz: 'Unexpected movement can cause misclicks, lower trust, and reduce conversions.',
+  fix: 'Set image/video dimensions, reserve ad space, and avoid late-loading layout changes.'
 }, {
-  keys: ['llms.txt', 'ai-readable', 'ai content structure'],
-  impact: 'Without AI-readable content structure, AI tools cannot easily parse, cite, or recommend your content.',
-  fix: 'Add an /llms.txt file and structure key content with clear headings, direct answers, and summary introductions.'
+  keys: ['pagespeed', 'page speed', 'performance score', 'speed score'],
+  why: 'Speed affects both user experience and search performance signals.',
+  biz: 'Slow pages can reduce organic traffic quality and lower conversion rates.',
+  fix: 'Run PageSpeed Insights and resolve the highest-impact performance issues first.'
 }, {
-  keys: ['brand', 'knowledge graph', 'entity', 'wikidata'],
-  impact: 'Weak entity signals make it harder for AI search engines to identify, trust, and recommend your brand.',
-  fix: 'Create a Google Business Profile, add Organization schema with sameAs links, and build brand mentions on authoritative sites.'
+  keys: ['webp', 'avif', 'image format', 'next-gen image'],
+  why: 'Modern image formats reduce file size while maintaining quality.',
+  biz: 'Heavy images slow loading, increase bounce risk, and waste mobile data.',
+  fix: 'Convert large images to WebP or AVIF and serve responsive sizes.'
 }, {
-  keys: ['cta', 'call to action', 'primary button'],
-  impact: 'Unclear or missing calls-to-action directly reduce conversions and revenue from existing traffic.',
-  fix: 'Ensure each key page has one clear primary CTA, with action-oriented language and strong visual contrast.'
+  keys: ['width height', 'image dimensions', 'aspect ratio', 'layout instability'],
+  why: 'Defined media dimensions prevent layout instability during page load.',
+  biz: 'Missing dimensions increase CLS scores and harm user experience.',
+  fix: 'Add width/height attributes or CSS aspect-ratio to all images and embeds.'
 }, {
-  keys: ['trust', 'review', 'testimonial', 'social proof', 'credibility'],
-  impact: 'Lack of trust signals increases visitor doubt and reduces conversion rates, especially for first-time visitors.',
-  fix: 'Add customer testimonials, reviews, case studies, or trust badges to key landing and conversion pages.'
+  keys: ['lazy load', 'lazy loading', 'below fold', 'defer image'],
+  why: 'Below-fold media should not slow down initial page load.',
+  biz: 'Unoptimised media loading delays first impressions and reduces engagement.',
+  fix: 'Lazy-load below-fold images and prioritise above-the-fold assets.'
 }, {
-  keys: ['404', 'broken link', 'error page'],
-  impact: 'Broken links damage user experience and waste crawl budget, reducing overall SEO performance.',
-  fix: 'Fix or redirect all broken internal links. Ensure the 404 page is helpful and links back to key content.'
+  keys: ['render blocking', 'render-blocking', 'critical css', 'blocking resource'],
+  why: 'Render-blocking resources delay visible page content loading.',
+  biz: 'Users wait longer before the page is useful, which increases drop-off.',
+  fix: 'Inline critical CSS, defer non-critical scripts, and remove unused CSS/JS.'
 }, {
-  keys: ['sitemap', 'xml sitemap'],
-  impact: 'A missing or outdated sitemap makes it harder for search engines to discover and index all pages.',
-  fix: 'Generate an updated XML sitemap and submit it via Google Search Console.'
+  keys: ['ttfb', 'time to first byte', 'server response', 'server speed'],
+  why: 'Server response time affects how quickly every page starts loading.',
+  biz: 'Slow TTFB weakens perceived performance and Core Web Vitals scores.',
+  fix: 'Improve hosting, caching, CDN usage, database queries, and backend response times.'
 }, {
-  keys: ['internal link', 'internal linking'],
-  impact: 'Poor internal linking limits how link authority flows through the site and reduces discoverability of key pages.',
-  fix: 'Add contextual internal links from high-traffic pages to key conversion or category pages.'
+  keys: ['font-display', 'font loading', 'web font', 'font swap'],
+  why: 'Font loading can delay text visibility or cause layout shifts.',
+  biz: 'Poor font handling makes the page feel slow or visually unstable.',
+  fix: 'Use font-display: swap and preload critical fonts for faster text rendering.'
+}, {
+  keys: ['https', 'ssl', 'mixed content', 'insecure', 'not secure'],
+  why: 'Secure pages are essential for user trust, browser safety, and SEO.',
+  biz: 'Non-HTTPS or mixed content can reduce user confidence and search performance.',
+  fix: 'Force HTTPS redirects, fix mixed content issues, and verify SSL configuration.'
+}, {
+  keys: ['hsts', 'strict transport'],
+  why: 'HSTS strengthens secure browsing by forcing HTTPS connections.',
+  biz: 'Without HSTS, users may be exposed to insecure connections or downgrade attacks.',
+  fix: 'Add a correct Strict-Transport-Security header after confirming sitewide HTTPS.'
+}, {
+  keys: ['security header', 'content security policy', 'csp', 'x-frame', 'referrer-policy'],
+  why: 'Security headers protect users from common browser-based attacks.',
+  biz: 'Weak headers increase security risk and can reduce user trust.',
+  fix: 'Add CSP, X-Frame-Options, X-Content-Type-Options, and Referrer-Policy headers.'
+}, {
+  keys: ['organization schema', 'organisation schema', 'brand entity', 'brand schema'],
+  why: 'Organization schema helps search engines understand the brand as an entity.',
+  biz: 'Missing entity markup weakens brand recognition in search and AI systems.',
+  fix: 'Add Organization schema with name, logo, URL, sameAs profiles, and contact details.'
+}, {
+  keys: ['website schema', 'searchaction'],
+  why: 'WebSite schema defines the site and its search functionality.',
+  biz: 'Missing schema can reduce eligibility for enhanced search features.',
+  fix: 'Add WebSite schema and SearchAction markup if internal site search exists.'
+}, {
+  keys: ['breadcrumb schema', 'breadcrumblist'],
+  why: 'Breadcrumb schema clarifies site hierarchy for search engines.',
+  biz: 'Missing breadcrumbs weaken SERP presentation and page relationship signals.',
+  fix: 'Add BreadcrumbList schema on relevant inner pages.'
+}, {
+  keys: ['product schema', 'product markup', 'price schema', 'availability schema'],
+  why: 'Product schema helps search engines understand products, prices, and availability.',
+  biz: 'Missing product markup can reduce rich result eligibility and CTR.',
+  fix: 'Add valid Product schema with offers, availability, price, and reviews where appropriate.'
+}, {
+  keys: ['article schema', 'blogposting', 'article markup'],
+  why: 'Article schema helps search engines understand authorship and publication data.',
+  biz: 'Missing article markup can reduce content trust and search eligibility.',
+  fix: 'Add Article or BlogPosting schema with headline, author, datePublished, and image.'
+}, {
+  keys: ['faq schema', 'faqpage', 'faq markup'],
+  why: 'FAQ structure helps search engines and AI systems extract clear answers.',
+  biz: 'Missing FAQ structure can reduce answer visibility and long-tail search reach.',
+  fix: 'Add well-structured FAQ content and valid FAQPage schema where appropriate.'
+}, {
+  keys: ['404', 'error page', 'broken link', 'dead link'],
+  why: 'A helpful 404 page helps users recover when they reach a broken URL.',
+  biz: 'Poor error recovery increases frustration, abandonment, and lost conversions.',
+  fix: 'Create a useful 404 page with search, navigation links, and key page recommendations.'
+}, {
+  keys: ['thin content', 'low quality content', 'low-value page'],
+  why: 'Thin pages provide limited value to users and search engines.',
+  biz: 'Low-value content weakens topical authority and organic performance.',
+  fix: 'Improve, consolidate, or noindex thin pages depending on their purpose.'
+},
+// ── On-Page & Content ──────────────────────────────────────────────────────
+{
+  keys: ['title tag', 'page title', 'title missing', 'title duplicate', 'title length'],
+  why: 'Title tags are one of the strongest on-page signals and heavily influence click-through rate.',
+  biz: 'Weak or duplicate titles can reduce rankings and SERP clicks significantly.',
+  fix: 'Write unique, keyword-aligned titles of around 50–60 characters for every page.'
+}, {
+  keys: ['meta description', 'description missing', 'description duplicate'],
+  why: 'Meta descriptions influence how compelling the search result appears to users.',
+  biz: 'Missing or weak descriptions can reduce click-through rate even when rankings are good.',
+  fix: 'Write unique, benefit-driven meta descriptions for all key pages (140–160 characters).'
+}, {
+  keys: ['h1', 'missing h1', 'multiple h1', 'no h1'],
+  why: 'The H1 clarifies the main topic of a page for users and search engines.',
+  biz: 'Missing or unclear H1s weaken page relevance and reduce user comprehension.',
+  fix: 'Use exactly one clear H1 per page, aligned with the page\'s primary search intent.'
+}, {
+  keys: ['heading hierarchy', 'heading structure', 'headings', 'h2', 'h3'],
+  why: 'Clear headings make content easier to scan and understand.',
+  biz: 'Poor structure reduces readability, accessibility, and AI content extraction.',
+  fix: 'Use a logical H1-H2-H3 hierarchy and make every heading descriptive and purposeful.'
+}, {
+  keys: ['keyword', 'keyword usage', 'keyword placement', 'keyword optimis'],
+  why: 'Search engines need clear topical relevance signals throughout the page.',
+  biz: 'Weak keyword alignment reduces rankings for important commercial and informational queries.',
+  fix: 'Place primary and semantic keywords naturally in titles, headings, copy, URLs, and alt text.'
+}, {
+  keys: ['keyword cannibali', 'cannibalisation'],
+  why: 'Multiple pages targeting the same intent compete against each other in search.',
+  biz: 'Cannibalization splits ranking signals and reduces the authority of each competing page.',
+  fix: 'Identify overlapping pages and consolidate, redirect, or meaningfully differentiate them.'
+}, {
+  keys: ['featured snippet', 'answer box', 'position zero'],
+  why: 'Featured snippets can increase visibility above standard organic results.',
+  biz: 'Missing answer formatting reduces chances of winning high-visibility SERP positions.',
+  fix: 'Add concise answer blocks, lists, tables, and FAQ-style sections to key pages.'
+}, {
+  keys: ['search intent', 'content intent', 'user intent', 'intent mismatch'],
+  why: 'Content must match what users expect when they search for a query.',
+  biz: 'Intent mismatch lowers rankings, engagement metrics, and conversion probability.',
+  fix: 'Compare top-ranking pages and align format, depth, and content angle with user intent.'
+}, {
+  keys: ['content length', 'word count', 'content depth', 'content thin'],
+  why: 'Content depth should match the complexity and intent of the target query.',
+  biz: 'Insufficient content fails to satisfy users or compete in detailed search categories.',
+  fix: 'Expand content with useful sections, examples, FAQs, data, and supporting evidence.'
+}, {
+  keys: ['original content', 'unique content', 'content originality'],
+  why: 'Original content builds trust, differentiation, and topical authority.',
+  biz: 'Duplicate or generic content reduces authority and competitiveness in search.',
+  fix: 'Rewrite copied or generic content and add expertise, original examples, or proprietary data.'
+}, {
+  keys: ['freshness', 'content date', 'outdated content', 'stale content'],
+  why: 'Outdated content loses relevance and can fall behind fresher competitor content.',
+  biz: 'Stale pages may underperform in rankings as search engines prefer fresh signals.',
+  fix: 'Update facts, examples, dates, screenshots, and recommendations regularly.'
+}, {
+  keys: ['readability', 'reading level', 'content clarity'],
+  why: 'Readable content helps users understand and act faster.',
+  biz: 'Difficult content reduces engagement, trust, and downstream conversion rates.',
+  fix: 'Use shorter sentences, clear headings, bullet points, and audience-appropriate language.'
+}, {
+  keys: ['visual content', 'image', 'video', 'diagram', 'infographic'],
+  why: 'Images, video, and diagrams improve understanding and engagement.',
+  biz: 'Text-only pages can feel less helpful and less persuasive to users.',
+  fix: 'Add relevant visuals, screenshots, comparison tables, diagrams, or explainer videos.'
+}, {
+  keys: ['common question', 'faq', 'frequent question', 'people also ask'],
+  why: 'Answering common questions improves usefulness and long-tail search visibility.',
+  biz: 'Missing answers reduce search coverage and user confidence in expertise.',
+  fix: 'Add FAQ sections based on real customer questions and search keyword data.'
+}, {
+  keys: ['internal link', 'internal linking', 'contextual link'],
+  why: 'Internal links distribute authority and guide users to related valuable content.',
+  biz: 'Weak internal linking reduces discovery, lowers engagement depth, and hurts rankings.',
+  fix: 'Add relevant contextual links between important pages throughout the site.'
+}, {
+  keys: ['anchor text', 'link text', 'generic anchor'],
+  why: 'Descriptive anchor text clarifies what linked pages are about to users and search engines.',
+  biz: 'Generic links like "click here" weaken navigation signals and SEO effectiveness.',
+  fix: 'Use descriptive, natural anchor text that reflects the destination page topic.'
+}, {
+  keys: ['e-e-a-t', 'eeat', 'expertise', 'experience', 'authority', 'trust signal'],
+  why: 'Trust signals help users and search systems evaluate content credibility.',
+  biz: 'Weak E-E-A-T can reduce confidence in competitive or sensitive niches.',
+  fix: 'Add author bios, credentials, editorial policies, references, and trust indicators.'
+},
+// ── Conversion & CTA ──────────────────────────────────────────────────────
+{
+  keys: ['cta', 'call to action', 'primary button', 'conversion button'],
+  why: 'Clear calls-to-action guide users toward the desired next step.',
+  biz: 'Weak CTAs directly reduce leads, sales, bookings, or enquiries from existing traffic.',
+  fix: 'Make primary CTAs visible, specific, benefit-driven, and visually distinct on every key page.'
+}, {
+  keys: ['above the fold', 'hero cta', 'visible cta'],
+  why: 'Users should quickly understand what to do next without scrolling.',
+  biz: 'Hidden CTAs reduce conversion rates, especially for users with limited time or intent.',
+  fix: 'Place a strong primary CTA above the fold on all key landing and product pages.'
+}, {
+  keys: ['cta contrast', 'button contrast', 'button visibility'],
+  why: 'CTA buttons must stand out visually to attract user attention.',
+  biz: 'Low-contrast or buried CTAs are easier to miss, reducing click and conversion rates.',
+  fix: 'Increase button contrast, size, whitespace, and visual hierarchy relative to surrounding content.'
+}, {
+  keys: ['testimonial', 'social proof', 'review', 'customer proof', 'star rating'],
+  why: 'Social proof reduces uncertainty and builds trust for hesitant visitors.',
+  biz: 'Missing proof can reduce conversion confidence, especially for new or cold traffic.',
+  fix: 'Add relevant testimonials, customer logos, ratings, reviews, or case results.'
+}, {
+  keys: ['trust badge', 'security badge', 'trust signal', 'payment trust', 'guarantee badge'],
+  why: 'Trust signals reassure users before they take a conversion action.',
+  biz: 'Low trust increases hesitation and reduces purchase, enquiry, or form submissions.',
+  fix: 'Add secure payment, guarantees, certifications, reviews, or recognized press mentions.'
+}, {
+  keys: ['pricing', 'price transparency', 'hidden price'],
+  why: 'Clear pricing reduces hesitation and pre-qualifies buyer intent.',
+  biz: 'Hidden or confusing pricing can increase drop-off before users reach the CTA.',
+  fix: 'Make pricing visible and transparent, and clearly explain what is included at each level.'
+}, {
+  keys: ['risk reversal', 'money back', 'guarantee', 'free trial', 'no risk'],
+  why: 'Guarantees and trials reduce the perceived risk of taking action.',
+  biz: 'High perceived risk is one of the most common reasons users delay or abandon.',
+  fix: 'Add a free trial, money-back guarantee, consultation offer, or clear cancellation policy.'
+}, {
+  keys: ['case study', 'success story', 'proof', 'result', 'outcome proof'],
+  why: 'Case studies prove that the business can deliver real, measurable results.',
+  biz: 'Without proof, users may not trust claims and choose a competitor instead.',
+  fix: 'Add case studies with a clear problem, solution, and specific measurable outcome.'
+}, {
+  keys: ['form', 'contact form', 'lead form', 'form field'],
+  why: 'Forms should be simple and easy to complete to reduce abandonment.',
+  biz: 'Long or confusing forms directly reduce submission rates and lead volume.',
+  fix: 'Remove unnecessary fields, group inputs logically, and support autofill where possible.'
+}, {
+  keys: ['form error', 'validation', 'inline error', 'form validation'],
+  why: 'Clear validation messages help users complete forms successfully.',
+  biz: 'Poor error handling causes frustration and significantly increases form abandonment.',
+  fix: 'Show inline, specific error messages close to the relevant field with guidance on how to fix them.'
+}, {
+  keys: ['thank you', 'confirmation page', 'post-submit', 'post submit'],
+  why: 'Post-submit pages should guide the user\'s next step and reinforce trust.',
+  biz: 'Weak confirmation pages miss opportunities for engagement, upsell, or referral.',
+  fix: 'Add confirmation messaging, next steps, timelines, and optional resources or actions.'
+}, {
+  keys: ['guest checkout', 'forced account', 'forced registration', 'checkout friction'],
+  why: 'Forced account creation creates friction at the most critical purchase moment.',
+  biz: 'This is one of the most common causes of checkout abandonment in e-commerce.',
+  fix: 'Allow guest checkout or delay account creation until after the purchase is complete.'
+}, {
+  keys: ['mobile popup', 'intrusive popup', 'interstitial', 'overlay mobile'],
+  why: 'Intrusive popups interrupt mobile users and disrupt the browsing experience.',
+  biz: 'Aggressive overlays can reduce conversions and negatively impact user satisfaction.',
+  fix: 'Avoid intrusive mobile overlays and keep key content accessible at all times.'
+}, {
+  keys: ['click to call', 'phone link', 'tel link', 'phone number'],
+  why: 'Mobile users often want immediate contact via phone.',
+  biz: 'Non-clickable phone numbers add unnecessary friction and reduce inbound calls.',
+  fix: 'Use tel: links for all phone numbers and test them on actual mobile devices.'
+}, {
+  keys: ['ga4', 'analytics', 'tracking', 'conversion tracking', 'event tracking'],
+  why: 'Conversion tracking is needed to understand what is working and what is not.',
+  biz: 'Without measurement, optimisation decisions are based on assumptions rather than data.',
+  fix: 'Configure GA4 events and conversions for all key user actions across the site.'
+},
+// ── UX ────────────────────────────────────────────────────────────────────
+{
+  keys: ['system status', 'loading state', 'progress indicator', 'feedback'],
+  why: 'Users need clear feedback when the system is processing an action.',
+  biz: 'Lack of feedback creates uncertainty, perceived slowness, and potential duplicate actions.',
+  fix: 'Show loading states, progress indicators, and success or error messages for all actions.'
+}, {
+  keys: ['inline validation', 'form validation ux', 'field error'],
+  why: 'Users should know immediately how to fix form errors.',
+  biz: 'Poor validation increases frustration and abandonment rates for forms.',
+  fix: 'Add clear inline validation close to each field as the user types or submits.'
+}, {
+  keys: ['language clarity', 'plain language', 'jargon', 'unclear label'],
+  why: 'Interface language should match user expectations and vocabulary.',
+  biz: 'Jargon or ambiguous labels can confuse users and reduce task completion rates.',
+  fix: 'Replace technical or unclear labels with simple, user-friendly language throughout.'
+}, {
+  keys: ['icon label', 'icon without text', 'icon clarity'],
+  why: 'Icons alone are often ambiguous to users unfamiliar with the interface.',
+  biz: 'Unlabelled icons can cause misuse and reduce navigation efficiency.',
+  fix: 'Add visible labels or tooltips to key icons, especially in navigation and action areas.'
+}, {
+  keys: ['undo', 'undo action', 'recovery', 'cancel action'],
+  why: 'Users need recovery options when they make mistakes.',
+  biz: 'No undo increases anxiety, loss of confidence, and potential data loss.',
+  fix: 'Add undo, back, cancel, or confirmation flows for important or irreversible actions.'
+}, {
+  keys: ['consistency', 'ui inconsistency', 'visual consistency', 'design consistency'],
+  why: 'Consistent UI patterns reduce cognitive load and make the site easier to learn.',
+  biz: 'Inconsistent design makes the interface feel unprofessional and harder to use.',
+  fix: 'Standardize buttons, labels, colours, spacing, and interaction states across the site.'
+}, {
+  keys: ['destructive action', 'delete confirm', 'irreversible', 'dangerous action'],
+  why: 'Dangerous actions need clear protection to prevent irreversible mistakes.',
+  biz: 'Accidental deletions or irreversible actions destroy trust and user confidence.',
+  fix: 'Use confirmation dialogs, typed confirmation, or hold-to-confirm for destructive actions.'
+}, {
+  keys: ['navigation', 'nav structure', 'menu structure', 'information architecture'],
+  why: 'Users need clear, predictable paths to important content and actions.',
+  biz: 'Weak navigation increases abandonment and prevents users from finding key pages.',
+  fix: 'Make navigation visible, predictable, and structured around real user tasks.'
+}, {
+  keys: ['search', 'site search', 'search functionality'],
+  why: 'Search helps users find specific content quickly on larger or content-rich sites.',
+  biz: 'Poor or absent search can block discovery and reduce conversion opportunity.',
+  fix: 'Make search visible, fast, relevant, and forgiving of minor typos.'
+}, {
+  keys: ['visual hierarchy', 'page hierarchy', 'content hierarchy'],
+  why: 'Hierarchy helps users understand what matters most on a page.',
+  biz: 'Weak hierarchy creates confusion and slows the user decision-making process.',
+  fix: 'Use clear headings, sizing, spacing, contrast, and visual weight to guide attention.'
+}, {
+  keys: ['error message', 'error handling', 'error state'],
+  why: 'Errors should always help users understand what went wrong and how to recover.',
+  biz: 'Vague error messages create frustration and increase abandonment.',
+  fix: 'Show specific, actionable error messages that explain the problem and resolution path.'
+}, {
+  keys: ['accessibility', 'wcag', 'aria', 'screen reader', 'a11y'],
+  why: 'Accessible design improves usability for all users, including those with disabilities.',
+  biz: 'Poor accessibility can exclude users and create legal compliance risk.',
+  fix: 'Check colour contrast, keyboard access, focus states, labels, alt text, and ARIA roles.'
+}, {
+  keys: ['keyboard', 'keyboard navigation', 'focus state', 'tab order'],
+  why: 'Keyboard navigation is essential for accessibility and power users.',
+  biz: 'Keyboard traps or missing focus states block an important segment of users.',
+  fix: 'Test all interactive elements using only the keyboard and fix any traps or missing states.'
+}, {
+  keys: ['mobile navigation', 'mobile menu', 'hamburger', 'mobile ux'],
+  why: 'Mobile users need fast, thumb-friendly navigation with minimal friction.',
+  biz: 'Poor mobile navigation reduces engagement and conversion rates on small screens.',
+  fix: 'Simplify mobile menus, increase tap targets to at least 44px, and prioritise key actions.'
+},
+// ── AI / SERP Visibility ───────────────────────────────────────────────────
+{
+  keys: ['ai crawler', 'gptbot', 'claudebot', 'perplexitybot', 'crawler access', 'blocked crawler'],
+  why: 'AI crawlers need site access to understand, index, and potentially cite content.',
+  biz: 'Blocking AI crawlers prevents the brand from appearing in AI-generated search answers.',
+  fix: 'Review robots.txt and allow GPTBot, ClaudeBot, and PerplexityBot unless intentionally blocked.'
+}, {
+  keys: ['llms.txt', 'ai readable', 'ai-readable', 'llm readable'],
+  why: 'AI-readable structure helps large language models understand key site information.',
+  biz: 'Weak AI-readable structure reduces discoverability in emerging AI search channels.',
+  fix: 'Add llms.txt or create clear AI-readable content hubs with concise summaries and key links.'
+}, {
+  keys: ['ai brand answer', 'brand in ai', 'chatgpt answer', 'perplexity answer', 'gemini answer'],
+  why: 'Appearing in AI-generated answers increases future discovery and brand trust.',
+  biz: 'If absent from AI answers, competitors may capture visibility in this growing channel.',
+  fix: 'Test core queries in ChatGPT, Perplexity, Gemini, and Google AI experiences regularly.'
+}, {
+  keys: ['knowledge graph', 'entity signal', 'brand entity', 'brand recognition', 'wikidata'],
+  why: 'Entity signals help search and AI systems understand, trust, and surface the brand.',
+  biz: 'Weak entity signals reduce trust, recognition, and citation likelihood in AI systems.',
+  fix: 'Strengthen Organization schema, sameAs links, About page, profiles, and brand co-mentions.'
+}, {
+  keys: ['ai overview', 'aio', 'google ai overview', 'ai generated answer'],
+  why: 'Google AI Overviews influence user discovery and organic click behaviour.',
+  biz: 'Not being cited reduces visibility for informational and navigational queries.',
+  fix: 'Create concise, expert, well-structured content that directly answers specific user questions.'
+}, {
+  keys: ['aeo', 'answer engine optimisation', 'answer engine', 'answer format'],
+  why: 'Answer Engine Optimization helps content become extractable by search and AI systems.',
+  biz: 'Poor answer structure reduces visibility in snippets, PAA boxes, and AI responses.',
+  fix: 'Use short answer blocks, FAQ sections, lists, tables, and clear descriptive headings.'
+}, {
+  keys: ['human editorial', 'editorial oversight', 'ai generated content', 'ai content quality'],
+  why: 'Human review improves accuracy, trust, and originality of published content.',
+  biz: 'Raw AI-generated content can appear generic and weaken brand credibility over time.',
+  fix: 'Add human editing, expert review, original examples, and clear authorship to all key content.'
+}, {
+  keys: ['author bio', 'author byline', 'author page', 'authorship'],
+  why: 'Author information supports trust, expertise signals, and E-E-A-T credibility.',
+  biz: 'Missing authorship reduces credibility, especially for expert or professional content.',
+  fix: 'Add author bylines, bios, credentials, photos, and links to author pages on all content.'
+}, {
+  keys: ['person schema', 'author schema', 'person markup'],
+  why: 'Person schema connects authors to expertise signals in a machine-readable way.',
+  biz: 'Missing author markup weakens trust and entity understanding for search and AI systems.',
+  fix: 'Add Person schema on author pages with name, role, credentials, and sameAs profile links.'
+}, {
+  keys: ['about page', 'about us', 'team page', 'company page'],
+  why: 'A strong About page proves legitimacy, expertise, and organizational credibility.',
+  biz: 'A weak About page can reduce user trust and brand authority in competitive sectors.',
+  fix: 'Add company background, team expertise, credentials, proof, values, and contact details.'
+}, {
+  keys: ['authority source', 'authoritative source', 'cite source', 'external reference'],
+  why: 'High-quality references support credibility and factual accuracy of content.',
+  biz: 'Weak sourcing reduces perceived expertise and trust with both users and AI systems.',
+  fix: 'Reference reputable sources such as .gov, .edu, research papers, or established industry bodies.'
 }];
 function getImpactAndFix(itemText, howTo) {
   const combined = (itemText + ' ' + (howTo || '')).toLowerCase();
   for (const entry of IMPACT_MAP) {
     if (entry.keys.some(k => combined.includes(k))) {
       return {
-        impact: entry.impact,
+        impact: entry.why,
+        businessImpact: entry.biz,
         fix: entry.fix
       };
     }
   }
   return {
-    impact: 'This issue is reducing site performance and should be resolved to improve overall quality and user experience.',
-    fix: howTo || 'Review and address this item based on the audit guidance provided.'
+    impact: 'This issue can reduce site quality, weaken user trust, and limit performance.',
+    businessImpact: 'If unresolved, this can contribute to lower visibility, weaker engagement, or reduced conversions.',
+    fix: howTo || 'Review this item, identify the root cause, and apply the recommended best practice.'
   };
 }
+const ESTIMATED_IMPACT = {
+  technical: 'Primary expected gain: stronger crawlability, faster loading, and improved indexation quality.',
+  onpage: 'Primary expected gain: better keyword relevance, higher click-through rates, and stronger content performance.',
+  ux: 'Primary expected gain: smoother user journeys, fewer usability blockers, and higher task completion rates.',
+  cro: 'Primary expected gain: more leads, sales, enquiries, and completed conversion actions.',
+  serp: 'Primary expected gain: stronger presence in AI-generated answers and modern search experiences.'
+};
+const AI_SERP_INTRO = score => {
+  const base = 'AI-driven search is becoming an important discovery layer across ChatGPT, Perplexity, Gemini, and Google AI experiences. This section evaluates whether the brand and content are structured in a way that can be understood, trusted, and cited by modern search and AI systems.';
+  if (score < 50) return base + '\n\nThis is a growing opportunity area. Many competitors have not yet optimised for AI visibility, so improvements here can create a meaningful early advantage.';
+  if (score < 75) return base + '\n\nSome AI visibility signals are already in place, but gaps remain in crawler access, entity clarity, content structure, or trust signals.';
+  return base + '\n\nThe site has strong AI visibility foundations. Continue strengthening entity signals, original content, and authoritative references.';
+};
 function generateReportCopy(score, results) {
   const evaluated = score.categories.filter(c => c.evaluated > 0);
   if (evaluated.length === 0) return null;
@@ -30846,6 +31229,7 @@ function generateReportCopy(score, results) {
   const priorityIssues = AUDIT_CATEGORIES.flatMap(cat => cat.sections.flatMap(sec => sec.items.filter(it => results[it.id] === 'Fail').map(it => {
     const {
       impact,
+      businessImpact,
       fix
     } = getImpactAndFix(it.item, it.howTo);
     return {
@@ -30853,6 +31237,7 @@ function generateReportCopy(score, results) {
       catLabel: cat.label,
       catRgb: hexToRgb(cat.color),
       impact,
+      businessImpact,
       fix
     };
   }))).sort((a, b) => (PSCORE[b.priority] ?? 0) - (PSCORE[a.priority] ?? 0));
@@ -30861,7 +31246,8 @@ function generateReportCopy(score, results) {
     performanceInterpretation,
     confidenceText,
     sectionInsights,
-    priorityIssues
+    priorityIssues,
+    weakestId: weakest.id
   };
 }
 
@@ -31049,8 +31435,68 @@ function downloadPDF(config, auditUrl, score, results) {
     align: 'right'
   });
 
-  // ── Overall score box ─────────────────────────────────────────────────────
+  // ── Client Snapshot box ───────────────────────────────────────────────────
   y += 28;
+  {
+    const snapH = 26;
+    doc.setFillColor(248, 249, 253);
+    doc.roundedRect(M, y, W - 2 * M, snapH, 2, 2, 'F');
+    doc.setDrawColor(215, 220, 232);
+    doc.setLineWidth(0.2);
+    doc.roundedRect(M, y, W - 2 * M, snapH, 2, 2, 'S');
+    doc.setFontSize(6);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(155, 160, 178);
+    doc.text('AUDIT SNAPSHOT', M + 5, y + 5);
+    const evalCatsSnap = score.categories.filter(c => c.evaluated > 0);
+    const weakestSnap = evalCatsSnap.length > 0 ? evalCatsSnap.reduce((a, b) => b.score < a.score ? b : a) : null;
+    const critSnap = AUDIT_CATEGORIES.flatMap(cat => cat.sections.flatMap(sec => sec.items.filter(it => results[it.id] === 'Fail' && it.priority === 'Critical'))).length;
+    const highSnap = AUDIT_CATEGORIES.flatMap(cat => cat.sections.flatMap(sec => sec.items.filter(it => results[it.id] === 'Fail' && it.priority === 'High'))).length;
+    const urgencySnap = critSnap > 0 ? `${critSnap} Critical issue${critSnap > 1 ? 's' : ''}` : highSnap > 0 ? `${highSnap} High-priority issue${highSnap > 1 ? 's' : ''}` : 'No critical blockers';
+    const oppSnap = weakestSnap ? weakestSnap.label.replace('AI & SERP Visibility', 'AI Visibility') + ` (${weakestSnap.score}/100)` : '—';
+    const scopeSnap = `Full UX + SEO Audit · ${score.categories.reduce((s, c) => s + c.total, 0)} checkpoints`;
+    const dateSnap = new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+    const snapCols = [{
+      label: 'Client',
+      val: clientName || '—'
+    }, {
+      label: 'Website',
+      val: auditUrl.replace(/https?:\/\/(www\.)?/, '')
+    }, {
+      label: 'Audit Scope',
+      val: scopeSnap
+    }, {
+      label: 'Reviewed',
+      val: dateSnap
+    }, {
+      label: 'Main Opportunity',
+      val: oppSnap
+    }, {
+      label: 'Urgency',
+      val: urgencySnap
+    }];
+    const colW = (W - 2 * M - 6) / 3;
+    snapCols.forEach((col, i) => {
+      const cx = M + 5 + i % 3 * (colW + 3);
+      const cy = y + 10 + Math.floor(i / 3) * 9;
+      doc.setFontSize(5.5);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(155, 160, 178);
+      doc.text(col.label.toUpperCase(), cx, cy);
+      doc.setFontSize(7);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(28, 33, 52);
+      const valLine = doc.splitTextToSize(col.val, colW - 2);
+      doc.text(valLine[0], cx, cy + 4.5);
+    });
+    y += snapH + 4;
+  }
+
+  // ── Overall score box ─────────────────────────────────────────────────────
   doc.setFillColor(...brandLight);
   doc.roundedRect(M, y, W - 2 * M, 28, 3, 3, 'F');
   doc.setDrawColor(...brandRgb);
@@ -31160,6 +31606,26 @@ function downloadPDF(config, auditUrl, score, results) {
     doc.setTextColor(145, 150, 168);
     doc.text(confLines, M, y);
     y += confLines.length * 3.8 + 3;
+
+    // Estimated Impact box
+    const estImpactText = copy.weakestId ? ESTIMATED_IMPACT[copy.weakestId] : null;
+    if (estImpactText) {
+      const eiLines = doc.splitTextToSize(estImpactText, W - 2 * M - 38);
+      const eiH = Math.max(14, 8 + eiLines.length * 4);
+      doc.setFillColor(232, 250, 244);
+      doc.roundedRect(M, y, W - 2 * M, eiH, 2, 2, 'F');
+      doc.setFillColor(16, 185, 129);
+      doc.roundedRect(M, y, 2.5, eiH, 1, 0, 'F');
+      doc.setFontSize(6);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(6, 120, 90);
+      doc.text('ESTIMATED IMPACT', M + 6, y + 5.5);
+      doc.setFontSize(7);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(22, 60, 50);
+      doc.text(eiLines, M + 6, y + 10.5);
+      y += eiH + 4;
+    }
   }
 
   // ── Audit Summary stats ───────────────────────────────────────────────────
@@ -31227,7 +31693,7 @@ function downloadPDF(config, auditUrl, score, results) {
     doc.line(M, y, W - M, y);
     y += 3;
     enrichedIssues.slice(0, 6).forEach((item, i) => {
-      const rowH = 22;
+      const rowH = 28;
       checkPageBreak(rowH + 2);
       if (i % 2 === 0) {
         doc.setFillColor(247, 248, 252);
@@ -31254,17 +31720,26 @@ function downloadPDF(config, auditUrl, score, results) {
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(22, 28, 48);
       const titleLine = doc.splitTextToSize(item.item, W - 2 * M - 5);
-      doc.text(titleLine[0], M + 2, y + 11.5);
+      doc.text(titleLine[0], M + 2, y + 12);
       // Why it matters
       doc.setFontSize(6.5);
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(80, 85, 105);
       const impactLine = doc.splitTextToSize(`Why it matters: ${item.impact}`, W - 2 * M - 5);
-      doc.text(impactLine[0], M + 2, y + 16.5);
+      doc.text(impactLine[0], M + 2, y + 17);
+      // Business impact
+      if (item.businessImpact) {
+        doc.setFontSize(6.5);
+        doc.setFont('helvetica', 'italic');
+        doc.setTextColor(100, 110, 135);
+        const bizLine = doc.splitTextToSize(`Business impact: ${item.businessImpact}`, W - 2 * M - 5);
+        doc.text(bizLine[0], M + 2, y + 21);
+      }
       // Action
       const fixLine = doc.splitTextToSize(`Action: ${item.fix}`, W - 2 * M - 5);
+      doc.setFont('helvetica', 'normal');
       doc.setTextColor(110, 120, 145);
-      doc.text(fixLine[0], M + 2, y + 20.5);
+      doc.text(fixLine[0], M + 2, y + 25.5);
       y += rowH;
     });
     if (enrichedIssues.length > 6) {
@@ -31344,6 +31819,23 @@ function downloadPDF(config, auditUrl, score, results) {
       doc.setTextColor(55, 60, 80);
       doc.text(iLines, M + 5, y + 4.5 + (iLines.length > 1 ? 0 : 1));
       y += iH + 4;
+    }
+
+    // AI Visibility intro paragraph
+    if (cat.id === 'serp') {
+      const catScore = score.categories.find(c => c.id === 'serp');
+      const introTxt = AI_SERP_INTRO(catScore ? catScore.score : 0);
+      const introParas = introTxt.split('\n\n');
+      introParas.forEach(para => {
+        checkPageBreak(14);
+        const pLines = doc.splitTextToSize(para, W - 2 * M);
+        doc.setFontSize(7.5);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(55, 60, 80);
+        doc.text(pLines, M, y);
+        y += pLines.length * 4 + 3;
+      });
+      y += 2;
     }
     cat.sections.forEach(sec => {
       checkPageBreak(20);
