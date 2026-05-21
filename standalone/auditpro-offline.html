@@ -33042,40 +33042,96 @@ function DashboardView({
   }, "Start Audit \u2192")), /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'grid',
-      gridTemplateColumns: 'repeat(4, 1fr)',
+      gridTemplateColumns: '2fr 1fr 1fr',
       gap: 12,
       marginBottom: 20
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      background: C.surface,
-      border: `1px solid ${C.border}`,
-      borderRadius: 12,
-      padding: '18px 20px'
+      background: totalEval > 0 ? `linear-gradient(135deg, ${C.accent}14 0%, ${C.accent}06 100%)` : C.surface,
+      border: `1.5px solid ${totalEval > 0 ? C.accent + '55' : C.border}`,
+      borderRadius: 14,
+      padding: '20px 24px'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      marginBottom: 14
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 10,
-      color: C.muted,
+      color: totalEval > 0 ? C.accent : C.muted,
       fontWeight: 700,
       textTransform: 'uppercase',
-      letterSpacing: '0.08em',
-      marginBottom: 8
+      letterSpacing: '0.08em'
     }
-  }, "Audit Score"), /*#__PURE__*/React.createElement("div", {
+  }, "Overall Score"), totalEval > 0 && /*#__PURE__*/React.createElement("div", {
     style: {
-      fontSize: 36,
+      fontSize: 10,
+      color: confidenceColor,
+      fontWeight: 600
+    }
+  }, confidence, " Confidence \xB7 ", completionPct, "% reviewed")), totalEval > 0 ? /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 20
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      alignItems: 'baseline',
+      gap: 4
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 56,
       fontWeight: 800,
-      color: totalEval > 0 ? C.accent : C.muted,
+      color: C.accent,
       lineHeight: 1
     }
-  }, totalEval > 0 ? `${score.weighted}%` : '—'), /*#__PURE__*/React.createElement("div", {
+  }, score.weighted), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 20,
+      fontWeight: 500,
+      color: C.muted,
+      lineHeight: 1
+    }
+  }, "/100")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      borderLeft: `1px solid ${C.border}`,
+      paddingLeft: 20
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 22,
+      fontWeight: 800,
+      color: C.text,
+      lineHeight: 1.1
+    }
+  }, "Grade ", score.grade), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 12,
       color: C.muted,
-      marginTop: 6
+      marginTop: 4
     }
-  }, totalEval > 0 ? `Grade ${score.grade} · ${score.rating}` : 'No items reviewed yet')), /*#__PURE__*/React.createElement("div", {
+  }, score.rating))) : /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 36,
+      fontWeight: 800,
+      color: C.muted,
+      lineHeight: 1
+    }
+  }, "\u2014"), !totalEval && /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 12,
+      color: C.muted,
+      marginTop: 8
+    }
+  }, "No items reviewed yet")), /*#__PURE__*/React.createElement("div", {
     onClick: () => scrollToIssues('Blank'),
     style: {
       background: C.surface,
@@ -33169,36 +33225,7 @@ function DashboardView({
     style: {
       color: C.accent
     }
-  }, "view details \u2193"))), /*#__PURE__*/React.createElement("div", {
-    style: {
-      background: C.surface,
-      border: `1px solid ${C.border}`,
-      borderRadius: 12,
-      padding: '18px 20px'
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 10,
-      color: C.muted,
-      fontWeight: 700,
-      textTransform: 'uppercase',
-      letterSpacing: '0.08em',
-      marginBottom: 8
-    }
-  }, "Confidence"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 36,
-      fontWeight: 800,
-      color: confidenceColor,
-      lineHeight: 1
-    }
-  }, confidence), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 11,
-      color: C.muted,
-      marginTop: 6
-    }
-  }, confidence === 'Low' && 'Review more items for reliable results', confidence === 'Medium' && 'Good coverage — keep going', confidence === 'High' && 'Strong coverage — results are reliable'))), score && (() => {
+  }, "view details \u2193")))), score && (() => {
     const evaluated = score.categories.filter(c => c.evaluated > 0);
     const weakestId = evaluated.length > 0 ? evaluated.reduce((a, b) => b.score < a.score ? b : a).id : null;
     return /*#__PURE__*/React.createElement("div", {

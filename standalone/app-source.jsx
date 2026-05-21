@@ -1933,16 +1933,38 @@ function DashboardView({ score, auditUrl, results, setPage, onEdit, audits, onSe
       )}
 
       {/* Top metrics row */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:12, marginBottom:20 }}>
-        {/* Score */}
-        <div style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 20px' }}>
-          <div style={{ fontSize:10, color:C.muted, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:8 }}>Audit Score</div>
-          <div style={{ fontSize:36, fontWeight:800, color: totalEval > 0 ? C.accent : C.muted, lineHeight:1 }}>
-            {totalEval > 0 ? `${score.weighted}%` : '—'}
+      <div style={{ display:'grid', gridTemplateColumns:'2fr 1fr 1fr', gap:12, marginBottom:20 }}>
+        {/* Score hero — spans 2 cols */}
+        <div style={{
+          background: totalEval > 0 ? `linear-gradient(135deg, ${C.accent}14 0%, ${C.accent}06 100%)` : C.surface,
+          border: `1.5px solid ${totalEval > 0 ? C.accent+'55' : C.border}`,
+          borderRadius:14, padding:'20px 24px'
+        }}>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:14 }}>
+            <div style={{ fontSize:10, color: totalEval > 0 ? C.accent : C.muted, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em' }}>
+              Overall Score
+            </div>
+            {totalEval > 0 && (
+              <div style={{ fontSize:10, color:confidenceColor, fontWeight:600 }}>
+                {confidence} Confidence · {completionPct}% reviewed
+              </div>
+            )}
           </div>
-          <div style={{ fontSize:12, color:C.muted, marginTop:6 }}>
-            {totalEval > 0 ? `Grade ${score.grade} · ${score.rating}` : 'No items reviewed yet'}
-          </div>
+          {totalEval > 0 ? (
+            <div style={{ display:'flex', alignItems:'center', gap:20 }}>
+              <div style={{ display:'flex', alignItems:'baseline', gap:4 }}>
+                <span style={{ fontSize:56, fontWeight:800, color:C.accent, lineHeight:1 }}>{score.weighted}</span>
+                <span style={{ fontSize:20, fontWeight:500, color:C.muted, lineHeight:1 }}>/100</span>
+              </div>
+              <div style={{ borderLeft:`1px solid ${C.border}`, paddingLeft:20 }}>
+                <div style={{ fontSize:22, fontWeight:800, color:C.text, lineHeight:1.1 }}>Grade {score.grade}</div>
+                <div style={{ fontSize:12, color:C.muted, marginTop:4 }}>{score.rating}</div>
+              </div>
+            </div>
+          ) : (
+            <div style={{ fontSize:36, fontWeight:800, color:C.muted, lineHeight:1 }}>—</div>
+          )}
+          {!totalEval && <div style={{ fontSize:12, color:C.muted, marginTop:8 }}>No items reviewed yet</div>}
         </div>
         {/* Completion — click to see blank items */}
         <div onClick={() => scrollToIssues('Blank')}
@@ -1966,16 +1988,6 @@ function DashboardView({ score, auditUrl, results, setPage, onEdit, audits, onSe
           <div style={{ fontSize:11, color:C.muted, marginTop:6 }}>
             {partialItems.length > 0 && <span style={{ color:C.amber }}>{partialItems.length} partial · </span>}
             <span style={{ color:C.accent }}>view details ↓</span>
-          </div>
-        </div>
-        {/* Confidence */}
-        <div style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 20px' }}>
-          <div style={{ fontSize:10, color:C.muted, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:8 }}>Confidence</div>
-          <div style={{ fontSize:36, fontWeight:800, color:confidenceColor, lineHeight:1 }}>{confidence}</div>
-          <div style={{ fontSize:11, color:C.muted, marginTop:6 }}>
-            {confidence === 'Low' && 'Review more items for reliable results'}
-            {confidence === 'Medium' && 'Good coverage — keep going'}
-            {confidence === 'High' && 'Strong coverage — results are reliable'}
           </div>
         </div>
       </div>
