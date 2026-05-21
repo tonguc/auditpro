@@ -30514,12 +30514,13 @@ const aiSerp = {
     }]
   }, {
     id: 'geo',
-    label: 'GEO — Generative Engine Optimization',
+    label: 'AI Visibility (GEO)',
+    advanced: true,
     items: [{
       id: 'serp12',
       num: 12,
-      item: 'Brand cited in ChatGPT / Perplexity / Gemini answers',
-      howTo: 'Search "[brand] + [topic]" in ChatGPT, Perplexity, Gemini. If absent, increase authoritative backlinks and brand co-mentions.',
+      item: 'Brand appears in AI-generated answers for core queries',
+      howTo: 'Search your brand or niche in ChatGPT, Perplexity, Gemini. If absent, build authoritative backlinks and increase brand co-mentions on trusted sites.',
       priority: 'High'
     }, {
       id: 'serp13',
@@ -30530,25 +30531,26 @@ const aiSerp = {
     }, {
       id: 'serp14',
       num: 14,
-      item: 'llms.txt file present and configured',
-      howTo: 'Add /llms.txt to guide AI crawlers to preferred content. Emerging standard — include key pages and descriptions.',
+      item: 'LLMs.txt or AI-readable content structure exists',
+      howTo: 'Add /llms.txt to guide AI crawlers to preferred content. Also ensure clean headings, direct answers, and structured HTML that LLMs can parse easily.',
       priority: 'Medium'
     }, {
       id: 'serp15',
       num: 15,
-      item: 'Content includes original data, statistics or research',
-      howTo: 'AI tools preferentially cite original research, surveys, unique data. Add proprietary statistics with source attribution.',
+      item: 'Content includes unique data, insights or first-hand information',
+      howTo: 'AI tools preferentially cite original research, proprietary data, and first-hand experience. Generic rephrased content is deprioritized.',
       priority: 'High'
     }, {
       id: 'serp16',
       num: 16,
-      item: 'Brand entity in Google Knowledge Graph',
-      howTo: 'Search brand in Google — Knowledge Panel present? If not, create Google Business Profile, add Wikidata entry, use Organization schema.',
+      item: 'Brand has entity signals (Knowledge Graph / structured presence)',
+      howTo: 'Search brand in Google — Knowledge Panel present? If not, create Google Business Profile, add Wikidata entry, use Organization schema with sameAs links.',
       priority: 'Medium'
     }]
   }, {
     id: 'eeat',
     label: 'E-E-A-T & Authorship Signals',
+    advanced: true,
     items: [{
       id: 'serp17',
       num: 17,
@@ -30564,20 +30566,20 @@ const aiSerp = {
     }, {
       id: 'serp19',
       num: 19,
-      item: 'About / team page establishes domain expertise',
-      howTo: 'About page should mention credentials, experience, certifications. AIO and GEO use this for trust scoring.',
+      item: 'About page demonstrates real expertise & credibility',
+      howTo: 'About page should clearly convey credentials, experience, and certifications. AIO and GEO systems use this page for trust scoring.',
       priority: 'Medium'
     }, {
       id: 'serp20',
       num: 20,
-      item: 'External authoritative sources cited in content',
-      howTo: 'Link out to .gov, .edu, peer-reviewed studies. AI tools value well-sourced content for citation eligibility.',
+      item: 'References high-authority sources (.gov, .edu, research)',
+      howTo: 'Link out to .gov, .edu, peer-reviewed studies, and established publications. AI tools value well-sourced content for citation eligibility.',
       priority: 'Medium'
     }, {
       id: 'serp21',
       num: 21,
-      item: 'No unattributed AI-generated thin content',
-      howTo: 'AI-spun content without editorial oversight triggers quality filters. Add human expertise, first-person experience, original commentary.',
+      item: 'Content shows human editorial oversight (not raw AI output)',
+      howTo: 'Raw AI-generated content without editorial review triggers quality filters. Add human expertise, first-person experience, and original commentary throughout.',
       priority: 'High'
     }]
   }]
@@ -30585,10 +30587,10 @@ const aiSerp = {
 const AUDIT_CATEGORIES = [technicalSEO, onPage, uxHeuristics, cro, aiSerp];
 const WEIGHTS = {
   technical: 0.25,
-  onpage: 0.25,
-  ux: 0.20,
-  cro: 0.17,
-  serp: 0.13
+  ux: 0.25,
+  onpage: 0.20,
+  cro: 0.15,
+  serp: 0.15
 };
 
 // ─── SCORING ──────────────────────────────────────────────────────────────────
@@ -32336,6 +32338,10 @@ function AuditView({
   const [clientName, setClientName] = useState(initialClientName);
   const [results, setResults] = useState(initialResults);
   const [activeCat, setActiveCat] = useState(AUDIT_CATEGORIES[0].id);
+  const [collapsedSections, setCollapsedSections] = useState({
+    geo: true,
+    eeat: true
+  });
   const scrollRef = useRef(null);
   const catIdxRef = useRef(0);
   const lastSwitchRef = useRef(0);
@@ -32514,91 +32520,124 @@ function AuditView({
     style: {
       padding: '20px 36px 32px'
     }
-  }, cat.sections.map(sec => /*#__PURE__*/React.createElement("div", {
-    key: sec.id,
-    style: {
-      marginBottom: 14
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      padding: '8px 14px',
-      background: cat.color + '22',
-      borderLeft: `3px solid ${cat.color}`,
-      borderRadius: '0 6px 6px 0',
-      fontSize: 11,
-      fontWeight: 700,
-      color: cat.color
-    }
-  }, sec.label), sec.items.map((item, i) => {
-    const s = results[item.id];
+  }, cat.sections.map(sec => {
+    const isCollapsed = sec.advanced && collapsedSections[sec.id];
+    const toggleCollapse = () => setCollapsedSections(prev => ({
+      ...prev,
+      [sec.id]: !prev[sec.id]
+    }));
     return /*#__PURE__*/React.createElement("div", {
-      key: item.id,
+      key: sec.id,
       style: {
-        display: 'flex',
-        alignItems: 'flex-start',
-        gap: 14,
-        padding: '11px 14px',
-        background: i % 2 === 0 ? C.surface : C.surfaceHover,
-        borderBottom: `1px solid ${C.border}`
+        marginBottom: 14
       }
     }, /*#__PURE__*/React.createElement("div", {
+      onClick: sec.advanced ? toggleCollapse : undefined,
       style: {
-        width: 24,
-        height: 24,
-        borderRadius: '50%',
-        flexShrink: 0,
-        background: `${SEV[item.priority]}22`,
-        border: `1px solid ${SEV[item.priority]}44`,
+        padding: '8px 14px',
+        background: cat.color + '22',
+        borderLeft: `3px solid ${cat.color}`,
+        borderRadius: '0 6px 6px 0',
+        fontSize: 11,
+        fontWeight: 700,
+        color: cat.color,
         display: 'flex',
         alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: 9,
-        fontWeight: 700,
-        color: SEV[item.priority]
+        justifyContent: 'space-between',
+        cursor: sec.advanced ? 'pointer' : 'default'
       }
-    }, item.num), /*#__PURE__*/React.createElement("div", {
-      style: {
-        flex: 1,
-        minWidth: 0
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 13,
-        fontWeight: 600,
-        color: C.text,
-        marginBottom: 2
-      }
-    }, item.item), /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 11,
-        color: C.muted,
-        fontStyle: 'italic',
-        lineHeight: 1.5
-      }
-    }, item.howTo)), /*#__PURE__*/React.createElement("div", {
+    }, /*#__PURE__*/React.createElement("span", {
       style: {
         display: 'flex',
-        gap: 4,
-        flexShrink: 0
+        alignItems: 'center',
+        gap: 8
       }
-    }, ['Pass', 'Partial', 'Fail', 'N/A'].map(v => /*#__PURE__*/React.createElement("button", {
-      key: v,
-      onClick: () => setResults(r => ({
-        ...r,
-        [item.id]: v
-      })),
+    }, sec.label, sec.advanced && /*#__PURE__*/React.createElement("span", {
       style: {
-        padding: '4px 8px',
-        borderRadius: 6,
-        fontSize: 11,
-        fontWeight: 600,
-        cursor: 'pointer',
-        border: `1px solid ${s === v ? STATUS_COLOR[v] : C.border}`,
-        background: s === v ? STATUS_BG[v] : 'transparent',
-        color: s === v ? STATUS_COLOR[v] : C.muted
+        fontSize: 9,
+        fontWeight: 700,
+        padding: '2px 6px',
+        borderRadius: 4,
+        background: cat.color + '33',
+        color: cat.color,
+        letterSpacing: '0.5px'
       }
-    }, v))));
-  }))), /*#__PURE__*/React.createElement("div", {
+    }, "ADVANCED")), sec.advanced && /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 11,
+        opacity: 0.7
+      }
+    }, isCollapsed ? '▶' : '▼')), !isCollapsed && sec.items.map((item, i) => {
+      const s = results[item.id];
+      return /*#__PURE__*/React.createElement("div", {
+        key: item.id,
+        style: {
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: 14,
+          padding: '11px 14px',
+          background: i % 2 === 0 ? C.surface : C.surfaceHover,
+          borderBottom: `1px solid ${C.border}`
+        }
+      }, /*#__PURE__*/React.createElement("div", {
+        style: {
+          width: 24,
+          height: 24,
+          borderRadius: '50%',
+          flexShrink: 0,
+          background: `${SEV[item.priority]}22`,
+          border: `1px solid ${SEV[item.priority]}44`,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontSize: 9,
+          fontWeight: 700,
+          color: SEV[item.priority]
+        }
+      }, item.num), /*#__PURE__*/React.createElement("div", {
+        style: {
+          flex: 1,
+          minWidth: 0
+        }
+      }, /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontSize: 13,
+          fontWeight: 600,
+          color: C.text,
+          marginBottom: 2
+        }
+      }, item.item), /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontSize: 11,
+          color: C.muted,
+          fontStyle: 'italic',
+          lineHeight: 1.5
+        }
+      }, item.howTo)), /*#__PURE__*/React.createElement("div", {
+        style: {
+          display: 'flex',
+          gap: 4,
+          flexShrink: 0
+        }
+      }, ['Pass', 'Partial', 'Fail', 'N/A'].map(v => /*#__PURE__*/React.createElement("button", {
+        key: v,
+        onClick: () => setResults(r => ({
+          ...r,
+          [item.id]: v
+        })),
+        style: {
+          padding: '4px 8px',
+          borderRadius: 6,
+          fontSize: 11,
+          fontWeight: 600,
+          cursor: 'pointer',
+          border: `1px solid ${s === v ? STATUS_COLOR[v] : C.border}`,
+          background: s === v ? STATUS_BG[v] : 'transparent',
+          color: s === v ? STATUS_COLOR[v] : C.muted
+        }
+      }, v))));
+    }));
+  }), /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
       justifyContent: 'space-between',

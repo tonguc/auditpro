@@ -289,25 +289,25 @@ const aiSerp = {
       { id:'serp10', num:10, item:'Site cited as source in Google AI Overview',           howTo:'Add author bios, cite sources, use structured data. AIO sources favor authoritative content.',           priority:'Critical' },
       { id:'serp11', num:11, item:'Content structured for AI answer extraction',          howTo:'Short intro paragraphs that directly answer the query. Lists, tables, and clear H2 questions.',         priority:'High'     },
     ]},
-    { id: 'geo', label: 'GEO — Generative Engine Optimization', items: [
-      { id:'serp12', num:12, item:'Brand cited in ChatGPT / Perplexity / Gemini answers', howTo:'Search "[brand] + [topic]" in ChatGPT, Perplexity, Gemini. If absent, increase authoritative backlinks and brand co-mentions.', priority:'High' },
+    { id: 'geo', label: 'AI Visibility (GEO)', advanced: true, items: [
+      { id:'serp12', num:12, item:'Brand appears in AI-generated answers for core queries', howTo:'Search your brand or niche in ChatGPT, Perplexity, Gemini. If absent, build authoritative backlinks and increase brand co-mentions on trusted sites.', priority:'High' },
       { id:'serp13', num:13, item:'AI crawlers not blocked in robots.txt',                howTo:'Check robots.txt — ensure GPTBot, ClaudeBot, PerplexityBot, anthropic-ai are not disallowed unless intentional.',  priority:'High'     },
-      { id:'serp14', num:14, item:'llms.txt file present and configured',                 howTo:'Add /llms.txt to guide AI crawlers to preferred content. Emerging standard — include key pages and descriptions.', priority:'Medium' },
-      { id:'serp15', num:15, item:'Content includes original data, statistics or research', howTo:'AI tools preferentially cite original research, surveys, unique data. Add proprietary statistics with source attribution.', priority:'High' },
-      { id:'serp16', num:16, item:'Brand entity in Google Knowledge Graph',               howTo:'Search brand in Google — Knowledge Panel present? If not, create Google Business Profile, add Wikidata entry, use Organization schema.', priority:'Medium' },
+      { id:'serp14', num:14, item:'LLMs.txt or AI-readable content structure exists',     howTo:'Add /llms.txt to guide AI crawlers to preferred content. Also ensure clean headings, direct answers, and structured HTML that LLMs can parse easily.', priority:'Medium' },
+      { id:'serp15', num:15, item:'Content includes unique data, insights or first-hand information', howTo:'AI tools preferentially cite original research, proprietary data, and first-hand experience. Generic rephrased content is deprioritized.', priority:'High' },
+      { id:'serp16', num:16, item:'Brand has entity signals (Knowledge Graph / structured presence)', howTo:'Search brand in Google — Knowledge Panel present? If not, create Google Business Profile, add Wikidata entry, use Organization schema with sameAs links.', priority:'Medium' },
     ]},
-    { id: 'eeat', label: 'E-E-A-T & Authorship Signals', items: [
+    { id: 'eeat', label: 'E-E-A-T & Authorship Signals', advanced: true, items: [
       { id:'serp17', num:17, item:'Author byline and bio on all content pages',           howTo:'Add author name, photo, credentials, and link to author page on every article. AI citation algorithms weight author signals heavily.', priority:'High' },
       { id:'serp18', num:18, item:'Person schema markup on author pages',                 howTo:'Add Person schema with sameAs links to LinkedIn, Google Scholar, published works.',                       priority:'High'     },
-      { id:'serp19', num:19, item:'About / team page establishes domain expertise',       howTo:'About page should mention credentials, experience, certifications. AIO and GEO use this for trust scoring.', priority:'Medium' },
-      { id:'serp20', num:20, item:'External authoritative sources cited in content',      howTo:'Link out to .gov, .edu, peer-reviewed studies. AI tools value well-sourced content for citation eligibility.', priority:'Medium' },
-      { id:'serp21', num:21, item:'No unattributed AI-generated thin content',            howTo:'AI-spun content without editorial oversight triggers quality filters. Add human expertise, first-person experience, original commentary.', priority:'High' },
+      { id:'serp19', num:19, item:'About page demonstrates real expertise & credibility', howTo:'About page should clearly convey credentials, experience, and certifications. AIO and GEO systems use this page for trust scoring.', priority:'Medium' },
+      { id:'serp20', num:20, item:'References high-authority sources (.gov, .edu, research)', howTo:'Link out to .gov, .edu, peer-reviewed studies, and established publications. AI tools value well-sourced content for citation eligibility.', priority:'Medium' },
+      { id:'serp21', num:21, item:'Content shows human editorial oversight (not raw AI output)', howTo:'Raw AI-generated content without editorial review triggers quality filters. Add human expertise, first-person experience, and original commentary throughout.', priority:'High' },
     ]},
   ]
 };
 
 const AUDIT_CATEGORIES = [technicalSEO, onPage, uxHeuristics, cro, aiSerp];
-const WEIGHTS = { technical: 0.25, onpage: 0.25, ux: 0.20, cro: 0.17, serp: 0.13 };
+const WEIGHTS = { technical: 0.25, ux: 0.25, onpage: 0.20, cro: 0.15, serp: 0.15 };
 
 // ─── SCORING ──────────────────────────────────────────────────────────────────
 
@@ -1172,6 +1172,7 @@ function AuditView({ onComplete, initialUrl = '', initialClientName = '', initia
   const [clientName, setClientName] = useState(initialClientName);
   const [results, setResults]       = useState(initialResults);
   const [activeCat, setActiveCat]   = useState(AUDIT_CATEGORIES[0].id);
+  const [collapsedSections, setCollapsedSections] = useState({ geo: true, eeat: true });
   const scrollRef = useRef(null);
   const catIdxRef = useRef(0);
   const lastSwitchRef = useRef(0);
@@ -1280,12 +1281,31 @@ function AuditView({ onComplete, initialUrl = '', initialClientName = '', initia
 
       {/* Category content */}
       <div style={{ padding:'20px 36px 32px' }}>
-        {cat.sections.map(sec => (
+        {cat.sections.map(sec => {
+          const isCollapsed = sec.advanced && collapsedSections[sec.id];
+          const toggleCollapse = () => setCollapsedSections(prev => ({ ...prev, [sec.id]: !prev[sec.id] }));
+          return (
           <div key={sec.id} style={{ marginBottom:14 }}>
-            <div style={{ padding:'8px 14px', background:cat.color + '22',
-              borderLeft:`3px solid ${cat.color}`, borderRadius:'0 6px 6px 0',
-              fontSize:11, fontWeight:700, color:cat.color }}>{sec.label}</div>
-            {sec.items.map((item, i) => {
+            <div onClick={sec.advanced ? toggleCollapse : undefined}
+              style={{ padding:'8px 14px', background:cat.color + '22',
+                borderLeft:`3px solid ${cat.color}`, borderRadius:'0 6px 6px 0',
+                fontSize:11, fontWeight:700, color:cat.color,
+                display:'flex', alignItems:'center', justifyContent:'space-between',
+                cursor: sec.advanced ? 'pointer' : 'default' }}>
+              <span style={{ display:'flex', alignItems:'center', gap:8 }}>
+                {sec.label}
+                {sec.advanced && (
+                  <span style={{ fontSize:9, fontWeight:700, padding:'2px 6px', borderRadius:4,
+                    background: cat.color + '33', color: cat.color, letterSpacing:'0.5px' }}>
+                    ADVANCED
+                  </span>
+                )}
+              </span>
+              {sec.advanced && (
+                <span style={{ fontSize:11, opacity:0.7 }}>{isCollapsed ? '▶' : '▼'}</span>
+              )}
+            </div>
+            {!isCollapsed && sec.items.map((item, i) => {
               const s = results[item.id];
               return (
                 <div key={item.id} style={{ display:'flex', alignItems:'flex-start', gap:14,
@@ -1312,7 +1332,8 @@ function AuditView({ onComplete, initialUrl = '', initialClientName = '', initia
               );
             })}
           </div>
-        ))}
+          );
+        })}
 
         {/* Prev / Next navigation */}
         <div style={{ display:'flex', justifyContent:'space-between', marginTop:16 }}>
