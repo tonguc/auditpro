@@ -29156,7 +29156,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
   <script>
 const {
   useState,
-  useEffect
+  useEffect,
+  useRef
 } = React;
 
 // ─── AUDIT DATA ───────────────────────────────────────────────────────────────
@@ -31670,13 +31671,50 @@ function AuditView({
   const [url, setUrl] = useState(initialUrl);
   const [clientName, setClientName] = useState(initialClientName);
   const [results, setResults] = useState(initialResults);
-  const [activeCat, setActiveCat] = useState('technical');
+  const [activeCat, setActiveCat] = useState(AUDIT_CATEGORIES[0].id);
+  const scrollRef = useRef(null);
+  const headerRef = useRef(null);
+  const sectionRefs = useRef({});
   const totalItems = AUDIT_CATEGORIES.flatMap(c => c.sections.flatMap(s => s.items)).length;
   const filledItems = Object.keys(results).filter(k => results[k] !== null && results[k] !== undefined).length;
   const remaining = totalItems - filledItems;
   const canComplete = filledItems > 0;
-  const cat = AUDIT_CATEGORIES.find(c => c.id === activeCat);
+
+  // Scroll-spy: update active tab as user scrolls
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+    const onScroll = () => {
+      const headerH = (headerRef.current?.offsetHeight ?? 120) + 16;
+      const containerTop = container.getBoundingClientRect().top;
+      let current = AUDIT_CATEGORIES[0].id;
+      for (const cat of AUDIT_CATEGORIES) {
+        const el = sectionRefs.current[cat.id];
+        if (!el) continue;
+        const elTop = el.getBoundingClientRect().top - containerTop;
+        if (elTop <= headerH) current = cat.id;
+      }
+      setActiveCat(current);
+    };
+    container.addEventListener('scroll', onScroll, {
+      passive: true
+    });
+    return () => container.removeEventListener('scroll', onScroll);
+  }, []);
+  const scrollTo = catId => {
+    const container = scrollRef.current;
+    const el = sectionRefs.current[catId];
+    if (!container || !el) return;
+    const headerH = (headerRef.current?.offsetHeight ?? 120) + 8;
+    const containerTop = container.getBoundingClientRect().top;
+    const elTop = el.getBoundingClientRect().top - containerTop + container.scrollTop - headerH;
+    container.scrollTo({
+      top: Math.max(0, elTop),
+      behavior: 'smooth'
+    });
+  };
   return /*#__PURE__*/React.createElement("div", {
+    ref: scrollRef,
     style: {
       flex: 1,
       overflowY: 'auto',
@@ -31684,38 +31722,39 @@ function AuditView({
       flexDirection: 'column'
     }
   }, /*#__PURE__*/React.createElement("div", {
+    ref: headerRef,
     style: {
       position: 'sticky',
       top: 0,
       zIndex: 20,
       background: C.bg,
       borderBottom: `1px solid ${C.border}`,
-      padding: '20px 36px 14px'
+      padding: '16px 36px 12px'
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginBottom: 12
+      marginBottom: 10
     }
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
     style: {
-      fontSize: 22,
+      fontSize: 20,
       fontWeight: 800,
       color: C.text
     }
   }, isEditing ? '✎ Edit Audit' : 'New Audit'), /*#__PURE__*/React.createElement("div", {
     style: {
-      fontSize: 13,
+      fontSize: 12,
       color: C.muted,
-      marginTop: 4
+      marginTop: 3
     }
   }, remaining > 0 ? /*#__PURE__*/React.createElement("span", {
     style: {
       color: C.amber
     }
-  }, remaining, " items remaining \u2014 mark Pass / Partial / Fail / N/A") : /*#__PURE__*/React.createElement("span", {
+  }, remaining, " remaining \u2014 mark Pass / Partial / Fail / N/A") : /*#__PURE__*/React.createElement("span", {
     style: {
       color: C.green
     }
@@ -31728,15 +31767,15 @@ function AuditView({
   }, /*#__PURE__*/React.createElement("input", {
     value: clientName,
     onChange: e => setClientName(e.target.value),
-    placeholder: "Client name (e.g. Acme Corp)",
+    placeholder: "Client name",
     style: {
       background: C.surface,
       border: `1px solid ${C.border}`,
       borderRadius: 8,
-      padding: '9px 14px',
+      padding: '8px 12px',
       color: C.text,
       fontSize: 13,
-      width: 190
+      width: 160
     }
   }), /*#__PURE__*/React.createElement("input", {
     value: url,
@@ -31746,10 +31785,10 @@ function AuditView({
       background: C.surface,
       border: `1px solid ${C.border}`,
       borderRadius: 8,
-      padding: '9px 14px',
+      padding: '8px 12px',
       color: C.text,
       fontSize: 13,
-      width: 220
+      width: 200
     }
   }), /*#__PURE__*/React.createElement("button", {
     onClick: () => canComplete && onComplete(url || clientName || 'Manual Audit', clientName, results, calculateScore(results)),
@@ -31758,7 +31797,7 @@ function AuditView({
       background: canComplete ? C.green : C.border,
       border: 'none',
       borderRadius: 8,
-      padding: '10px 20px',
+      padding: '9px 18px',
       color: '#fff',
       fontWeight: 600,
       fontSize: 13,
@@ -31769,40 +31808,73 @@ function AuditView({
   }, isEditing ? 'Save Changes →' : 'Complete Audit →'))), /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
-      gap: 8,
+      gap: 6,
       flexWrap: 'wrap'
     }
-  }, AUDIT_CATEGORIES.map(c => /*#__PURE__*/React.createElement("button", {
-    key: c.id,
-    onClick: () => setActiveCat(c.id),
+  }, AUDIT_CATEGORIES.map(c => {
+    const active = activeCat === c.id;
+    return /*#__PURE__*/React.createElement("button", {
+      key: c.id,
+      onClick: () => scrollTo(c.id),
+      style: {
+        background: active ? c.color : C.surface,
+        border: `1px solid ${active ? c.color : C.border}`,
+        borderRadius: 8,
+        padding: '6px 14px',
+        color: active ? '#fff' : C.muted,
+        fontSize: 12,
+        fontWeight: active ? 700 : 400,
+        cursor: 'pointer',
+        transition: 'background 0.15s, color 0.15s'
+      }
+    }, c.icon, " ", c.label);
+  }))), /*#__PURE__*/React.createElement("div", {
     style: {
-      background: activeCat === c.id ? c.color : C.surface,
-      border: `1px solid ${activeCat === c.id ? c.color : C.border}`,
-      borderRadius: 8,
-      padding: '8px 16px',
-      color: activeCat === c.id ? '#fff' : C.muted,
-      fontSize: 12,
-      fontWeight: activeCat === c.id ? 700 : 400,
-      cursor: 'pointer'
-    }
-  }, c.icon, " ", c.label)))), /*#__PURE__*/React.createElement("div", {
-    style: {
-      padding: '20px 36px',
+      padding: '20px 36px 40px',
       flex: 1
     }
-  }, cat.sections.map(sec => /*#__PURE__*/React.createElement("div", {
-    key: sec.id,
+  }, AUDIT_CATEGORIES.map(cat => /*#__PURE__*/React.createElement("div", {
+    key: cat.id,
+    ref: el => sectionRefs.current[cat.id] = el,
     style: {
-      marginBottom: 16
+      marginBottom: 32
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      padding: '10px 16px',
+      display: 'flex',
+      alignItems: 'center',
+      gap: 10,
+      marginBottom: 12
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      width: 4,
+      height: 20,
+      borderRadius: 2,
       background: cat.color,
-      borderRadius: '8px 8px 0 0',
-      fontSize: 12,
+      flexShrink: 0
+    }
+  }), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 14,
+      fontWeight: 800,
+      color: C.text
+    }
+  }, cat.icon, " ", cat.label)), cat.sections.map(sec => /*#__PURE__*/React.createElement("div", {
+    key: sec.id,
+    style: {
+      marginBottom: 14
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: '8px 14px',
+      background: cat.color + '22',
+      borderLeft: `3px solid ${cat.color}`,
+      borderRadius: '0 6px 6px 0',
+      fontSize: 11,
       fontWeight: 700,
-      color: '#fff'
+      color: cat.color,
+      marginBottom: 0
     }
   }, sec.label), sec.items.map((item, i) => {
     const s = results[item.id];
@@ -31812,14 +31884,14 @@ function AuditView({
         display: 'flex',
         alignItems: 'flex-start',
         gap: 14,
-        padding: '12px 16px',
+        padding: '11px 14px',
         background: i % 2 === 0 ? C.surface : C.surfaceHover,
         borderBottom: `1px solid ${C.border}`
       }
     }, /*#__PURE__*/React.createElement("div", {
       style: {
-        width: 26,
-        height: 26,
+        width: 24,
+        height: 24,
         borderRadius: '50%',
         flexShrink: 0,
         background: `${SEV[item.priority]}22`,
@@ -31827,7 +31899,7 @@ function AuditView({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
-        fontSize: 10,
+        fontSize: 9,
         fontWeight: 700,
         color: SEV[item.priority]
       }
@@ -31841,7 +31913,7 @@ function AuditView({
         fontSize: 13,
         fontWeight: 600,
         color: C.text,
-        marginBottom: 3
+        marginBottom: 2
       }
     }, item.item), /*#__PURE__*/React.createElement("div", {
       style: {
@@ -31853,7 +31925,7 @@ function AuditView({
     }, item.howTo)), /*#__PURE__*/React.createElement("div", {
       style: {
         display: 'flex',
-        gap: 5,
+        gap: 4,
         flexShrink: 0
       }
     }, ['Pass', 'Partial', 'Fail', 'N/A'].map(v => /*#__PURE__*/React.createElement("button", {
@@ -31863,7 +31935,7 @@ function AuditView({
         [item.id]: v
       })),
       style: {
-        padding: '5px 9px',
+        padding: '4px 8px',
         borderRadius: 6,
         fontSize: 11,
         fontWeight: 600,
@@ -31873,7 +31945,7 @@ function AuditView({
         color: s === v ? STATUS_COLOR[v] : C.muted
       }
     }, v))));
-  })))));
+  })))))));
 }
 function WhiteLabelView({
   audits,
@@ -32722,19 +32794,13 @@ function App() {
     onEdit: handleEdit,
     audits: audits,
     onSelectAudit: handleSelectAudit
-  }), page === 'audit' && /*#__PURE__*/React.createElement("div", {
-    style: {
-      flex: 1,
-      display: 'flex',
-      overflowY: 'auto'
-    }
-  }, /*#__PURE__*/React.createElement(AuditView, {
+  }), page === 'audit' && /*#__PURE__*/React.createElement(AuditView, {
     onComplete: handleComplete,
     initialUrl: editMode ? auditUrl : '',
     initialClientName: editMode ? clientName : '',
     initialResults: editMode ? results : {},
     isEditing: editMode
-  })), page === 'whitelabel' && /*#__PURE__*/React.createElement(WhiteLabelView, {
+  }), page === 'whitelabel' && /*#__PURE__*/React.createElement(WhiteLabelView, {
     audits: audits,
     currentUrl: auditUrl,
     currentClientName: clientName,

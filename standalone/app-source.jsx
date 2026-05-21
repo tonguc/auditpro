@@ -1,4 +1,4 @@
-const { useState, useEffect } = React;
+const { useState, useEffect, useRef } = React;
 
 // ─── AUDIT DATA ───────────────────────────────────────────────────────────────
 
@@ -880,95 +880,142 @@ function AuditView({ onComplete, initialUrl = '', initialClientName = '', initia
   const [url, setUrl]               = useState(initialUrl);
   const [clientName, setClientName] = useState(initialClientName);
   const [results, setResults]       = useState(initialResults);
-  const [activeCat, setActiveCat]   = useState('technical');
+  const [activeCat, setActiveCat]   = useState(AUDIT_CATEGORIES[0].id);
+
+  const scrollRef  = useRef(null);
+  const headerRef  = useRef(null);
+  const sectionRefs = useRef({});
 
   const totalItems = AUDIT_CATEGORIES.flatMap(c => c.sections.flatMap(s => s.items)).length;
   const filledItems = Object.keys(results).filter(k => results[k] !== null && results[k] !== undefined).length;
   const remaining = totalItems - filledItems;
-
   const canComplete = filledItems > 0;
-  const cat = AUDIT_CATEGORIES.find(c => c.id === activeCat);
+
+  // Scroll-spy: update active tab as user scrolls
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+    const onScroll = () => {
+      const headerH = (headerRef.current?.offsetHeight ?? 120) + 16;
+      const containerTop = container.getBoundingClientRect().top;
+      let current = AUDIT_CATEGORIES[0].id;
+      for (const cat of AUDIT_CATEGORIES) {
+        const el = sectionRefs.current[cat.id];
+        if (!el) continue;
+        const elTop = el.getBoundingClientRect().top - containerTop;
+        if (elTop <= headerH) current = cat.id;
+      }
+      setActiveCat(current);
+    };
+    container.addEventListener('scroll', onScroll, { passive: true });
+    return () => container.removeEventListener('scroll', onScroll);
+  }, []);
+
+  const scrollTo = (catId) => {
+    const container = scrollRef.current;
+    const el = sectionRefs.current[catId];
+    if (!container || !el) return;
+    const headerH = (headerRef.current?.offsetHeight ?? 120) + 8;
+    const containerTop = container.getBoundingClientRect().top;
+    const elTop = el.getBoundingClientRect().top - containerTop + container.scrollTop - headerH;
+    container.scrollTo({ top: Math.max(0, elTop), behavior: 'smooth' });
+  };
+
   return (
-    <div style={{ flex:1, overflowY:'auto', display:'flex', flexDirection:'column' }}>
-      <div style={{ position:'sticky', top:0, zIndex:20, background:C.bg,
-        borderBottom:`1px solid ${C.border}`, padding:'20px 36px 14px' }}>
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
+    <div ref={scrollRef} style={{ flex:1, overflowY:'auto', display:'flex', flexDirection:'column' }}>
+      <div ref={headerRef} style={{ position:'sticky', top:0, zIndex:20, background:C.bg,
+        borderBottom:`1px solid ${C.border}`, padding:'16px 36px 12px' }}>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:10 }}>
           <div>
-            <h1 style={{ fontSize:22, fontWeight:800, color:C.text }}>
+            <h1 style={{ fontSize:20, fontWeight:800, color:C.text }}>
               {isEditing ? '✎ Edit Audit' : 'New Audit'}
             </h1>
-            <div style={{ fontSize:13, color:C.muted, marginTop:4 }}>
+            <div style={{ fontSize:12, color:C.muted, marginTop:3 }}>
               {remaining > 0
-                ? <span style={{ color:C.amber }}>{remaining} items remaining — mark Pass / Partial / Fail / N/A</span>
+                ? <span style={{ color:C.amber }}>{remaining} remaining — mark Pass / Partial / Fail / N/A</span>
                 : <span style={{ color:C.green }}>All {totalItems} items reviewed ✓</span>
               }
             </div>
           </div>
           <div style={{ display:'flex', gap:8, alignItems:'center' }}>
             <input value={clientName} onChange={e => setClientName(e.target.value)}
-              placeholder="Client name (e.g. Acme Corp)"
+              placeholder="Client name"
               style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:8,
-                padding:'9px 14px', color:C.text, fontSize:13, width:190 }} />
+                padding:'8px 12px', color:C.text, fontSize:13, width:160 }} />
             <input value={url} onChange={e => setUrl(e.target.value)}
               placeholder="https://yoursite.com"
               style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:8,
-                padding:'9px 14px', color:C.text, fontSize:13, width:220 }} />
+                padding:'8px 12px', color:C.text, fontSize:13, width:200 }} />
             <button
               onClick={() => canComplete && onComplete(url || clientName || 'Manual Audit', clientName, results, calculateScore(results))}
               disabled={!canComplete}
               style={{ background: canComplete ? C.green : C.border, border:'none', borderRadius:8,
-                padding:'10px 20px', color:'#fff', fontWeight:600, fontSize:13, whiteSpace:'nowrap',
+                padding:'9px 18px', color:'#fff', fontWeight:600, fontSize:13, whiteSpace:'nowrap',
                 cursor: canComplete ? 'pointer' : 'not-allowed', opacity: canComplete ? 1 : 0.45 }}>
               {isEditing ? 'Save Changes →' : 'Complete Audit →'}
             </button>
           </div>
         </div>
-        <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
-          {AUDIT_CATEGORIES.map(c => (
-            <button key={c.id} onClick={() => setActiveCat(c.id)} style={{
-              background: activeCat === c.id ? c.color : C.surface,
-              border:`1px solid ${activeCat === c.id ? c.color : C.border}`,
-              borderRadius:8, padding:'8px 16px',
-              color: activeCat === c.id ? '#fff' : C.muted,
-              fontSize:12, fontWeight: activeCat === c.id ? 700 : 400, cursor:'pointer' }}>
-              {c.icon} {c.label}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div style={{ padding:'20px 36px', flex:1 }}>
-      {cat.sections.map(sec => (
-        <div key={sec.id} style={{ marginBottom:16 }}>
-          <div style={{ padding:'10px 16px', background:cat.color, borderRadius:'8px 8px 0 0',
-            fontSize:12, fontWeight:700, color:'#fff' }}>{sec.label}</div>
-          {sec.items.map((item, i) => {
-            const s = results[item.id];
+        <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
+          {AUDIT_CATEGORIES.map(c => {
+            const active = activeCat === c.id;
             return (
-              <div key={item.id} style={{ display:'flex', alignItems:'flex-start', gap:14,
-                padding:'12px 16px', background: i % 2 === 0 ? C.surface : C.surfaceHover,
-                borderBottom:`1px solid ${C.border}` }}>
-                <div style={{ width:26, height:26, borderRadius:'50%', flexShrink:0,
-                  background:`${SEV[item.priority]}22`, border:`1px solid ${SEV[item.priority]}44`,
-                  display:'flex', alignItems:'center', justifyContent:'center',
-                  fontSize:10, fontWeight:700, color:SEV[item.priority] }}>{item.num}</div>
-                <div style={{ flex:1, minWidth:0 }}>
-                  <div style={{ fontSize:13, fontWeight:600, color:C.text, marginBottom:3 }}>{item.item}</div>
-                  <div style={{ fontSize:11, color:C.muted, fontStyle:'italic', lineHeight:1.5 }}>{item.howTo}</div>
-                </div>
-                <div style={{ display:'flex', gap:5, flexShrink:0 }}>
-                  {['Pass','Partial','Fail','N/A'].map(v => (
-                    <button key={v} onClick={() => setResults(r => ({ ...r, [item.id]: v }))} style={{
-                      padding:'5px 9px', borderRadius:6, fontSize:11, fontWeight:600, cursor:'pointer',
-                      border:`1px solid ${s === v ? STATUS_COLOR[v] : C.border}`,
-                      background: s === v ? STATUS_BG[v] : 'transparent',
-                      color: s === v ? STATUS_COLOR[v] : C.muted }}>{v}</button>
-                  ))}
-                </div>
-              </div>
+              <button key={c.id} onClick={() => scrollTo(c.id)} style={{
+                background: active ? c.color : C.surface,
+                border:`1px solid ${active ? c.color : C.border}`,
+                borderRadius:8, padding:'6px 14px',
+                color: active ? '#fff' : C.muted,
+                fontSize:12, fontWeight: active ? 700 : 400, cursor:'pointer',
+                transition:'background 0.15s, color 0.15s' }}>
+                {c.icon} {c.label}
+              </button>
             );
           })}
         </div>
-      ))}
+      </div>
+
+      <div style={{ padding:'20px 36px 40px', flex:1 }}>
+        {AUDIT_CATEGORIES.map(cat => (
+          <div key={cat.id} ref={el => sectionRefs.current[cat.id] = el} style={{ marginBottom:32 }}>
+            <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:12 }}>
+              <div style={{ width:4, height:20, borderRadius:2, background:cat.color, flexShrink:0 }} />
+              <span style={{ fontSize:14, fontWeight:800, color:C.text }}>{cat.icon} {cat.label}</span>
+            </div>
+            {cat.sections.map(sec => (
+              <div key={sec.id} style={{ marginBottom:14 }}>
+                <div style={{ padding:'8px 14px', background:cat.color + '22',
+                  borderLeft:`3px solid ${cat.color}`, borderRadius:'0 6px 6px 0',
+                  fontSize:11, fontWeight:700, color:cat.color, marginBottom:0 }}>{sec.label}</div>
+                {sec.items.map((item, i) => {
+                  const s = results[item.id];
+                  return (
+                    <div key={item.id} style={{ display:'flex', alignItems:'flex-start', gap:14,
+                      padding:'11px 14px', background: i % 2 === 0 ? C.surface : C.surfaceHover,
+                      borderBottom:`1px solid ${C.border}` }}>
+                      <div style={{ width:24, height:24, borderRadius:'50%', flexShrink:0,
+                        background:`${SEV[item.priority]}22`, border:`1px solid ${SEV[item.priority]}44`,
+                        display:'flex', alignItems:'center', justifyContent:'center',
+                        fontSize:9, fontWeight:700, color:SEV[item.priority] }}>{item.num}</div>
+                      <div style={{ flex:1, minWidth:0 }}>
+                        <div style={{ fontSize:13, fontWeight:600, color:C.text, marginBottom:2 }}>{item.item}</div>
+                        <div style={{ fontSize:11, color:C.muted, fontStyle:'italic', lineHeight:1.5 }}>{item.howTo}</div>
+                      </div>
+                      <div style={{ display:'flex', gap:4, flexShrink:0 }}>
+                        {['Pass','Partial','Fail','N/A'].map(v => (
+                          <button key={v} onClick={() => setResults(r => ({ ...r, [item.id]: v }))} style={{
+                            padding:'4px 8px', borderRadius:6, fontSize:11, fontWeight:600, cursor:'pointer',
+                            border:`1px solid ${s === v ? STATUS_COLOR[v] : C.border}`,
+                            background: s === v ? STATUS_BG[v] : 'transparent',
+                            color: s === v ? STATUS_COLOR[v] : C.muted }}>{v}</button>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ))}
+          </div>
+        ))}
       </div>
     </div>
   );
@@ -1375,13 +1422,11 @@ function App() {
       <div style={{ flex:1, display:'flex', overflow:'hidden' }}>
         {page === 'dashboard'  && <DashboardView score={score} issues={issues} auditUrl={auditUrl} results={results}
           setPage={handleNewAudit} onEdit={handleEdit} audits={audits} onSelectAudit={handleSelectAudit} />}
-        {page === 'audit'      && <div style={{ flex:1, display:'flex', overflowY:'auto' }}>
-          <AuditView onComplete={handleComplete}
+        {page === 'audit'      && <AuditView onComplete={handleComplete}
             initialUrl={editMode ? auditUrl : ''}
             initialClientName={editMode ? clientName : ''}
             initialResults={editMode ? results : {}}
-            isEditing={editMode} />
-        </div>}
+            isEditing={editMode} />}
         {page === 'whitelabel' && <WhiteLabelView audits={audits} currentUrl={auditUrl}
           currentClientName={clientName} score={score} results={results}
           onSelect={handleSelectAudit} onDelete={handleDeleteAudit} onUpdateAudit={handleUpdateAudit} onEditAudit={handleEditAudit} />}
