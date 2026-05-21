@@ -1871,7 +1871,15 @@ function DashboardView({ score, auditUrl, results, setPage, onEdit, audits, onSe
   const blankItems   = allItems.filter(it => !it.status);
   const filteredIssues = issueFilter === 'Fail' ? failItems : issueFilter === 'Partial' ? partialItems : issueFilter === 'Blank' ? blankItems : [];
 
-  const scrollToIssues = (filter) => { setIssueFilter(filter); setTimeout(() => issuesRef.current?.scrollIntoView({ behavior:'smooth', block:'start' }), 50); };
+  const scoreColor   = totalEval > 0 ? (score.weighted >= 70 ? C.green : score.weighted >= 50 ? C.amber : C.red) : C.muted;
+  const criticalCount = failItems.filter(i => i.priority === 'Critical').length;
+  const perfLabel    = totalEval > 0
+    ? score.weighted >= 85 ? 'Strong performance — site is well optimised'
+    : score.weighted >= 70 ? 'Good performance with clear room to improve'
+    : score.weighted >= 50 ? 'Below average — key opportunities are being missed'
+    : 'Poor performance actively limiting growth'
+    : null;
+
 
   const FILTER_TABS = [
     { key:'Fail',    label:`Fail`,    count: failItems.length,    color: C.red    },
@@ -1932,70 +1940,91 @@ function DashboardView({ score, auditUrl, results, setPage, onEdit, audits, onSe
         </div>
       )}
 
-      {/* Top metrics row */}
-      <div style={{ display:'grid', gridTemplateColumns:'2fr 1fr 1fr', gap:12, marginBottom:20 }}>
-        {/* Score hero — spans 2 cols */}
-        <div style={{
-          background: totalEval > 0 ? `linear-gradient(135deg, ${C.accent}14 0%, ${C.accent}06 100%)` : C.surface,
-          border: `1.5px solid ${totalEval > 0 ? C.accent+'55' : C.border}`,
-          borderRadius:14, padding:'20px 24px'
-        }}>
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:14 }}>
-            <div style={{ fontSize:10, color: totalEval > 0 ? C.accent : C.muted, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em' }}>
-              Overall Score
-            </div>
+      {/* ── Premium Score Summary ─────────────────────────────────────────── */}
+      <div style={{
+        background: totalEval > 0 ? `${C.accent}0C` : C.surface,
+        border: `2px solid ${totalEval > 0 ? C.accent+'44' : C.border}`,
+        borderRadius: 16, padding: '28px 32px 22px', marginBottom: 20
+      }}>
+        {/* Top 3-column row */}
+        <div style={{ display:'flex', gap:0, alignItems:'stretch' }}>
+
+          {/* LEFT — Score number */}
+          <div style={{ display:'flex', alignItems:'baseline', gap:6, flexShrink:0, paddingRight:32 }}>
+            <span style={{ fontSize:72, fontWeight:900, color: totalEval > 0 ? C.accent : C.muted,
+              lineHeight:1, letterSpacing:'-4px' }}>
+              {totalEval > 0 ? score.weighted : '—'}
+            </span>
             {totalEval > 0 && (
-              <div style={{ fontSize:10, color:confidenceColor, fontWeight:600 }}>
-                {confidence} Confidence · {completionPct}% reviewed
-              </div>
+              <span style={{ fontSize:40, fontWeight:600, color:C.accent, opacity:0.45, lineHeight:1 }}>/100</span>
             )}
           </div>
-          {totalEval > 0 ? (
-            <div style={{ display:'flex', alignItems:'center', gap:20 }}>
-              {/* Score stacked: big number over /100 */}
-              <div>
-                <div style={{ fontSize:62, fontWeight:900, color:C.accent, lineHeight:1, letterSpacing:'-2px' }}>{score.weighted}</div>
-                <div style={{ fontSize:12, fontWeight:600, color:C.muted, letterSpacing:'1px', marginTop:2 }}>/100</div>
+
+          {/* CENTER — Grade + meaning */}
+          <div style={{ flex:1, borderLeft:`1.5px solid ${C.border}`, borderRight:`1.5px solid ${C.border}`,
+            paddingLeft:28, paddingRight:28, display:'flex', flexDirection:'column', justifyContent:'center', gap:8 }}>
+            <div style={{ fontSize:11, fontWeight:700, color:C.muted, textTransform:'uppercase', letterSpacing:'0.1em' }}>
+              Overall Score
+            </div>
+            <div style={{ fontSize:30, fontWeight:800, color:C.text, lineHeight:1 }}>
+              {totalEval > 0 ? `Grade ${score.grade}` : 'No data yet'}
+            </div>
+            {totalEval > 0 && (
+              <span style={{ display:'inline-block', alignSelf:'flex-start', fontSize:13, fontWeight:700,
+                padding:'5px 14px', borderRadius:20, background:`${scoreColor}1A`, color:scoreColor }}>
+                {score.rating}
+              </span>
+            )}
+            <div style={{ fontSize:13, color:C.muted, lineHeight:1.5 }}>
+              {perfLabel || 'Complete your audit to see performance insights.'}
+            </div>
+          </div>
+
+          {/* RIGHT — Confidence box */}
+          <div style={{ flexShrink:0, paddingLeft:28, display:'flex', flexDirection:'column', justifyContent:'center', gap:6 }}>
+            <div style={{ background:`${confidenceColor}14`, border:`1.5px solid ${confidenceColor}33`,
+              borderRadius:12, padding:'16px 20px', minWidth:190 }}>
+              <div style={{ fontSize:10, fontWeight:700, color:C.muted, textTransform:'uppercase',
+                letterSpacing:'0.1em', marginBottom:10 }}>Audit Confidence</div>
+              <div style={{ fontSize:24, fontWeight:800, color:confidenceColor, lineHeight:1, marginBottom:4 }}>
+                {confidence}
               </div>
-              <div style={{ width:1, background:C.border, alignSelf:'stretch', margin:'4px 0' }} />
-              {/* Grade + rating */}
-              <div>
-                <div style={{ display:'inline-block', background:`${C.accent}18`, borderRadius:8, padding:'4px 12px', marginBottom:6 }}>
-                  <span style={{ fontSize:22, fontWeight:800, color:C.accent }}>Grade {score.grade}</span>
-                </div>
-                <div style={{ fontSize:13, color:C.muted }}>{score.rating}</div>
+              <div style={{ fontSize:12, color:C.muted }}>{completionPct}% of items reviewed</div>
+              <div style={{ fontSize:11, color:C.muted, marginTop:4 }}>{totalEval} / {totalAll} checkpoints</div>
+            </div>
+          </div>
+        </div>
+
+        {/* KPI mini row */}
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(3, 1fr)', gap:10,
+          borderTop:`1px solid ${C.border}`, marginTop:22, paddingTop:18 }}>
+          {[
+            { icon:'🚨', value: criticalCount,
+              label:'Critical Issues', color: criticalCount > 0 ? C.red : C.muted,
+              sub: criticalCount > 0 ? 'click to view ↓' : 'None found',
+              onClick: () => scrollToIssues('Fail') },
+            { icon:'⚠️', value: failItems.length,
+              label:'Total Failures', color: failItems.length > 0 ? C.amber : C.muted,
+              sub: partialItems.length > 0 ? `+ ${partialItems.length} partial` : 'click to view ↓',
+              onClick: () => scrollToIssues('Fail') },
+            { icon:'☑', value: `${completionPct}%`,
+              label:'Checklist Reviewed', color: completionPct >= 80 ? C.green : C.accent,
+              sub: blankItems.length > 0 ? `${blankItems.length} items remaining` : 'Fully reviewed ✓',
+              onClick: () => scrollToIssues('Blank') },
+          ].map((kpi, i) => (
+            <div key={i} onClick={kpi.onClick} style={{ display:'flex', alignItems:'center', gap:14,
+              background:C.surface, border:`1px solid ${C.border}`, borderRadius:10,
+              padding:'14px 18px', cursor:'pointer', transition:'border-color 0.15s' }}
+              onMouseEnter={e => e.currentTarget.style.borderColor = kpi.color}
+              onMouseLeave={e => e.currentTarget.style.borderColor = C.border}>
+              <span style={{ fontSize:22, lineHeight:1 }}>{kpi.icon}</span>
+              <div style={{ flex:1, minWidth:0 }}>
+                <div style={{ fontSize:26, fontWeight:800, color:kpi.color, lineHeight:1 }}>{kpi.value}</div>
+                <div style={{ fontSize:11, fontWeight:600, color:C.text, marginTop:3 }}>{kpi.label}</div>
+                <div style={{ fontSize:10, color:C.muted, marginTop:1 }}>{kpi.sub}</div>
               </div>
             </div>
-          ) : (
-            <div>
-              <div style={{ fontSize:36, fontWeight:800, color:C.muted, lineHeight:1 }}>—</div>
-              <div style={{ fontSize:12, color:C.muted, marginTop:8 }}>No items reviewed yet</div>
-            </div>
-          )}
-        </div>
-        {/* Completion — click to see blank items */}
-        <div onClick={() => scrollToIssues('Blank')}
-          style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 20px', cursor:'pointer' }}>
-          <div style={{ fontSize:10, color:C.muted, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:8 }}>Completion</div>
-          <div style={{ fontSize:36, fontWeight:800, color:C.text, lineHeight:1 }}>{completionPct}<span style={{ fontSize:18 }}>%</span></div>
-          <div style={{ marginTop:10, background:C.border, borderRadius:4, height:5 }}>
-            <div style={{ height:5, borderRadius:4, background:C.accent, width:`${completionPct}%`, transition:'width 0.4s ease' }} />
-          </div>
-          <div style={{ fontSize:11, color:C.muted, marginTop:5 }}>
-            {totalEval} / {totalAll} items
-            {blankItems.length > 0 && <span style={{ color:C.accent }}> · {blankItems.length} remaining ↓</span>}
-          </div>
-        </div>
-        {/* Issues Found — clickable + smooth scroll */}
-        <div onClick={() => scrollToIssues('Fail')}
-          style={{ background:C.surface, border:`1px solid ${failItems.length > 0 ? C.red+'44' : C.border}`,
-            borderRadius:12, padding:'18px 20px', cursor:'pointer', transition:'border-color 0.15s' }}>
-          <div style={{ fontSize:10, color:C.muted, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:8 }}>Issues Found</div>
-          <div style={{ fontSize:36, fontWeight:800, color: failItems.length > 0 ? C.red : C.muted, lineHeight:1 }}>{failItems.length}</div>
-          <div style={{ fontSize:11, color:C.muted, marginTop:6 }}>
-            {partialItems.length > 0 && <span style={{ color:C.amber }}>{partialItems.length} partial · </span>}
-            <span style={{ color:C.accent }}>view details ↓</span>
-          </div>
+          ))}
         </div>
       </div>
 
