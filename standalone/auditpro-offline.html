@@ -31392,7 +31392,7 @@ function DashboardView({
   onSelectAudit
 }) {
   const [detailCat, setDetailCat] = useState(null);
-  const [issueFilter, setIssueFilter] = useState('Fail');
+  const [issueFilter, setIssueFilter] = useState(null);
   const issuesRef = useRef(null);
   const totalAll = AUDIT_CATEGORIES.flatMap(c => c.sections.flatMap(s => s.items)).length;
   const totalEval = score?.totalEvaluated ?? 0;
@@ -31437,7 +31437,14 @@ function DashboardView({
   const failItems = allItems.filter(it => it.status === 'Fail').sort((a, b) => (PSCORE[b.priority] ?? 0) - (PSCORE[a.priority] ?? 0));
   const partialItems = allItems.filter(it => it.status === 'Partial').sort((a, b) => (PSCORE[b.priority] ?? 0) - (PSCORE[a.priority] ?? 0));
   const blankItems = allItems.filter(it => !it.status);
-  const filteredIssues = issueFilter === 'Fail' ? failItems : issueFilter === 'Partial' ? partialItems : blankItems;
+  const filteredIssues = issueFilter === 'Fail' ? failItems : issueFilter === 'Partial' ? partialItems : issueFilter === 'Blank' ? blankItems : [];
+  const scrollToIssues = filter => {
+    setIssueFilter(filter);
+    setTimeout(() => issuesRef.current?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
+    }), 50);
+  };
   const FILTER_TABS = [{
     key: 'Fail',
     label: `Fail`,
@@ -31643,11 +31650,13 @@ function DashboardView({
       marginTop: 6
     }
   }, totalEval > 0 ? `Grade ${score.grade} · ${score.rating}` : 'No items reviewed yet')), /*#__PURE__*/React.createElement("div", {
+    onClick: () => scrollToIssues('Blank'),
     style: {
       background: C.surface,
       border: `1px solid ${C.border}`,
       borderRadius: 12,
-      padding: '18px 20px'
+      padding: '18px 20px',
+      cursor: 'pointer'
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -31690,14 +31699,12 @@ function DashboardView({
       color: C.muted,
       marginTop: 5
     }
-  }, totalEval, " / ", totalAll, " items")), /*#__PURE__*/React.createElement("div", {
-    onClick: () => {
-      setIssueFilter('Fail');
-      setTimeout(() => issuesRef.current?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      }), 50);
-    },
+  }, totalEval, " / ", totalAll, " items", blankItems.length > 0 && /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: C.accent
+    }
+  }, " \xB7 ", blankItems.length, " remaining \u2193"))), /*#__PURE__*/React.createElement("div", {
+    onClick: () => scrollToIssues('Fail'),
     style: {
       background: C.surface,
       border: `1px solid ${failItems.length > 0 ? C.red + '44' : C.border}`,
@@ -31893,7 +31900,14 @@ function DashboardView({
       fontSize: 11,
       color: C.muted
     }
-  }, "based on ", totalEval, "/", totalAll, " reviewed")), filteredIssues.length === 0 ? /*#__PURE__*/React.createElement("div", {
+  }, "based on ", totalEval, "/", totalAll, " reviewed")), issueFilter === null ? /*#__PURE__*/React.createElement("div", {
+    style: {
+      padding: '32px 24px',
+      textAlign: 'center',
+      color: C.muted,
+      fontSize: 13
+    }
+  }, "Click a card above or select a filter to explore issues.") : filteredIssues.length === 0 ? /*#__PURE__*/React.createElement("div", {
     style: {
       padding: '32px 24px',
       textAlign: 'center',

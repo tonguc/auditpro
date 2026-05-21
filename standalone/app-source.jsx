@@ -806,7 +806,7 @@ function CategoryDetail({ catId, results, onClose }) {
 
 function DashboardView({ score, auditUrl, results, setPage, onEdit, audits, onSelectAudit }) {
   const [detailCat, setDetailCat] = useState(null);
-  const [issueFilter, setIssueFilter] = useState('Fail');
+  const [issueFilter, setIssueFilter] = useState(null);
   const issuesRef = useRef(null);
 
   const totalAll      = AUDIT_CATEGORIES.flatMap(c => c.sections.flatMap(s => s.items)).length;
@@ -836,7 +836,9 @@ function DashboardView({ score, auditUrl, results, setPage, onEdit, audits, onSe
   const failItems    = allItems.filter(it => it.status === 'Fail').sort((a,b) => (PSCORE[b.priority]??0)-(PSCORE[a.priority]??0));
   const partialItems = allItems.filter(it => it.status === 'Partial').sort((a,b) => (PSCORE[b.priority]??0)-(PSCORE[a.priority]??0));
   const blankItems   = allItems.filter(it => !it.status);
-  const filteredIssues = issueFilter === 'Fail' ? failItems : issueFilter === 'Partial' ? partialItems : blankItems;
+  const filteredIssues = issueFilter === 'Fail' ? failItems : issueFilter === 'Partial' ? partialItems : issueFilter === 'Blank' ? blankItems : [];
+
+  const scrollToIssues = (filter) => { setIssueFilter(filter); setTimeout(() => issuesRef.current?.scrollIntoView({ behavior:'smooth', block:'start' }), 50); };
 
   const FILTER_TABS = [
     { key:'Fail',    label:`Fail`,    count: failItems.length,    color: C.red    },
@@ -909,17 +911,21 @@ function DashboardView({ score, auditUrl, results, setPage, onEdit, audits, onSe
             {totalEval > 0 ? `Grade ${score.grade} · ${score.rating}` : 'No items reviewed yet'}
           </div>
         </div>
-        {/* Completion */}
-        <div style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 20px' }}>
+        {/* Completion — click to see blank items */}
+        <div onClick={() => scrollToIssues('Blank')}
+          style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 20px', cursor:'pointer' }}>
           <div style={{ fontSize:10, color:C.muted, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:8 }}>Completion</div>
           <div style={{ fontSize:36, fontWeight:800, color:C.text, lineHeight:1 }}>{completionPct}<span style={{ fontSize:18 }}>%</span></div>
           <div style={{ marginTop:10, background:C.border, borderRadius:4, height:5 }}>
             <div style={{ height:5, borderRadius:4, background:C.accent, width:`${completionPct}%`, transition:'width 0.4s ease' }} />
           </div>
-          <div style={{ fontSize:11, color:C.muted, marginTop:5 }}>{totalEval} / {totalAll} items</div>
+          <div style={{ fontSize:11, color:C.muted, marginTop:5 }}>
+            {totalEval} / {totalAll} items
+            {blankItems.length > 0 && <span style={{ color:C.accent }}> · {blankItems.length} remaining ↓</span>}
+          </div>
         </div>
         {/* Issues Found — clickable + smooth scroll */}
-        <div onClick={() => { setIssueFilter('Fail'); setTimeout(() => issuesRef.current?.scrollIntoView({ behavior:'smooth', block:'start' }), 50); }}
+        <div onClick={() => scrollToIssues('Fail')}
           style={{ background:C.surface, border:`1px solid ${failItems.length > 0 ? C.red+'44' : C.border}`,
             borderRadius:12, padding:'18px 20px', cursor:'pointer', transition:'border-color 0.15s' }}>
           <div style={{ fontSize:10, color:C.muted, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:8 }}>Issues Found</div>
@@ -988,7 +994,11 @@ function DashboardView({ score, auditUrl, results, setPage, onEdit, audits, onSe
             based on {totalEval}/{totalAll} reviewed
           </div>
         </div>
-        {filteredIssues.length === 0 ? (
+        {issueFilter === null ? (
+          <div style={{ padding:'32px 24px', textAlign:'center', color:C.muted, fontSize:13 }}>
+            Click a card above or select a filter to explore issues.
+          </div>
+        ) : filteredIssues.length === 0 ? (
           <div style={{ padding:'32px 24px', textAlign:'center', color:C.muted, fontSize:13 }}>
             {issueFilter === 'Fail'    && (totalEval === 0 ? 'Complete some audit items to see issues.' : '🎉 No failures found in reviewed items.')}
             {issueFilter === 'Partial' && '✅ No partial items found.'}
