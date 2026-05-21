@@ -31225,10 +31225,23 @@ function generateReportCopy(score, results) {
   const critCount = AUDIT_CATEGORIES.flatMap(cat => cat.sections.flatMap(sec => sec.items.filter(it => results[it.id] === 'Fail' && it.priority === 'Critical'))).length;
   const highCount = AUDIT_CATEGORIES.flatMap(cat => cat.sections.flatMap(sec => sec.items.filter(it => results[it.id] === 'Fail' && it.priority === 'High'))).length;
   const urgencyText = critCount > 3 ? `${critCount} critical issues that require urgent attention` : critCount > 0 ? `${critCount} critical issue${critCount > 1 ? 's' : ''} that need immediate resolution` : highCount > 0 ? `${highCount} high-priority issue${highCount > 1 ? 's' : ''} that should be addressed soon` : 'no critical blockers — improvements are available but not urgent';
-  const executiveSummary = `This website shows ${PERF_LEVEL(overall)} performance with an overall score of ${overall}/100 (Grade ${score.grade}). ` + `The biggest opportunity lies in ${weakestMeaning}. ` + `There are ${urgencyText} that are currently limiting performance.\n\n` + `This means the site is underperforming compared to competitors and leaving measurable growth opportunities on the table.\n\n` + `Addressing the top priority issues will deliver the fastest improvements in visibility, user experience, and conversions. ` + `If these issues are resolved, the site has strong potential to significantly improve both traffic and business outcomes.`;
-  const performanceInterpretation = `This score indicates ${PERF_MEANING(overall)}.`;
-  const confLevel = compRate < 20 ? 'low' : compRate < 60 ? 'medium' : 'high';
-  const confidenceText = `Based on ${compRate}% of checkpoints reviewed (${evalCount} of ${totalCount}), ` + `this audit provides a ${confLevel}-confidence view of site performance.`;
+  const isLowCov = compRate < 20;
+  const isMedCov = compRate >= 20 && compRate < 60;
+  const scoreLabel = isLowCov ? 'Preliminary Score' : isMedCov ? 'Indicative Score' : 'Overall Score';
+  const confLevel = isLowCov ? 'low' : isMedCov ? 'medium' : 'high';
+  const executiveSummary = isLowCov
+    ? `This is a preliminary result based on limited data. Only ${compRate}% of the audit has been completed (${evalCount} of ${totalCount} checks reviewed). The score of ${overall}/100 (Grade ${score.grade}) reflects only the sections evaluated so far and should not be treated as a final assessment.\n\nOf the items reviewed, the main area needing attention is ${weakestMeaning}. There are ${urgencyText} identified so far — however, more issues may exist in unevaluated sections.\n\nComplete more of the audit to get a reliable and accurate picture of site performance. The result may change significantly as more checks are completed.`
+    : isMedCov
+      ? `This website shows ${PERF_LEVEL(overall)} performance based on ${compRate}% of the audit (${evalCount} of ${totalCount} checks). Score: ${overall}/100, Grade ${score.grade}. The biggest opportunity lies in ${weakestMeaning}. There are ${urgencyText}.\n\nThis is an indicative result — completing the remaining sections may reveal additional issues. Addressing the top priority issues identified so far will deliver meaningful improvements in visibility, user experience, and conversions.`
+      : `This website shows ${PERF_LEVEL(overall)} performance with an overall score of ${overall}/100 (Grade ${score.grade}). ` + `The biggest opportunity lies in ${weakestMeaning}. ` + `There are ${urgencyText} that are currently limiting performance.\n\n` + `This means the site is underperforming compared to competitors and leaving measurable growth opportunities on the table.\n\n` + `Addressing the top priority issues will deliver the fastest improvements in visibility, user experience, and conversions. ` + `If these issues are resolved, the site has strong potential to significantly improve both traffic and business outcomes.`;
+  const performanceInterpretation = isLowCov
+    ? `This is a preliminary result based on limited data (${evalCount}/${totalCount} checks). It may not reflect overall site performance.`
+    : isMedCov
+      ? `This indicative score covers ${compRate}% of the audit. Completing remaining sections will improve accuracy.`
+      : `This score indicates ${PERF_MEANING(overall)}.`;
+  const confidenceText = isLowCov
+    ? `Low-confidence result: only ${compRate}% of checkpoints reviewed (${evalCount} of ${totalCount}). Complete more audit items for an accurate assessment. Continue the audit to uncover additional issues and improve accuracy.`
+    : `Based on ${compRate}% of checkpoints reviewed (${evalCount} of ${totalCount}), this audit provides a ${confLevel}-confidence view of site performance.`;
   const sectionInsights = {};
   score.categories.forEach(cat => {
     const fn = SECTION_INSIGHTS[cat.id];
@@ -31261,7 +31274,11 @@ function generateReportCopy(score, results) {
     confidenceText,
     sectionInsights,
     priorityIssues,
-    weakestId: weakest.id
+    weakestId: weakest.id,
+    weakestLabel: weakest.label.replace('AI & SERP Visibility','AI & SERP'),
+    scoreLabel,
+    isLowCov,
+    isMedCov
   };
 }
 
@@ -31527,22 +31544,57 @@ function downloadPDF(config, auditUrl, score, results) {
     y += snapH + 4;
   }
 
+  // ── Low-coverage warning block ────────────────────────────────────────────
+  if (score.completionPct < 20) {
+    const warnH = 20;
+    doc.setFillColor(255, 248, 220);
+    doc.roundedRect(M, y, W - 2 * M, warnH, 2, 2, 'F');
+    doc.setDrawColor(245, 158, 11);
+    doc.setLineWidth(0.35);
+    doc.roundedRect(M, y, W - 2 * M, warnH, 2, 2, 'S');
+    doc.setFillColor(245, 158, 11);
+    doc.roundedRect(M, y, 3, warnH, 1, 0, 'F');
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(120, 75, 0);
+    doc.text('⚠  Low Confidence Result', M + 7, y + 8);
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(100, 65, 0);
+    const warnMsg = `Only ${score.completionPct}% of the audit has been completed (${score.totalEvaluated}/${score.totalAll} checks). This is a preliminary result and may not reflect overall site performance.`;
+    const warnLines = doc.splitTextToSize(warnMsg, W - 2 * M - 12);
+    doc.text(warnLines, M + 7, y + 14);
+    y += warnH + 5;
+  }
+
   // ── Overall score box ─────────────────────────────────────────────────────
-  const boxH = 32;
+  const boxH = score.completionPct < 60 ? 38 : 32;
   doc.setFillColor(...brandLight);
   doc.roundedRect(M, y, W - 2 * M, boxH, 3, 3, 'F');
   doc.setDrawColor(...brandRgb);
   doc.setLineWidth(0.4);
   doc.roundedRect(M, y, W - 2 * M, boxH, 3, 3, 'S');
 
-  // Left: score number + /100 on same baseline, tight together
-  const scoreBaseY = y + 22;
-  doc.setFontSize(30);
+  // Left: score label + score number + /100
+  const isLowCovPDF = score.completionPct < 20;
+  const isMedCovPDF = score.completionPct >= 20 && score.completionPct < 60;
+  const scoreLabelPDF = copy?.scoreLabel || (isLowCovPDF ? 'Preliminary Score' : isMedCovPDF ? 'Indicative Score' : 'Overall Score');
+  const labelColor = isLowCovPDF ? [180, 110, 0] : isMedCovPDF ? [14, 100, 160] : [...brandRgb];
+  // Score label (small, above number)
+  doc.setFontSize(6.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(...labelColor);
+  doc.text(scoreLabelPDF.toUpperCase(), M + 12, y + 8);
+  // Score number
+  const scoreBaseY = isLowCovPDF ? y + 24 : y + 26;
+  const scoreFontSize = isLowCovPDF ? 24 : 30;
+  doc.setFontSize(scoreFontSize);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(...brandRgb);
   doc.text(`${score.weighted}`, M + 12, scoreBaseY);
   const numW = doc.getTextWidth(`${score.weighted}`);
-  doc.setFontSize(17);
+  const slashSize = isLowCovPDF ? 13 : 17;
+  doc.setFontSize(slashSize);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(...brandRgb);
   doc.text('/100', M + 12 + numW + 1, scoreBaseY);
@@ -31554,17 +31606,33 @@ function downloadPDF(config, auditUrl, score, results) {
   doc.setLineWidth(0.3);
   doc.line(divX, y + 5, divX, y + boxH - 5);
 
-  // Center: confidence label + % reviewed stacked
-  const confColor = score.confidence === 'High' ? [5, 150, 105] : score.confidence === 'Medium' ? [14, 165, 233] : [245, 158, 11];
+  // Center: coverage + opportunity + microcopy
   const centerX = divX + 8;
-  doc.setFontSize(8.5);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(...confColor);
-  doc.text(`${st(score.confidence)} Confidence`, centerX, y + 13);
+  const weakestLabelPDF = copy?.weakestLabel || '';
+  // Line 1: Coverage
   doc.setFontSize(7.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(55, 60, 80);
+  doc.text(`Audit Coverage: ${score.completionPct}%`, centerX, y + 9);
+  // Line 2: evaluated/total
+  doc.setFontSize(6.5);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(115, 120, 138);
-  doc.text(`${score.completionPct}% reviewed`, centerX, y + 22);
+  doc.text(`${score.totalEvaluated} of ${score.totalAll} checks reviewed`, centerX, y + 15);
+  // Line 3: opportunity
+  if (weakestLabelPDF) {
+    doc.setFontSize(6.5);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(55, 60, 80);
+    doc.text(`Main Opportunity: ${weakestLabelPDF}`, centerX, y + 21);
+  }
+  // Line 4: microcopy for non-high coverage
+  if (!copy || isLowCovPDF || isMedCovPDF) {
+    doc.setFontSize(6);
+    doc.setFont('helvetica', 'italic');
+    doc.setTextColor(isLowCovPDF ? 150 : 115, isLowCovPDF ? 95 : 120, isLowCovPDF ? 0 : 138);
+    doc.text('Complete more checks to get a reliable score.', centerX, y + boxH - 5);
+  }
 
   // Right divider before grade
   const div2X = W - M - 42;
@@ -31572,20 +31640,17 @@ function downloadPDF(config, auditUrl, score, results) {
   doc.setLineWidth(0.3);
   doc.line(div2X, y + 5, div2X, y + boxH - 5);
 
-  // Right: Grade letter (big, eye-catching) + rating label below
+  // Right: Grade (less dominant on low coverage)
   const gradeAreaCx = div2X + (W - M - div2X) / 2;
-  doc.setFontSize(22);
+  const gradeFontSize = isLowCovPDF ? 16 : 22;
+  doc.setFontSize(gradeFontSize);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(...brandRgb);
-  doc.text(`Grade ${score.grade}`, gradeAreaCx, y + 18, {
-    align: 'center'
-  });
+  doc.text(`Grade ${score.grade}`, gradeAreaCx, y + (isLowCovPDF ? 16 : 18), { align: 'center' });
   doc.setFontSize(8);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(90, 95, 115);
-  doc.text(st(score.rating), gradeAreaCx, y + 27, {
-    align: 'center'
-  });
+  doc.text(st(score.rating), gradeAreaCx, y + (isLowCovPDF ? 24 : 27), { align: 'center' });
 
   // ── Section Scores ────────────────────────────────────────────────────────
   y += boxH + 10;
@@ -31602,15 +31667,16 @@ function downloadPDF(config, auditUrl, score, results) {
     const catRgb = hexToRgb(cat.color);
     const catLite = lighten(catRgb, 0.92);
     const noData = cat.evaluated === 0;
+    const catBoxH = 30;
     doc.setFillColor(...(noData ? [244, 245, 250] : catLite));
-    doc.roundedRect(x, y, catBoxW, 28, 2, 2, 'F');
+    doc.roundedRect(x, y, catBoxW, catBoxH, 2, 2, 'F');
     doc.setDrawColor(...(noData ? [210, 215, 225] : catRgb));
     doc.setLineWidth(0.25);
-    doc.roundedRect(x, y, catBoxW, 28, 2, 2, 'S');
-    doc.setFontSize(noData ? 8 : 17);
+    doc.roundedRect(x, y, catBoxW, catBoxH, 2, 2, 'S');
+    doc.setFontSize(noData ? 7 : 17);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...(noData ? [185, 190, 205] : catRgb));
-    doc.text(noData ? '—' : `${cat.score}`, x + catBoxW / 2, noData ? y + 13 : y + 13, {
+    doc.text(noData ? 'N/E' : `${cat.score}`, x + catBoxW / 2, noData ? y + 11 : y + 13, {
       align: 'center'
     });
     doc.setFontSize(5.5);
@@ -31628,17 +31694,16 @@ function downloadPDF(config, auditUrl, score, results) {
         align: 'center'
       });
     } else {
-      doc.setFontSize(5.5);
+      doc.setFontSize(5);
       doc.setFont('helvetica', 'italic');
       doc.setTextColor(175, 180, 198);
-      doc.text('Not evaluated', x + catBoxW / 2, y + 24, {
-        align: 'center'
-      });
+      doc.text('Not evaluated', x + catBoxW / 2, y + 23, { align: 'center' });
+      doc.text('Complete to unlock', x + catBoxW / 2, y + 27, { align: 'center' });
     }
   });
 
   // ── Executive Summary (rule engine) ──────────────────────────────────────
-  y += 34;
+  y += 36;
   if (copy) {
     // Performance interpretation — italic one-liner above the box
     const interpLines = doc.splitTextToSize(copy.performanceInterpretation, W - 2 * M);
