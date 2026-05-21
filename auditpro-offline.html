@@ -31349,7 +31349,7 @@ function downloadPDF(config, auditUrl, score, results) {
         w = maxH * ratio;
       }
       const drawX = alignRight ? x - w : x;
-      doc.addImage(b64.split(',')[1], 'PNG', drawX, yPos, w, h);
+      doc.addImage(b64, 'PNG', drawX, yPos, w, h);
       return {
         w,
         h
@@ -31579,7 +31579,7 @@ function downloadPDF(config, auditUrl, score, results) {
   });
 
   // ── Section Scores ────────────────────────────────────────────────────────
-  y += 34;
+  y += boxH + 10;
   doc.setFontSize(9);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(30, 35, 45);
