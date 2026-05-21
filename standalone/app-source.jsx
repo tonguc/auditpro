@@ -1117,24 +1117,30 @@ function downloadPDF(config, auditUrl, score, results) {
   doc.text('/100', M + 12 + numW + 1, scoreBaseY);
   const slashW = doc.getTextWidth('/100');
 
-  // Vertical divider
+  // Left divider after score
   const divX = M + 12 + numW + slashW + 7;
   doc.setDrawColor(215, 220, 232); doc.setLineWidth(0.3);
   doc.line(divX, y + 5, divX, y + boxH - 5);
 
-  // Center: Grade + rating
-  const gradeX = divX + 8;
-  doc.setFontSize(15); doc.setFont('helvetica','bold'); doc.setTextColor(28, 32, 48);
-  doc.text(`Grade ${score.grade}`, gradeX, y + 13);
-  doc.setFontSize(9); doc.setFont('helvetica','normal'); doc.setTextColor(90, 95, 115);
-  doc.text(st(score.rating), gradeX, y + 22);
-
-  // Right: confidence label + % reviewed stacked
+  // Center: confidence label + % reviewed stacked
   const confColor = score.confidence === 'High' ? [5,150,105] : score.confidence === 'Medium' ? [14,165,233] : [245,158,11];
-  doc.setFontSize(8); doc.setFont('helvetica','bold'); doc.setTextColor(...confColor);
-  doc.text(`${st(score.confidence)} Confidence`, W - M - 5, y + 11, {align:'right'});
+  const centerX = divX + 8;
+  doc.setFontSize(8.5); doc.setFont('helvetica','bold'); doc.setTextColor(...confColor);
+  doc.text(`${st(score.confidence)} Confidence`, centerX, y + 13);
   doc.setFontSize(7.5); doc.setFont('helvetica','normal'); doc.setTextColor(115, 120, 138);
-  doc.text(`${score.completionPct}% reviewed`, W - M - 5, y + 21, {align:'right'});
+  doc.text(`${score.completionPct}% reviewed`, centerX, y + 22);
+
+  // Right divider before grade
+  const div2X = W - M - 42;
+  doc.setDrawColor(215, 220, 232); doc.setLineWidth(0.3);
+  doc.line(div2X, y + 5, div2X, y + boxH - 5);
+
+  // Right: Grade letter (big, eye-catching) + rating label below
+  const gradeAreaCx = div2X + (W - M - div2X) / 2;
+  doc.setFontSize(22); doc.setFont('helvetica','bold'); doc.setTextColor(...brandRgb);
+  doc.text(`Grade ${score.grade}`, gradeAreaCx, y + 18, {align:'center'});
+  doc.setFontSize(8); doc.setFont('helvetica','normal'); doc.setTextColor(90, 95, 115);
+  doc.text(st(score.rating), gradeAreaCx, y + 27, {align:'center'});
 
   // ── Section Scores ────────────────────────────────────────────────────────
   y += 34;
