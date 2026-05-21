@@ -31412,6 +31412,7 @@ function downloadPDF(config, auditUrl, score, results) {
 
   const onBrand     = contrastText(brandRgb);
   const onBrandMuted = contrastMuted(brandRgb);
+  const darkRgb = brandRgb.map(v => Math.max(0, Math.round(v * 0.72)));
 
   // Client logo — transparent (composited on brand color)
   let clientLogoW = 0;
