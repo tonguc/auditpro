@@ -13,6 +13,7 @@ const C = {
   text: '#F0F4FF', muted: '#6B7A99',
 }
 const SEV: Record<string, string> = { Critical: '#EF4444', High: '#F59E0B', Medium: '#0EA5E9', Low: '#10B981' }
+const GRADE_COLOR: Record<string, string> = { A: '#10B981', B: '#0EA5E9', C: '#F59E0B', D: '#EF4444' }
 const STATUS_COLOR: Record<string, string> = { Pass: '#10B981', Partial: '#F59E0B', Fail: '#EF4444', 'N/A': '#6B7A99' }
 const STATUS_BG: Record<string, string>    = { Pass: '#10B98122', Partial: '#F59E0B22', Fail: '#EF444422', 'N/A': '#6B7A9922' }
 
@@ -187,12 +188,24 @@ function DashboardView({ score, issues, auditUrl, results, setPage }: {
         </button>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '200px 1fr', gap: 20, marginBottom: 20 }}>
-        <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 12,
-          padding: 24, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-          <ScoreRing score={score.weighted} size={130} />
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 11, color: C.muted, fontWeight: 600, textTransform: 'uppercase' }}>Weighted Score</div>
-            <div style={{ fontSize: 12, color: C.amber, marginTop: 4 }}>{score.rating}</div>
+        <div style={{ background: C.surface, border: `1px solid ${GRADE_COLOR[score.grade] ?? C.accent}44`, borderRadius: 12,
+          padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <ScoreRing score={score.weighted} size={130} color={GRADE_COLOR[score.grade] ?? C.accent} />
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+            <div>
+              <div style={{ fontSize: 10, color: C.muted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Audit Score</div>
+              <div style={{ fontSize: 11, color: GRADE_COLOR[score.grade] ?? C.accent, marginTop: 4, fontWeight: 500 }}>{score.rating}</div>
+            </div>
+            <div style={{ textAlign: 'right', lineHeight: 1 }}>
+              <div style={{
+                fontSize: 56, fontWeight: 900, lineHeight: 1,
+                color: GRADE_COLOR[score.grade] ?? C.accent,
+                textShadow: `0 0 24px ${GRADE_COLOR[score.grade] ?? C.accent}88, 0 0 48px ${GRADE_COLOR[score.grade] ?? C.accent}44`,
+              }}>{score.grade}</div>
+              <div style={{ fontSize: 9, color: C.muted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 2 }}>Grade</div>
+            </div>
           </div>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
