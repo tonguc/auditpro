@@ -30736,6 +30736,9 @@ function downloadPDF(config, auditUrl, score, results) {
   const clientName = config.clientName || '';
   const agencyLogo = config.agencyLogo || null;
   const clientLogo = config.clientLogo || null;
+  const agencyEmail = config.agencyEmail || '';
+  const agencyWebsite = config.agencyWebsite || '';
+  const agencyTitle = config.agencyTitle || '';
   let y = 0;
   function addPage() {
     doc.addPage();
@@ -30743,17 +30746,24 @@ function downloadPDF(config, auditUrl, score, results) {
     drawFooter();
   }
   function drawFooter() {
-    doc.setFontSize(7.5);
-    doc.setTextColor(160, 160, 160);
-    doc.text(auditUrl, W - M, H - 8, {
+    doc.setFontSize(6.5);
+    doc.setTextColor(170, 172, 180);
+    doc.setFont('helvetica', 'normal');
+    doc.text(auditUrl, W - M, H - 6, {
       align: 'right'
     });
+    doc.text(new Date().toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    }), M, H - 6);
+    doc.setDrawColor(220, 222, 228);
+    doc.setLineWidth(0.2);
+    doc.line(M, H - 10, W - M, H - 10);
   }
   function checkPageBreak(needed) {
-    if (y + needed > H - 20) addPage();
+    if (y + needed > H - 18) addPage();
   }
-
-  // Aspect-ratio-preserving image helper — accepts normalised PNG data URLs
   function addLogoToDoc(b64, x, yPos, maxW, maxH, alignRight) {
     try {
       const props = doc.getImageProperties(b64);
@@ -30778,22 +30788,30 @@ function downloadPDF(config, auditUrl, score, results) {
     }
   }
 
-  // ── Cover header bar (two-tone) ───────────────────────────────────────────────
+  // ── Executive Insight Generator ────────────────────────────────────────────
+  function generateInsight() {
+    const evaluated = score.categories.filter(c => c.evaluated > 0);
+    if (evaluated.length === 0) return null;
+    const overall = score.weighted;
+    const weakest = evaluated.reduce((a, b) => b.score < a.score ? b : a);
+    const critFails = AUDIT_CATEGORIES.flatMap(cat => cat.sections.flatMap(sec => sec.items.filter(it => results[it.id] === 'Fail' && it.priority === 'Critical'))).length;
+    const highFails = AUDIT_CATEGORIES.flatMap(cat => cat.sections.flatMap(sec => sec.items.filter(it => results[it.id] === 'Fail' && it.priority === 'High'))).length;
+    const totalFails = score.categories.reduce((s, c) => s + c.failed, 0);
+    const healthLabel = overall >= 80 ? 'strong' : overall >= 60 ? 'moderate' : overall >= 40 ? 'needs significant improvement' : 'in critical condition';
+    let urgency = '';
+    if (critFails > 0) urgency = `${critFails} critical issue${critFails > 1 ? 's' : ''} require immediate attention.`;else if (highFails > 0) urgency = `${highFails} high-priority issue${highFails > 1 ? 's' : ''} were identified.`;else if (totalFails > 0) urgency = `${totalFails} item${totalFails > 1 ? 's' : ''} failed across the reviewed sections.`;else urgency = 'No failed items found — focus on completing unevaluated sections.';
+    const weakestLabel = weakest.label.replace('AI & SERP Visibility', 'AI Visibility');
+    return `This website has a ${healthLabel} overall score of ${overall}/100 (Grade ${score.grade}). The area requiring most attention is ${weakestLabel} (${weakest.score}/100). ${urgency} Prioritise the Top Priority Issues below, then work through each category section.`;
+  }
+
+  // ── PAGE 1: COVER ──────────────────────────────────────────────────────────
   const headerH = 50;
-  // Top zone — main brand colour
   doc.setFillColor(...brandRgb);
   doc.rect(0, 0, W, 36, 'F');
-  // Bottom zone — 25% darker for "Powered by" strip
   const darkRgb = brandRgb.map(v => Math.max(0, Math.round(v * 0.72)));
   doc.setFillColor(...darkRgb);
   doc.rect(0, 36, W, headerH - 36, 'F');
-
-  // Client logo — right side of top zone, aspect-ratio-preserved, max 36×13mm
-  if (clientLogo) {
-    addLogoToDoc(clientLogo, W - M, 4, 36, 13, true);
-  }
-
-  // Client name + subtitle + URL (top zone)
+  if (clientLogo) addLogoToDoc(clientLogo, W - M, 4, 36, 13, true);
   doc.setTextColor(255, 255, 255);
   doc.setFontSize(clientName ? 16 : 18);
   doc.setFont('helvetica', 'bold');
@@ -30804,8 +30822,6 @@ function downloadPDF(config, auditUrl, score, results) {
   doc.setFontSize(7);
   doc.setTextColor(210, 225, 240);
   doc.text(auditUrl, M, 31);
-
-  // "Powered by" — bottom zone
   doc.setFontSize(6);
   doc.setTextColor(180, 200, 220);
   doc.text('Powered by', M, 43);
@@ -30819,92 +30835,178 @@ function downloadPDF(config, auditUrl, score, results) {
     doc.setFont('helvetica', 'normal');
   }
 
-  // ── Cover body ───────────────────────────────────────────────────────────────
-  y = headerH + 9;
-  doc.setTextColor(130, 130, 130);
-  doc.setFontSize(8);
-  doc.text(`Report Date: ${new Date().toLocaleDateString('en-US', {
+  // ── Prepared by / for ─────────────────────────────────────────────────────
+  y = headerH + 6;
+  const halfW = (W - 2 * M - 4) / 2;
+  doc.setFillColor(245, 247, 251);
+  doc.roundedRect(M, y, W - 2 * M, 22, 2, 2, 'F');
+  doc.setDrawColor(215, 220, 232);
+  doc.setLineWidth(0.2);
+  doc.roundedRect(M, y, W - 2 * M, 22, 2, 2, 'S');
+  // Left: Prepared by
+  doc.setFontSize(6);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(155, 160, 178);
+  doc.text('PREPARED BY', M + 5, y + 6);
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(25, 30, 48);
+  doc.text(config.agencyName, M + 5, y + 12);
+  if (agencyTitle) {
+    doc.setFontSize(7.5);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(90, 95, 115);
+    doc.text(agencyTitle, M + 5, y + 17);
+  }
+  const contactLine = [agencyWebsite, agencyEmail].filter(Boolean).join('  ·  ');
+  if (contactLine) {
+    doc.setFontSize(7);
+    doc.setTextColor(125, 130, 150);
+    doc.text(contactLine, M + 5, agencyTitle ? y + 21 : y + 17);
+  }
+  // Divider
+  doc.setDrawColor(210, 215, 228);
+  doc.line(M + halfW + 2, y + 4, M + halfW + 2, y + 19);
+  // Right: Prepared for
+  const rx = M + halfW + 6;
+  doc.setFontSize(6);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(155, 160, 178);
+  doc.text('PREPARED FOR', rx, y + 6);
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(25, 30, 48);
+  doc.text(clientName || '—', rx, y + 12);
+  doc.setFontSize(7.5);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(90, 95, 115);
+  const urlShort = auditUrl.replace(/https?:\/\/(www\.)?/, '');
+  doc.text(urlShort, rx, y + 17);
+  doc.setFontSize(6);
+  doc.setTextColor(155, 160, 178);
+  doc.text(new Date().toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric'
-  })}`, M, y);
+  }), W - M, y + 6, {
+    align: 'right'
+  });
 
-  // Overall score box
-  y += 8;
+  // ── Overall score box ─────────────────────────────────────────────────────
+  y += 28;
   doc.setFillColor(...brandLight);
-  doc.roundedRect(M, y, W - 2 * M, 36, 3, 3, 'F');
+  doc.roundedRect(M, y, W - 2 * M, 28, 3, 3, 'F');
   doc.setDrawColor(...brandRgb);
-  doc.setLineWidth(0.4);
-  doc.roundedRect(M, y, W - 2 * M, 36, 3, 3, 'S');
-  doc.setFontSize(32);
+  doc.setLineWidth(0.35);
+  doc.roundedRect(M, y, W - 2 * M, 28, 3, 3, 'S');
+  doc.setFontSize(28);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(...brandRgb);
-  doc.text(`${score.weighted}`, M + 16, y + 24);
-  doc.setFontSize(12);
-  doc.setTextColor(...brandRgb);
-  doc.text('/100', M + 40, y + 24);
-  doc.setFontSize(15);
-  doc.setTextColor(55, 55, 55);
-  doc.text(`Grade ${score.grade}`, M + 72, y + 18);
+  doc.text(`${score.weighted}`, M + 14, y + 20);
   doc.setFontSize(10);
-  doc.setTextColor(100, 100, 100);
+  doc.setTextColor(...brandRgb);
+  doc.text('/100', M + 36, y + 20);
+  doc.setFontSize(13);
+  doc.setTextColor(50, 55, 65);
+  doc.text(`Grade ${score.grade}`, M + 72, y + 13);
+  doc.setFontSize(9);
+  doc.setTextColor(95, 100, 115);
   doc.setFont('helvetica', 'normal');
-  doc.text(score.rating, M + 72, y + 28);
-
-  // Category scores
-  y += 44;
-  doc.setFontSize(12);
+  doc.text(score.rating, M + 72, y + 21);
+  const confColor = score.confidence === 'High' ? [5, 150, 105] : score.confidence === 'Medium' ? [14, 165, 233] : [245, 158, 11];
+  doc.setFontSize(6.5);
   doc.setFont('helvetica', 'bold');
-  doc.setTextColor(30, 30, 30);
-  doc.text('Category Scores', M, y);
-  y += 7;
+  doc.setTextColor(...confColor);
+  doc.text(`${score.confidence} Confidence · ${score.completionPct}% reviewed`, W - M - 4, y + 7, {
+    align: 'right'
+  });
+
+  // ── Section Scores ────────────────────────────────────────────────────────
+  y += 34;
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(30, 35, 45);
+  doc.text('Section Scores', M, y);
+  y += 5;
   const numCats = score.categories.length;
   const catGap = 3;
   const catBoxW = (W - 2 * M - catGap * (numCats - 1)) / numCats;
   score.categories.forEach((cat, i) => {
     const x = M + i * (catBoxW + catGap);
     const catRgb = hexToRgb(cat.color);
-    const catLight = lighten(catRgb, 0.92);
-    doc.setFillColor(...catLight);
-    doc.roundedRect(x, y, catBoxW, 32, 2, 2, 'F');
-    doc.setDrawColor(...catRgb);
-    doc.setLineWidth(0.3);
-    doc.roundedRect(x, y, catBoxW, 32, 2, 2, 'S');
-    doc.setFontSize(19);
+    const catLite = lighten(catRgb, 0.92);
+    const noData = cat.evaluated === 0;
+    doc.setFillColor(...(noData ? [244, 245, 250] : catLite));
+    doc.roundedRect(x, y, catBoxW, 28, 2, 2, 'F');
+    doc.setDrawColor(...(noData ? [210, 215, 225] : catRgb));
+    doc.setLineWidth(0.25);
+    doc.roundedRect(x, y, catBoxW, 28, 2, 2, 'S');
+    doc.setFontSize(noData ? 8 : 17);
     doc.setFont('helvetica', 'bold');
-    doc.setTextColor(...catRgb);
-    doc.text(`${cat.score}`, x + catBoxW / 2, y + 14, {
+    doc.setTextColor(...(noData ? [185, 190, 205] : catRgb));
+    doc.text(noData ? '—' : `${cat.score}`, x + catBoxW / 2, noData ? y + 13 : y + 13, {
       align: 'center'
     });
-    doc.setFontSize(6.5);
+    doc.setFontSize(5.5);
     doc.setFont('helvetica', 'normal');
-    doc.setTextColor(80, 80, 80);
+    doc.setTextColor(noData ? 175 : 75, noData ? 180 : 75, noData ? 198 : 75);
     const lbl = cat.label.replace('Technical SEO', 'Tech SEO').replace('On-Page & Content', 'On-Page').replace('UX Heuristics', 'UX').replace('Conversion & CTA', 'CRO').replace('AI & SERP Visibility', 'AI/SERP');
-    doc.text(lbl, x + catBoxW / 2, y + 22, {
+    doc.text(lbl, x + catBoxW / 2, y + 19, {
       align: 'center'
     });
-    doc.setFontSize(8);
-    doc.setFont('helvetica', 'bold');
-    doc.text(`Grade ${cat.grade}`, x + catBoxW / 2, y + 29, {
-      align: 'center'
-    });
+    if (!noData) {
+      doc.setFontSize(6.5);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(...catRgb);
+      doc.text(`Grade ${cat.grade}`, x + catBoxW / 2, y + 25, {
+        align: 'center'
+      });
+    } else {
+      doc.setFontSize(5.5);
+      doc.setFont('helvetica', 'italic');
+      doc.setTextColor(175, 180, 198);
+      doc.text('Not evaluated', x + catBoxW / 2, y + 24, {
+        align: 'center'
+      });
+    }
   });
 
-  // Summary stats
-  y += 40;
-  doc.setFontSize(12);
+  // ── Executive Insight ─────────────────────────────────────────────────────
+  y += 34;
+  const insight = generateInsight();
+  if (insight) {
+    const insightLines = doc.splitTextToSize(insight, W - 2 * M - 10);
+    const insightH = Math.max(18, 11 + insightLines.length * 4.2);
+    doc.setFillColor(...brandLight);
+    doc.roundedRect(M, y, W - 2 * M, insightH, 2, 2, 'F');
+    doc.setFillColor(...brandRgb);
+    doc.roundedRect(M, y, 2.5, insightH, 1, 0, 'F');
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...brandRgb);
+    doc.text('Executive Summary', M + 6, y + 6);
+    doc.setFont('helvetica', 'normal');
+    doc.setFontSize(7.5);
+    doc.setTextColor(45, 50, 65);
+    doc.text(insightLines, M + 6, y + 12);
+    y += insightH + 5;
+  }
+
+  // ── Audit Summary stats ───────────────────────────────────────────────────
+  doc.setFontSize(9);
   doc.setFont('helvetica', 'bold');
-  doc.setTextColor(30, 30, 30);
-  doc.text('Summary', M, y);
-  y += 7;
+  doc.setTextColor(30, 35, 45);
+  doc.text('Audit Summary', M, y);
+  y += 5;
   const totalPass = score.categories.reduce((s, c) => s + c.passed, 0);
   const totalFail = score.categories.reduce((s, c) => s + c.failed, 0);
   const totalPartial = score.categories.reduce((s, c) => s + c.partial, 0);
   const totalItems = score.categories.reduce((s, c) => s + c.total, 0);
-  const stats = [{
-    label: 'Total Checked',
+  const statW = (W - 2 * M - 9) / 4;
+  [{
+    label: 'Total Items',
     value: `${totalItems}`,
-    color: [40, 40, 40]
+    color: [40, 42, 55]
   }, {
     label: 'Passed',
     value: `${totalPass}`,
@@ -30917,167 +31019,419 @@ function downloadPDF(config, auditUrl, score, results) {
     label: 'Failed',
     value: `${totalFail}`,
     color: STATUS_COLORS_PDF.Fail
-  }];
-  const statW = (W - 2 * M - 9) / 4;
-  stats.forEach((stat, i) => {
+  }].forEach((stat, i) => {
     const x = M + i * (statW + 3);
-    doc.setFillColor(245, 247, 250);
-    doc.roundedRect(x, y, statW, 20, 2, 2, 'F');
-    doc.setFontSize(15);
+    doc.setFillColor(244, 246, 250);
+    doc.roundedRect(x, y, statW, 17, 2, 2, 'F');
+    doc.setFontSize(13);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...stat.color);
-    doc.text(stat.value, x + statW / 2, y + 11, {
+    doc.text(stat.value, x + statW / 2, y + 9.5, {
       align: 'center'
     });
-    doc.setFontSize(6.5);
+    doc.setFontSize(6);
     doc.setFont('helvetica', 'normal');
-    doc.setTextColor(120, 120, 120);
-    doc.text(stat.label, x + statW / 2, y + 17, {
+    doc.setTextColor(120, 125, 140);
+    doc.text(stat.label, x + statW / 2, y + 14.5, {
       align: 'center'
     });
   });
-  drawFooter();
+  y += 21;
 
-  // ── Top Priority Issues ───────────────────────────────────────────────────────
-  const reviewedCount = Object.keys(results).length;
-  const priorityFails = AUDIT_CATEGORIES.flatMap(cat => cat.sections.flatMap(sec => sec.items.filter(it => results[it.id] === 'Fail' && (it.priority === 'Critical' || it.priority === 'High')).map(it => ({
+  // ── Top Priority Issues ───────────────────────────────────────────────────
+  const PSCORE_PDF = {
+    Critical: 4,
+    High: 3,
+    Medium: 2,
+    Low: 1
+  };
+  const priorityFails = AUDIT_CATEGORIES.flatMap(cat => cat.sections.flatMap(sec => sec.items.filter(it => results[it.id] === 'Fail').map(it => ({
     ...it,
-    catColor: hexToRgb(cat.color),
-    priorityOrder: it.priority === 'Critical' ? 0 : 1
-  })))).sort((a, b) => a.priorityOrder - b.priorityOrder);
+    catLabel: cat.label,
+    catRgb: hexToRgb(cat.color)
+  })))).sort((a, b) => (PSCORE_PDF[b.priority] ?? 0) - (PSCORE_PDF[a.priority] ?? 0));
   if (priorityFails.length > 0) {
-    y += 24;
-    doc.setFontSize(11);
+    doc.setFontSize(9);
     doc.setFont('helvetica', 'bold');
-    doc.setTextColor(30, 30, 30);
+    doc.setTextColor(30, 35, 45);
     doc.text('Top Priority Issues', M, y);
-    doc.setFontSize(6.5);
+    doc.setFontSize(6);
     doc.setFont('helvetica', 'normal');
-    doc.setTextColor(150, 150, 150);
-    doc.text(`Critical & High severity · based on ${reviewedCount} of ${totalItems} items reviewed`, W - M, y, {
+    doc.setTextColor(155, 160, 178);
+    doc.text(`${priorityFails.length} issue${priorityFails.length > 1 ? 's' : ''} · sorted by impact`, W - M, y, {
       align: 'right'
     });
-    y += 5;
-    // Thin divider
-    doc.setDrawColor(220, 220, 220);
-    doc.setLineWidth(0.3);
-    doc.line(M, y, W - M, y);
     y += 4;
-    priorityFails.forEach((item, i) => {
-      if (y > H - 30) return; // don't overflow cover page
-      const rowH = 8;
+    doc.setDrawColor(215, 218, 228);
+    doc.setLineWidth(0.2);
+    doc.line(M, y, W - M, y);
+    y += 3;
+    priorityFails.slice(0, 8).forEach((item, i) => {
+      const rowH = 17;
+      checkPageBreak(rowH + 2);
       if (i % 2 === 0) {
-        doc.setFillColor(248, 249, 252);
+        doc.setFillColor(247, 248, 252);
         doc.rect(M, y, W - 2 * M, rowH, 'F');
       }
-      doc.setFillColor(...item.catColor);
+      // Category dot
+      doc.setFillColor(...item.catRgb);
       doc.circle(M + 3, y + rowH / 2, 1.5, 'F');
-      const badgeColor = item.priority === 'Critical' ? [220, 53, 69] : [255, 140, 0];
-      doc.setFillColor(...badgeColor);
-      doc.roundedRect(M + 7, y + 1.5, 20, 4.5, 1, 1, 'F');
+      // Priority badge
+      const bCol = item.priority === 'Critical' ? [214, 45, 60] : item.priority === 'High' ? [210, 115, 5] : item.priority === 'Medium' ? [12, 155, 220] : [14, 180, 120];
+      doc.setFillColor(...bCol);
+      doc.roundedRect(M + 7, y + 2, 20, 4.5, 1, 1, 'F');
       doc.setFontSize(5);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(255, 255, 255);
-      doc.text(item.priority.toUpperCase(), M + 17, y + 4.8, {
+      doc.text(item.priority.toUpperCase(), M + 17, y + 5.2, {
         align: 'center'
       });
-      doc.setFontSize(7);
+      // Category tag
+      const shortCat = item.catLabel.replace('Technical SEO', 'Tech SEO').replace('On-Page & Content', 'On-Page').replace('UX Heuristics', 'UX').replace('Conversion & CTA', 'CRO').replace('AI & SERP Visibility', 'AI/SERP');
+      doc.setFontSize(5.5);
       doc.setFont('helvetica', 'normal');
-      doc.setTextColor(40, 40, 40);
-      doc.text(item.item, M + 30, y + 5.5, {
-        maxWidth: W - 2 * M - 32
-      });
+      doc.setTextColor(...item.catRgb);
+      doc.text(shortCat, M + 30, y + 5.2);
+      // Item title
+      doc.setFontSize(8);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(25, 30, 45);
+      const titleLine = doc.splitTextToSize(item.item, W - 2 * M - 34);
+      doc.text(titleLine[0], M + 30, y + 10.5);
+      // HowTo hint
+      doc.setFontSize(6.5);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(100, 105, 122);
+      const howLine = doc.splitTextToSize(item.howTo, W - 2 * M - 34);
+      doc.text(howLine[0], M + 30, y + 14.8);
       y += rowH;
     });
+    if (priorityFails.length > 8) {
+      doc.setFontSize(6.5);
+      doc.setFont('helvetica', 'italic');
+      doc.setTextColor(160, 165, 182);
+      doc.text(`+ ${priorityFails.length - 8} more issues in the detailed sections below.`, M + 7, y + 4);
+      y += 7;
+    }
   }
   drawFooter();
+
+  // ── CATEGORY DETAIL PAGES ──────────────────────────────────────────────────
   AUDIT_CATEGORIES.forEach(cat => {
     addPage();
     const catColor = hexToRgb(cat.color);
     const catDark = catColor.map(v => Math.max(0, Math.round(v * 0.72)));
-    // Two-tone header: category colour (top) + darker strip (bottom)
     doc.setFillColor(...catColor);
     doc.rect(0, 0, W, 18, 'F');
     doc.setFillColor(...catDark);
     doc.rect(0, 18, W, 8, 'F');
-    // Category name
     doc.setTextColor(255, 255, 255);
-    doc.setFontSize(14);
+    doc.setFontSize(13);
     doc.setFont('helvetica', 'bold');
-    doc.text(cat.label, M, 13);
-    // Score pill — right side of top zone
+    doc.text(`${cat.icon}  ${cat.label}`, M, 13);
     const catScore = score.categories.find(c => c.id === cat.id);
-    if (catScore) {
-      doc.setFontSize(10);
+    // AI Visibility NEW badge
+    if (cat.id === 'serp') {
+      doc.setFillColor(255, 255, 255);
+      doc.roundedRect(W - M - 16, 5.5, 13, 5, 1, 1, 'F');
+      doc.setFontSize(5);
       doc.setFont('helvetica', 'bold');
-      doc.text(`${catScore.score}/100 — Grade ${catScore.grade}`, W - M, 13, {
-        align: 'right'
+      doc.setTextColor(...catColor);
+      doc.text('NEW', W - M - 9.5, 9.2, {
+        align: 'center'
       });
     }
-    // Thin accent line using brand colour
+    // Score + evaluation state
+    if (catScore) {
+      const scoreStr = catScore.evaluated > 0 ? `${catScore.score}/100 — Grade ${catScore.grade}` : 'Not evaluated';
+      const scoreX = cat.id === 'serp' ? W - M - 20 : W - M;
+      doc.setFontSize(9);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(255, 255, 255);
+      doc.text(scoreStr, scoreX, 13, {
+        align: 'right'
+      });
+      // Low confidence warning
+      if (catScore.evaluated > 0 && catScore.evaluated < catScore.total * 0.3) {
+        doc.setFontSize(6);
+        doc.setFont('helvetica', 'italic');
+        doc.setTextColor(230, 215, 165);
+        doc.text(`Low confidence — only ${catScore.evaluated}/${catScore.total} items reviewed`, M, 22.5);
+      }
+    }
+    // AI Visibility subtitle
+    if (cat.id === 'serp') {
+      doc.setFontSize(6.5);
+      doc.setFont('helvetica', 'italic');
+      doc.setTextColor(210, 230, 248);
+      doc.text('Optimize your presence in ChatGPT, Perplexity, Gemini & next-gen search engines', M, 22.5);
+    }
     doc.setFillColor(...brandRgb);
-    doc.rect(0, 26, W, 1, 'F');
-    y = 33;
+    doc.rect(0, 26, W, 0.7, 'F');
+    y = 32;
     cat.sections.forEach(sec => {
       checkPageBreak(20);
-      doc.setFillColor(...lighten(catColor, 0.85));
+      doc.setFillColor(...lighten(catColor, 0.88));
       doc.rect(M, y, W - 2 * M, 8, 'F');
-      doc.setFontSize(9);
+      doc.setFontSize(8.5);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(...catColor);
       doc.text(sec.label, M + 3, y + 5.5);
-      y += 10;
-      sec.items.forEach((item, idx) => {
+      if (sec.advanced) {
+        doc.setFontSize(5);
+        doc.setFont('helvetica', 'bold');
+        doc.text('ADVANCED', W - M - 3, y + 5.5, {
+          align: 'right'
+        });
+      }
+      y += 9;
+      // GEO section subtitle
+      if (sec.id === 'geo') {
+        doc.setFontSize(6.5);
+        doc.setFont('helvetica', 'italic');
+        doc.setTextColor(120, 130, 152);
+        doc.text('AI brand visibility in ChatGPT, Perplexity, Gemini & Knowledge Graph', M + 3, y + 3.5);
+        y += 6;
+      }
+      const visibleItems = sec.items.filter(it => results[it.id] !== 'N/A');
+      const naCount = sec.items.length - visibleItems.length;
+      visibleItems.forEach((item, idx) => {
         checkPageBreak(10);
-        const status = results[item.id] || 'N/A';
-        const statusColor = STATUS_COLORS_PDF[status] || STATUS_COLORS_PDF['N/A'];
+        const status = results[item.id] || 'Blank';
+        const statusColor = STATUS_COLORS_PDF[status] || [160, 165, 180];
         if (idx % 2 === 0) {
-          doc.setFillColor(248, 249, 252);
+          doc.setFillColor(247, 248, 252);
           doc.rect(M, y, W - 2 * M, 8, 'F');
         }
-        doc.setFontSize(7);
+        // Fail row highlight
+        if (status === 'Fail') {
+          doc.setFillColor(252, 245, 246);
+          doc.rect(M, y, 2, 8, 'F');
+        }
+        doc.setFontSize(6.5);
         doc.setFont('helvetica', 'bold');
-        doc.setTextColor(150, 150, 150);
+        doc.setTextColor(155, 160, 175);
         doc.text(`${item.num}`, M + 3, y + 5.5);
-        doc.setFontSize(8);
-        doc.setFont('helvetica', 'normal');
-        doc.setTextColor(40, 40, 40);
+        doc.setFontSize(7.5);
+        doc.setFont('helvetica', status === 'Fail' ? 'bold' : 'normal');
+        doc.setTextColor(35, 40, 55);
         const itemText = doc.splitTextToSize(item.item, W - 2 * M - 40);
         doc.text(itemText[0], M + 12, y + 5.5);
         doc.setFillColor(...statusColor);
         const badgeX = W - M - 22;
-        doc.roundedRect(badgeX, y + 1, 20, 5.5, 2, 2, 'F');
-        doc.setFontSize(6.5);
+        doc.roundedRect(badgeX, y + 1.2, 20, 5.2, 2, 2, 'F');
+        doc.setFontSize(6);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(255, 255, 255);
-        doc.text(status, badgeX + 10, y + 5, {
+        doc.text(status === 'Blank' ? 'Blank' : status, badgeX + 10, y + 4.9, {
           align: 'center'
         });
         y += 8;
       });
+      if (naCount > 0) {
+        doc.setFontSize(6);
+        doc.setFont('helvetica', 'italic');
+        doc.setTextColor(175, 180, 198);
+        doc.text(`${naCount} non-applicable item${naCount > 1 ? 's' : ''} excluded from this report.`, M + 3, y + 3.5);
+        y += 6;
+      }
+      if (visibleItems.length === 0 && naCount > 0) {
+        doc.setFontSize(7);
+        doc.setFont('helvetica', 'italic');
+        doc.setTextColor(175, 180, 198);
+        doc.text('All items in this section were marked N/A.', M + 3, y + 3.5);
+        y += 6;
+      }
       y += 3;
     });
   });
+
+  // ── RECOMMENDED NEXT STEPS PAGE ────────────────────────────────────────────
   addPage();
-  doc.setFontSize(16);
+  doc.setFillColor(...brandRgb);
+  doc.rect(0, 0, W, 18, 'F');
+  doc.setFillColor(...darkRgb);
+  doc.rect(0, 18, W, 7, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
-  doc.setTextColor(...brandRgb);
-  doc.text(config.agencyName, M, y + 10);
-  y += 20;
-  doc.setFontSize(11);
-  doc.setTextColor(60, 60, 60);
-  doc.text('About This Report', M, y);
-  y += 8;
-  doc.setFontSize(9);
+  doc.text('Recommended Next Steps', M, 13);
+  doc.setFontSize(7);
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(100, 100, 100);
-  const disclaimer = doc.splitTextToSize(`This UX + SEO audit report was generated for ${auditUrl} on ${new Date().toLocaleDateString()}. ` + `The audit covers 190 checkpoints across Technical SEO, On-Page & Content, UX Heuristics, Conversion & CTA, and AI & SERP Visibility. ` + `Some items require manual verification or tools like Google Search Console, Screaming Frog, or PageSpeed Insights. ` + `Scores reflect the items reviewed; unreviewed items are excluded from scoring.`, W - 2 * M);
-  doc.text(disclaimer, M, y);
-  y += disclaimer.length * 5 + 15;
-  doc.setFontSize(10);
+  doc.setTextColor(210, 225, 240);
+  doc.text('A prioritised action plan based on this audit', M, 22.5);
+  y = 34;
+  const evaluatedCats = score.categories.filter(c => c.evaluated > 0);
+  const weakestCat = evaluatedCats.length > 0 ? evaluatedCats.reduce((a, b) => b.score < a.score ? b : a) : null;
+  const critCount = AUDIT_CATEGORIES.flatMap(cat => cat.sections.flatMap(sec => sec.items.filter(it => results[it.id] === 'Fail' && it.priority === 'Critical'))).length;
+  const steps = [critCount > 0 ? {
+    num: '1',
+    title: `Fix ${critCount} Critical Issue${critCount > 1 ? 's' : ''}`,
+    body: 'These failures have the highest impact on performance, user experience, and search visibility. Address them before anything else.',
+    hot: true
+  } : {
+    num: '1',
+    title: 'Resolve All Failed Items',
+    body: 'Work through each failed item in the detailed sections. Sort by priority — Critical and High items first.',
+    hot: false
+  }, weakestCat ? {
+    num: '2',
+    title: `Strengthen ${weakestCat.label.replace('AI & SERP Visibility', 'AI Visibility')} — Score: ${weakestCat.score}/100`,
+    body: 'This is the weakest area in the audit. A focused effort here will have the highest impact on overall site health and score.',
+    hot: false
+  } : {
+    num: '2',
+    title: 'Complete Unevaluated Sections',
+    body: 'Several sections have not been fully reviewed. Complete them to get a reliable overall score and more actionable insights.',
+    hot: false
+  }, {
+    num: '3',
+    title: 'Work Through the Top Priority Issues',
+    body: 'Each priority issue in this report includes a specific how-to action. These are your clearest, most actionable next steps.',
+    hot: false
+  }, {
+    num: '4',
+    title: 'Strengthen AI Visibility & E-E-A-T',
+    body: 'AI search engines (ChatGPT, Perplexity, Google AI Overviews) increasingly drive organic traffic. Ensure your brand, authors, and content are optimised for this layer.',
+    hot: false
+  }, {
+    num: '5',
+    title: 'Re-run This Audit in 4–8 Weeks',
+    body: 'Track your progress by re-running the audit after implementing changes. Use the score difference to demonstrate the value of your work to stakeholders.',
+    hot: false
+  }];
+  steps.forEach(step => {
+    checkPageBreak(22);
+    const stepH = 19;
+    const sColor = step.hot ? [214, 45, 60] : brandRgb;
+    const sBg = step.hot ? [255, 247, 247] : brandLight;
+    doc.setFillColor(...sBg);
+    doc.roundedRect(M, y, W - 2 * M, stepH, 2, 2, 'F');
+    doc.setDrawColor(...sColor);
+    doc.setLineWidth(0.2);
+    doc.roundedRect(M, y, W - 2 * M, stepH, 2, 2, 'S');
+    doc.setFillColor(...sColor);
+    doc.circle(M + 8, y + stepH / 2, 4.5, 'F');
+    doc.setFontSize(8.5);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(255, 255, 255);
+    doc.text(step.num, M + 8, y + stepH / 2 + 3, {
+      align: 'center'
+    });
+    doc.setFontSize(8.5);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(25, 30, 48);
+    doc.text(step.title, M + 17, y + 8.5);
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(75, 80, 100);
+    const bodyLines = doc.splitTextToSize(step.body, W - 2 * M - 20);
+    doc.text(bodyLines, M + 17, y + 14);
+    y += stepH + 3;
+  });
+  y += 5;
+  checkPageBreak(18);
+  doc.setFillColor(...brandLight);
+  doc.roundedRect(M, y, W - 2 * M, 16, 2, 2, 'F');
+  doc.setFontSize(8);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(...brandRgb);
-  doc.text(`Prepared by ${config.agencyName}`, M, y);
+  doc.text(`Questions? ${config.agencyName} is here to help.`, M + 5, y + 7);
+  if (agencyEmail || agencyWebsite) {
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(80, 90, 112);
+    doc.text([agencyEmail, agencyWebsite].filter(Boolean).join('  ·  '), M + 5, y + 13);
+  }
+  drawFooter();
+
+  // ── ABOUT THIS REPORT PAGE ─────────────────────────────────────────────────
+  addPage();
+  doc.setFillColor(...brandRgb);
+  doc.rect(0, 0, W, 18, 'F');
+  doc.setFillColor(...darkRgb);
+  doc.rect(0, 18, W, 7, 'F');
+  doc.setTextColor(255, 255, 255);
+  doc.setFontSize(14);
+  doc.setFont('helvetica', 'bold');
+  doc.text('About This Report', M, 13);
+  y = 30;
+
+  // Prepared by / for cards
+  const cardW = (W - 2 * M - 5) / 2;
+  // Left card
+  doc.setFillColor(244, 246, 252);
+  doc.roundedRect(M, y, cardW, 38, 2, 2, 'F');
+  doc.setFontSize(6.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(150, 155, 175);
+  doc.text('PREPARED BY', M + 5, y + 7);
+  if (agencyLogo) {
+    addLogoToDoc(agencyLogo, M + 5, y + 10, 30, 11, false);
+    doc.setFontSize(9.5);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(20, 25, 45);
+    doc.text(config.agencyName, M + 5, y + 26);
+  } else {
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(20, 25, 45);
+    doc.text(config.agencyName, M + 5, y + 16);
+  }
+  if (agencyTitle) {
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(85, 90, 112);
+    doc.text(agencyTitle, M + 5, agencyLogo ? y + 31 : y + 22);
+  }
+  if (agencyWebsite) {
+    doc.setFontSize(7.5);
+    doc.setTextColor(14, 155, 230);
+    doc.text(agencyWebsite, M + 5, agencyLogo ? y + 35 : agencyTitle ? y + 27 : y + 22);
+  }
+  if (agencyEmail) {
+    doc.setFontSize(7.5);
+    doc.setTextColor(85, 90, 112);
+    doc.text(agencyEmail, M + 5, agencyLogo ? y + 35 + (agencyWebsite ? 5 : 0) : agencyTitle && agencyWebsite ? y + 32 : agencyTitle ? y + 27 : agencyWebsite ? y + 27 : y + 22);
+  }
+
+  // Right card
+  const rx2 = M + cardW + 5;
+  doc.setFillColor(244, 246, 252);
+  doc.roundedRect(rx2, y, cardW, 38, 2, 2, 'F');
+  doc.setFontSize(6.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(150, 155, 175);
+  doc.text('PREPARED FOR', rx2 + 5, y + 7);
+  if (clientLogo) {
+    addLogoToDoc(clientLogo, rx2 + 5, y + 10, 30, 11, false);
+    doc.setFontSize(9.5);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(20, 25, 45);
+    doc.text(clientName || '—', rx2 + 5, y + 26);
+  } else {
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(20, 25, 45);
+    doc.text(clientName || '—', rx2 + 5, y + 16);
+  }
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(85, 90, 112);
+  doc.text(auditUrl.replace(/https?:\/\/(www\.)?/, ''), rx2 + 5, clientLogo ? y + 31 : y + 22);
+  y += 44;
+
+  // Disclaimer
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(28, 32, 48);
+  doc.text('About This Audit', M, y);
+  y += 6;
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(85, 90, 112);
+  const disclaimer = doc.splitTextToSize(`This UX + SEO audit was conducted for ${auditUrl} on ${new Date().toLocaleDateString()}. ` + `It covers ${score.categories.reduce((s, c) => s + c.total, 0)} checkpoints across Technical SEO, On-Page & Content, UX Heuristics, Conversion & CTA, and AI Visibility. ` + `Scores are based on evaluated items only — blank and N/A items are excluded from scoring. ` + `Some checks require verification with external tools (Google Search Console, PageSpeed Insights, Screaming Frog, etc.). ` + `This report is intended as a professional client deliverable and should be reviewed in the context of the site's specific goals.`, W - 2 * M);
+  doc.text(disclaimer, M, y);
   drawFooter();
   const safeClient = (clientName || auditUrl).replace(/https?:\/\//, '').replace(/[^a-zA-Z0-9.-]/g, '_');
   doc.save(`${config.agencyName.replace(/\s+/g, '_')}_Audit_${safeClient}.pdf`);
@@ -32487,10 +32841,7 @@ function AuditView({
   const [clientName, setClientName] = useState(initialClientName);
   const [results, setResults] = useState(initialResults);
   const [activeCat, setActiveCat] = useState(AUDIT_CATEGORIES[0].id);
-  const [collapsedSections, setCollapsedSections] = useState({
-    geo: true,
-    eeat: true
-  });
+  const [collapsedSections, setCollapsedSections] = useState({});
   const scrollRef = useRef(null);
   const catIdxRef = useRef(0);
   const lastSwitchRef = useRef(0);
@@ -32949,6 +33300,9 @@ function WhiteLabelView({
   const [showClearModal, setShowClearModal] = useState(false);
   const [name, setName] = useState('My Agency');
   const [color, setColor] = useState('#0EA5E9');
+  const [agencyEmail, setAgencyEmail] = useState('');
+  const [agencyWebsite, setAgencyWebsite] = useState('');
+  const [agencyTitle, setAgencyTitle] = useState('');
   const [agencyLogo, setAgencyLogo] = useState(null);
   const [saved, setSaved] = useState(false);
   const [downloading, setDownloading] = useState(false);
@@ -32984,6 +33338,9 @@ function WhiteLabelView({
         const cfg = JSON.parse(raw);
         setName(cfg.agencyName);
         setColor(cfg.brandColor);
+        if (cfg.agencyEmail) setAgencyEmail(cfg.agencyEmail);
+        if (cfg.agencyWebsite) setAgencyWebsite(cfg.agencyWebsite);
+        if (cfg.agencyTitle) setAgencyTitle(cfg.agencyTitle);
         if (cfg.agencyLogo) setAgencyLogo(cfg.agencyLogo);
       }
     } catch {}
@@ -33027,6 +33384,9 @@ function WhiteLabelView({
     localStorage.setItem('auditpro_whitelabel', JSON.stringify({
       agencyName: name,
       brandColor: color,
+      agencyEmail,
+      agencyWebsite,
+      agencyTitle,
       agencyLogo: agencyLogo || null
     }));
     setSaved(true);
@@ -33043,7 +33403,10 @@ function WhiteLabelView({
         brandColor: color,
         clientName: auditClient,
         agencyLogo,
-        clientLogo
+        clientLogo,
+        agencyEmail,
+        agencyWebsite,
+        agencyTitle
       }, auditUrl, auditScore, auditResults);
     } catch (e) {
       alert('PDF error: ' + (e && e.message ? e.message : String(e)));
@@ -33107,6 +33470,93 @@ function WhiteLabelView({
   }, "Agency Name"), /*#__PURE__*/React.createElement("input", {
     value: name,
     onChange: e => setName(e.target.value),
+    style: {
+      width: '100%',
+      background: C.bg,
+      border: `1px solid ${C.border}`,
+      borderRadius: 8,
+      padding: '10px 14px',
+      color: C.text,
+      fontSize: 13,
+      outline: 'none',
+      boxSizing: 'border-box'
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: 16
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    style: {
+      fontSize: 11,
+      color: C.muted,
+      fontWeight: 600,
+      textTransform: 'uppercase',
+      letterSpacing: '0.08em',
+      display: 'block',
+      marginBottom: 8
+    }
+  }, "Role / Title"), /*#__PURE__*/React.createElement("input", {
+    value: agencyTitle,
+    onChange: e => setAgencyTitle(e.target.value),
+    placeholder: "e.g. UX & SEO Consultant",
+    style: {
+      width: '100%',
+      background: C.bg,
+      border: `1px solid ${C.border}`,
+      borderRadius: 8,
+      padding: '10px 14px',
+      color: C.text,
+      fontSize: 13,
+      outline: 'none',
+      boxSizing: 'border-box'
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: 16
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    style: {
+      fontSize: 11,
+      color: C.muted,
+      fontWeight: 600,
+      textTransform: 'uppercase',
+      letterSpacing: '0.08em',
+      display: 'block',
+      marginBottom: 8
+    }
+  }, "Website"), /*#__PURE__*/React.createElement("input", {
+    value: agencyWebsite,
+    onChange: e => setAgencyWebsite(e.target.value),
+    placeholder: "e.g. yoursite.com",
+    style: {
+      width: '100%',
+      background: C.bg,
+      border: `1px solid ${C.border}`,
+      borderRadius: 8,
+      padding: '10px 14px',
+      color: C.text,
+      fontSize: 13,
+      outline: 'none',
+      boxSizing: 'border-box'
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginBottom: 16
+    }
+  }, /*#__PURE__*/React.createElement("label", {
+    style: {
+      fontSize: 11,
+      color: C.muted,
+      fontWeight: 600,
+      textTransform: 'uppercase',
+      letterSpacing: '0.08em',
+      display: 'block',
+      marginBottom: 8
+    }
+  }, "Email"), /*#__PURE__*/React.createElement("input", {
+    value: agencyEmail,
+    onChange: e => setAgencyEmail(e.target.value),
+    placeholder: "e.g. hello@yoursite.com",
     style: {
       width: '100%',
       background: C.bg,
