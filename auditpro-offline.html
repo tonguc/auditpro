@@ -34678,7 +34678,7 @@ function WhiteLabelView({
         : /*#__PURE__*/React.createElement("div", { style: { fontSize: 9, color: '#9298b0', fontStyle: 'italic', padding: '4px 0' } }, hasAudit ? "No failed items yet" : "Complete an audit to see issues")
     )
     );
-  })()), showClearModal && /*#__PURE__*/React.createElement(ClearAllModal, {
+  })())), showClearModal && /*#__PURE__*/React.createElement(ClearAllModal, {
     count: audits.length,
     onConfirm: () => {
       setShowClearModal(false);
