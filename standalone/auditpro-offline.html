@@ -31393,6 +31393,7 @@ function DashboardView({
 }) {
   const [detailCat, setDetailCat] = useState(null);
   const [issueFilter, setIssueFilter] = useState('Fail');
+  const issuesRef = useRef(null);
   const totalAll = AUDIT_CATEGORIES.flatMap(c => c.sections.flatMap(s => s.items)).length;
   const totalEval = score?.totalEvaluated ?? 0;
   const completionPct = score?.completionPct ?? 0;
@@ -31690,7 +31691,13 @@ function DashboardView({
       marginTop: 5
     }
   }, totalEval, " / ", totalAll, " items")), /*#__PURE__*/React.createElement("div", {
-    onClick: () => setIssueFilter('Fail'),
+    onClick: () => {
+      setIssueFilter('Fail');
+      setTimeout(() => issuesRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      }), 50);
+    },
     style: {
       background: C.surface,
       border: `1px solid ${failItems.length > 0 ? C.red + '44' : C.border}`,
@@ -31837,6 +31844,7 @@ function DashboardView({
       color: C.muted
     }
   }, cat.evaluated > 0 ? `${cat.passed}✓ ${cat.failed}✗ ${cat.evaluated} reviewed` : 'Not started')))), /*#__PURE__*/React.createElement("div", {
+    ref: issuesRef,
     style: {
       background: C.surface,
       border: `1px solid ${C.border}`,

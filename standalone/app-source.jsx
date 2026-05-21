@@ -807,6 +807,7 @@ function CategoryDetail({ catId, results, onClose }) {
 function DashboardView({ score, auditUrl, results, setPage, onEdit, audits, onSelectAudit }) {
   const [detailCat, setDetailCat] = useState(null);
   const [issueFilter, setIssueFilter] = useState('Fail');
+  const issuesRef = useRef(null);
 
   const totalAll      = AUDIT_CATEGORIES.flatMap(c => c.sections.flatMap(s => s.items)).length;
   const totalEval     = score?.totalEvaluated ?? 0;
@@ -917,8 +918,8 @@ function DashboardView({ score, auditUrl, results, setPage, onEdit, audits, onSe
           </div>
           <div style={{ fontSize:11, color:C.muted, marginTop:5 }}>{totalEval} / {totalAll} items</div>
         </div>
-        {/* Issues Found — clickable */}
-        <div onClick={() => setIssueFilter('Fail')}
+        {/* Issues Found — clickable + smooth scroll */}
+        <div onClick={() => { setIssueFilter('Fail'); setTimeout(() => issuesRef.current?.scrollIntoView({ behavior:'smooth', block:'start' }), 50); }}
           style={{ background:C.surface, border:`1px solid ${failItems.length > 0 ? C.red+'44' : C.border}`,
             borderRadius:12, padding:'18px 20px', cursor:'pointer', transition:'border-color 0.15s' }}>
           <div style={{ fontSize:10, color:C.muted, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:8 }}>Issues Found</div>
@@ -969,7 +970,7 @@ function DashboardView({ score, auditUrl, results, setPage, onEdit, audits, onSe
       )}
 
       {/* Issues section */}
-      <div style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:12, overflow:'hidden' }}>
+      <div ref={issuesRef} style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:12, overflow:'hidden' }}>
         <div style={{ padding:'14px 20px', borderBottom:`1px solid ${C.border}`, display:'flex', alignItems:'center', gap:12 }}>
           <div style={{ fontSize:13, fontWeight:700, color:C.text }}>🎯 Issues &amp; Gaps</div>
           <div style={{ display:'flex', gap:6, marginLeft:'auto' }}>
