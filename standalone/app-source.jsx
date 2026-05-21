@@ -650,12 +650,19 @@ function downloadPDF(config, auditUrl, score, results) {
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
 
-const C = {
+const DARK_C = {
   bg: '#0A0E1A', surface: '#111827', surfaceHover: '#1a2235',
   border: '#1e2d45', accent: '#0EA5E9', accentDim: '#0c4a6e',
   green: '#10B981', amber: '#F59E0B', red: '#EF4444', purple: '#8B5CF6',
   text: '#F0F4FF', muted: '#6B7A99',
 };
+const LIGHT_C = {
+  bg: '#F0F4F8', surface: '#FFFFFF', surfaceHover: '#F1F5F9',
+  border: '#D1D9E6', accent: '#0284C7', accentDim: '#DBEAFE',
+  green: '#059669', amber: '#B45309', red: '#DC2626', purple: '#6D28D9',
+  text: '#0F172A', muted: '#64748B',
+};
+const C = { ...DARK_C };
 const SEV = { Critical: '#EF4444', High: '#F59E0B', Medium: '#0EA5E9', Low: '#10B981' };
 const STATUS_COLOR = { Pass: '#10B981', Partial: '#F59E0B', Fail: '#EF4444', 'N/A': '#6B7A99' };
 const STATUS_BG    = { Pass: '#10B98122', Partial: '#F59E0B22', Fail: '#EF444422', 'N/A': '#6B7A9922' };
@@ -682,7 +689,7 @@ function ScoreRing({ score, size = 120, color = C.accent }) {
   );
 }
 
-function Sidebar({ page, setPage }) {
+function Sidebar({ page, setPage, isDark, onToggleTheme }) {
   const nav = [
     { id:'dashboard', icon:'▦', label:'Dashboard' },
     { id:'audit',     icon:'◎', label:'New Audit' },
@@ -690,7 +697,7 @@ function Sidebar({ page, setPage }) {
   ];
   return (
     <div style={{ width:220, background:C.surface, borderRight:`1px solid ${C.border}`,
-      display:'flex', flexDirection:'column', minHeight:'100vh', flexShrink:0 }}>
+      display:'flex', flexDirection:'column', height:'100vh', flexShrink:0 }}>
       <div style={{ padding:'24px 24px 20px', borderBottom:`1px solid ${C.border}` }}>
         <div style={{ fontSize:16, fontWeight:800, color:C.text }}>
           <span style={{ color:C.accent }}>Audit</span>Pro
@@ -702,15 +709,28 @@ function Sidebar({ page, setPage }) {
           <div key={n.id} onClick={() => setPage(n.id)} style={{
             display:'flex', alignItems:'center', gap:10, padding:'10px 12px',
             borderRadius:8, cursor:'pointer', marginBottom:2,
-            background: page === n.id ? `${C.accentDim}55` : 'transparent',
+            background: page === n.id ? `${C.accent}18` : 'transparent',
             color: page === n.id ? C.accent : C.muted }}>
             <span style={{ fontSize:14, width:18, textAlign:'center' }}>{n.icon}</span>
             <span style={{ fontSize:13, fontWeight: page === n.id ? 600 : 400 }}>{n.label}</span>
           </div>
         ))}
       </nav>
-      <div style={{ padding:'16px 24px', borderTop:`1px solid ${C.border}`, fontSize:11, color:C.muted }}>
-        AuditPro v1.0
+      <div style={{ padding:'16px 16px', borderTop:`1px solid ${C.border}` }}>
+        <button onClick={onToggleTheme} style={{
+          width:'100%', background: isDark ? '#1e2d45' : '#E2EAF4',
+          border:`1px solid ${C.border}`, borderRadius:8,
+          padding:'9px 12px', cursor:'pointer',
+          display:'flex', alignItems:'center', gap:10 }}>
+          <span style={{ fontSize:16 }}>{isDark ? '☀️' : '🌙'}</span>
+          <span style={{ fontSize:12, fontWeight:600, color:C.muted }}>
+            {isDark ? 'Light Mode' : 'Dark Mode'}
+          </span>
+          <span style={{ marginLeft:'auto', fontSize:10, color:C.muted, opacity:0.6 }}>
+            {isDark ? 'ON' : 'ON'}
+          </span>
+        </button>
+        <div style={{ fontSize:10, color:C.muted, marginTop:10, textAlign:'center' }}>AuditPro v2.5</div>
       </div>
     </div>
   );
@@ -1556,6 +1576,20 @@ function App() {
   const [results, setResults]         = useState({});
   const [audits, setAudits]           = useState([]);
   const [editMode, setEditMode]       = useState(false);
+  const [isDark, setIsDark]           = useState(() => {
+    try { return localStorage.getItem('auditpro_theme') !== 'light'; } catch { return true; }
+  });
+
+  // Keep C in sync — runs before children render
+  Object.assign(C, isDark ? DARK_C : LIGHT_C);
+
+  const handleToggleTheme = () => {
+    setIsDark(d => {
+      const next = !d;
+      try { localStorage.setItem('auditpro_theme', next ? 'dark' : 'light'); } catch {}
+      return next;
+    });
+  };
 
   useEffect(() => {
     const saved = loadAudits();
@@ -1620,7 +1654,7 @@ function App() {
   return (
     <div style={{ display:'flex', height:'100vh', background:C.bg, color:C.text,
       fontFamily:'-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }}>
-      <Sidebar page={page} setPage={p => { if (p === 'audit') { setEditMode(false); } setPage(p); }} />
+      <Sidebar page={page} setPage={p => { if (p === 'audit') { setEditMode(false); } setPage(p); }} isDark={isDark} onToggleTheme={handleToggleTheme} />
       <div style={{ flex:1, display:'flex', overflow:'hidden' }}>
         {page === 'dashboard'  && <DashboardView score={score} auditUrl={auditUrl} results={results}
           setPage={handleNewAudit} onEdit={handleEdit} audits={audits} onSelectAudit={handleSelectAudit} />}

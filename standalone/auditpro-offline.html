@@ -30994,7 +30994,7 @@ function downloadPDF(config, auditUrl, score, results) {
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
 
-const C = {
+const DARK_C = {
   bg: '#0A0E1A',
   surface: '#111827',
   surfaceHover: '#1a2235',
@@ -31007,6 +31007,23 @@ const C = {
   purple: '#8B5CF6',
   text: '#F0F4FF',
   muted: '#6B7A99'
+};
+const LIGHT_C = {
+  bg: '#F0F4F8',
+  surface: '#FFFFFF',
+  surfaceHover: '#F1F5F9',
+  border: '#D1D9E6',
+  accent: '#0284C7',
+  accentDim: '#DBEAFE',
+  green: '#059669',
+  amber: '#B45309',
+  red: '#DC2626',
+  purple: '#6D28D9',
+  text: '#0F172A',
+  muted: '#64748B'
+};
+const C = {
+  ...DARK_C
 };
 const SEV = {
   Critical: '#EF4444',
@@ -31094,7 +31111,9 @@ function ScoreRing({
 }
 function Sidebar({
   page,
-  setPage
+  setPage,
+  isDark,
+  onToggleTheme
 }) {
   const nav = [{
     id: 'dashboard',
@@ -31116,7 +31135,7 @@ function Sidebar({
       borderRight: `1px solid ${C.border}`,
       display: 'flex',
       flexDirection: 'column',
-      minHeight: '100vh',
+      height: '100vh',
       flexShrink: 0
     }
   }, /*#__PURE__*/React.createElement("div", {
@@ -31156,7 +31175,7 @@ function Sidebar({
       borderRadius: 8,
       cursor: 'pointer',
       marginBottom: 2,
-      background: page === n.id ? `${C.accentDim}55` : 'transparent',
+      background: page === n.id ? `${C.accent}18` : 'transparent',
       color: page === n.id ? C.accent : C.muted
     }
   }, /*#__PURE__*/React.createElement("span", {
@@ -31172,12 +31191,47 @@ function Sidebar({
     }
   }, n.label)))), /*#__PURE__*/React.createElement("div", {
     style: {
-      padding: '16px 24px',
-      borderTop: `1px solid ${C.border}`,
-      fontSize: 11,
+      padding: '16px 16px',
+      borderTop: `1px solid ${C.border}`
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: onToggleTheme,
+    style: {
+      width: '100%',
+      background: isDark ? '#1e2d45' : '#E2EAF4',
+      border: `1px solid ${C.border}`,
+      borderRadius: 8,
+      padding: '9px 12px',
+      cursor: 'pointer',
+      display: 'flex',
+      alignItems: 'center',
+      gap: 10
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 16
+    }
+  }, isDark ? '☀️' : '🌙'), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 12,
+      fontWeight: 600,
       color: C.muted
     }
-  }, "AuditPro v1.0"));
+  }, isDark ? 'Light Mode' : 'Dark Mode'), /*#__PURE__*/React.createElement("span", {
+    style: {
+      marginLeft: 'auto',
+      fontSize: 10,
+      color: C.muted,
+      opacity: 0.6
+    }
+  }, isDark ? 'ON' : 'ON')), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 10,
+      color: C.muted,
+      marginTop: 10,
+      textAlign: 'center'
+    }
+  }, "AuditPro v2.5")));
 }
 function CategoryDetail({
   catId,
@@ -33063,6 +33117,25 @@ function App() {
   const [results, setResults] = useState({});
   const [audits, setAudits] = useState([]);
   const [editMode, setEditMode] = useState(false);
+  const [isDark, setIsDark] = useState(() => {
+    try {
+      return localStorage.getItem('auditpro_theme') !== 'light';
+    } catch {
+      return true;
+    }
+  });
+
+  // Keep C in sync — runs before children render
+  Object.assign(C, isDark ? DARK_C : LIGHT_C);
+  const handleToggleTheme = () => {
+    setIsDark(d => {
+      const next = !d;
+      try {
+        localStorage.setItem('auditpro_theme', next ? 'dark' : 'light');
+      } catch {}
+      return next;
+    });
+  };
   useEffect(() => {
     const saved = loadAudits();
     setAudits(saved);
@@ -33149,7 +33222,9 @@ function App() {
         setEditMode(false);
       }
       setPage(p);
-    }
+    },
+    isDark: isDark,
+    onToggleTheme: handleToggleTheme
   }), /*#__PURE__*/React.createElement("div", {
     style: {
       flex: 1,
