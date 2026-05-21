@@ -420,45 +420,45 @@ const STATUS_COLORS_PDF = {
 const PERF_LEVEL = s => s >= 85 ? 'strong' : s >= 70 ? 'good' : s >= 50 ? 'below average' : 'poor';
 
 const PERF_MEANING = s =>
-  s >= 85 ? 'strong performance with minor areas for refinement' :
-  s >= 70 ? 'solid performance with clear opportunities for improvement' :
-  s >= 50 ? 'below-average performance with missed opportunities in visibility, experience, and conversion' :
-            'poor performance that is likely harming both search rankings and user experience';
+  s >= 85 ? 'strong performance — the site is well-optimised with minor areas still to refine' :
+  s >= 70 ? 'solid performance, with clear opportunities to improve visibility, experience, and conversion' :
+  s >= 50 ? 'below-average performance — the site is missing key opportunities across search visibility, user experience, and conversions' :
+            'poor performance that is actively limiting search rankings, user engagement, and conversion outcomes';
 
 const WEAKEST_MEANING = {
-  technical: 'technical foundation and search crawlability',
-  onpage:    'content quality and on-page search visibility',
-  ux:        'user experience and usability',
-  cro:       'conversion performance and call-to-action effectiveness',
-  serp:      'visibility in AI-driven search engines',
+  technical: 'the technical foundation — the underlying issues that limit how search engines can crawl and rank the site',
+  onpage:    'on-page content and search signals — the areas that directly determine keyword relevance and click-through rates',
+  ux:        'user experience — the friction points that are causing visitors to disengage before converting',
+  cro:       'conversion performance — the gaps preventing visitors from becoming customers, leads, or enquiries',
+  serp:      'AI and search visibility — the signals that determine whether the brand appears in modern search and AI-generated results',
 };
 
 const SECTION_INSIGHTS = {
   technical: s => s >= 80
-    ? 'Technical SEO is in good shape. Core infrastructure is solid and well-crawlable. Minor tweaks may still yield gains.'
+    ? 'Technical SEO is well-structured. Search engines can crawl, index, and process the site effectively. Minor refinements may still yield incremental gains.'
     : s >= 60
-    ? 'Technical SEO has gaps that could limit how search engines discover and index the site. Resolving these improves the foundation for all other SEO efforts.'
-    : 'Technical SEO is underperforming and is likely suppressing search visibility. Issues here affect every other aspect of site performance.',
+    ? 'Technical SEO has gaps that are restricting how search engines discover and rank the site. Fixing these builds the foundation that all other SEO efforts depend on.'
+    : 'Technical SEO issues are actively suppressing search visibility. These problems affect crawlability, page speed, and how search engines process every page on the site.',
   onpage: s => s >= 80
-    ? 'On-Page SEO is well-optimised. Content is structured and targeted effectively for search engines.'
+    ? 'On-Page SEO is well-optimised. Content is clearly structured, keyword-aligned, and formatted to drive both rankings and click-through rates.'
     : s >= 60
-    ? 'On-Page SEO needs attention. Weak meta data and heading structure are reducing click-through rates and search relevance.'
-    : 'On-Page SEO is significantly lacking. Poor or missing titles, descriptions, and headings directly reduce organic traffic and search rankings.',
+    ? 'On-Page weaknesses in meta data, headings, and content structure are reducing keyword relevance and click-through rates in search results.'
+    : 'On-Page issues are directly limiting organic traffic. Weak or missing titles, descriptions, and headings reduce how often and how prominently the site appears in search.',
   ux: s => s >= 80
-    ? 'User experience is strong. The site is accessible, navigable, and well-structured for visitors.'
+    ? 'User experience is strong. The site is accessible, easy to navigate, and structured to support engagement and task completion.'
     : s >= 60
-    ? 'UX has usability gaps that may frustrate visitors and increase bounce rates, affecting both engagement and conversions.'
-    : 'User experience is poor and is likely causing high drop-off. Visitors are struggling to navigate, read, or trust the site.',
+    ? 'UX gaps are creating friction that frustrates visitors, increases bounce rates, and reduces engagement and conversion potential.'
+    : 'User experience problems are causing significant visitor drop-off. People are struggling to navigate, find information, or trust the site — which directly reduces conversions.',
   cro: s => s >= 80
-    ? 'Conversion optimisation is solid. Clear CTAs and effective trust signals support user decision-making.'
+    ? 'Conversion optimisation is solid. Clear CTAs, trust signals, and a smooth user journey are supporting strong conversion rates.'
     : s >= 60
-    ? 'Conversion performance has weaknesses. Unclear calls-to-action and missing trust signals are reducing the site\'s ability to convert visitors into customers.'
-    : 'Conversion rate optimisation is significantly underperforming. The site is likely losing substantial revenue due to poor CTA design and weak trust signals.',
+    ? 'Conversion gaps are preventing visitors from taking action. Unclear calls-to-action and missing trust signals are reducing enquiries, sign-ups, and sales.'
+    : 'Conversion rate performance is weak. The site is losing potential customers at key decision points — due to absent CTAs, poor trust signals, and conversion friction.',
   serp: s => s >= 80
-    ? 'AI Visibility is well-established. The brand has strong signals for AI-driven search engines and content that supports citation and discovery.'
+    ? 'AI Visibility is well-established. The brand has strong entity signals, structured content, and authorship cues that support citation across AI-driven search.'
     : s >= 60
-    ? 'AI Visibility has gaps. While some signals are in place, the brand may be absent from AI-generated answers in key categories.'
-    : 'AI Visibility is weak. The site is poorly positioned for AI-driven search (ChatGPT, Perplexity, Google AI Overviews) — a rapidly growing traffic channel.',
+    ? 'AI Visibility has gaps. Some signals are in place, but the brand may be absent from AI-generated answers in key topic categories across ChatGPT, Perplexity, and Google AI.'
+    : 'AI Visibility is weak. The site is poorly positioned for AI-driven search — including ChatGPT, Perplexity, and Google AI Overviews — which is rapidly becoming a primary discovery channel.',
 };
 
 const IMPACT_MAP = [
@@ -868,22 +868,17 @@ function generateReportCopy(score, results) {
   const executiveSummary =
     `This website shows ${PERF_LEVEL(overall)} performance with an overall score of ${overall}/100 (Grade ${score.grade}). ` +
     `The biggest opportunity lies in ${weakestMeaning}. ` +
-    `There are ${urgencyText} that are currently limiting performance. ` +
-    `Addressing the top priority issues will deliver the fastest measurable improvements in visibility, user experience, and conversions. ` +
-    `The site is currently underperforming relative to its potential and leaving measurable growth opportunities on the table. ` +
-    `If these issues are resolved, it has strong potential to significantly improve both traffic and business outcomes.`;
+    `There are ${urgencyText} that are currently limiting performance.\n\n` +
+    `This means the site is underperforming compared to competitors and leaving measurable growth opportunities on the table.\n\n` +
+    `Addressing the top priority issues will deliver the fastest improvements in visibility, user experience, and conversions. ` +
+    `If these issues are resolved, the site has strong potential to significantly improve both traffic and business outcomes.`;
 
-  const performanceInterpretation = `This score indicates ${PERF_MEANING(overall)} and highlights missed opportunities in search visibility, user experience, and conversion performance.`;
+  const performanceInterpretation = `This score indicates ${PERF_MEANING(overall)}.`;
 
   const confLevel = compRate < 20 ? 'low' : compRate < 60 ? 'medium' : 'high';
-  const confNote  = compRate < 20
-    ? 'Review more checkpoints for reliable conclusions.'
-    : compRate < 60
-    ? 'Results give a useful picture of site health, though some areas may need further review.'
-    : 'A strong majority of checkpoints have been reviewed — this is a solid basis for action.';
   const confidenceText =
-    `This audit is based on ${compRate}% of checkpoints (${evalCount} of ${totalCount} items). ` +
-    `Results should be interpreted with ${confLevel} confidence. ${confNote}`;
+    `Based on ${compRate}% of checkpoints reviewed (${evalCount} of ${totalCount}), ` +
+    `this audit provides a ${confLevel}-confidence view of site performance.`;
 
   const sectionInsights = {};
   score.categories.forEach(cat => {
@@ -1139,13 +1134,21 @@ function downloadPDF(config, auditUrl, score, results) {
   // ── Executive Summary (rule engine) ──────────────────────────────────────
   y += 34;
   if (copy) {
-    // Performance interpretation — one line above the box
+    // Performance interpretation — italic one-liner above the box
+    const interpLines = doc.splitTextToSize(copy.performanceInterpretation, W - 2*M);
     doc.setFontSize(7); doc.setFont('helvetica','italic'); doc.setTextColor(110,115,135);
-    doc.text(copy.performanceInterpretation, M, y);
-    y += 5;
-    // Executive Summary box
-    const execLines = doc.splitTextToSize(copy.executiveSummary, W - 2*M - 10);
-    const execH = Math.max(20, 12 + execLines.length * 4.2);
+    doc.text(interpLines, M, y);
+    y += interpLines.length * 3.8 + 3;
+
+    // Executive Summary box — paragraphs separated by \n\n
+    const execParas = copy.executiveSummary.split('\n\n');
+    const execAllLines = [];
+    execParas.forEach((para, pi) => {
+      const pLines = doc.splitTextToSize(para, W - 2*M - 10);
+      pLines.forEach(l => execAllLines.push(l));
+      if (pi < execParas.length - 1) execAllLines.push(''); // blank gap line
+    });
+    const execH = Math.max(22, 12 + execAllLines.length * 4.2);
     doc.setFillColor(...brandLight);
     doc.roundedRect(M, y, W - 2*M, execH, 2, 2, 'F');
     doc.setFillColor(...brandRgb);
@@ -1153,25 +1156,27 @@ function downloadPDF(config, auditUrl, score, results) {
     doc.setFontSize(6.5); doc.setFont('helvetica','bold'); doc.setTextColor(...brandRgb);
     doc.text('Executive Summary', M + 6, y + 6);
     doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(42,48,65);
-    doc.text(execLines, M + 6, y + 12);
+    doc.text(execAllLines, M + 6, y + 12);
     y += execH + 4;
+
     // Confidence text
     const confLines = doc.splitTextToSize(copy.confidenceText, W - 2*M);
     doc.setFontSize(6.5); doc.setFont('helvetica','italic'); doc.setTextColor(145,150,168);
     doc.text(confLines, M, y);
     y += confLines.length * 3.8 + 3;
 
-    // Estimated Impact box — multi-bullet format
+    // Estimated Impact box — intro + bullets + primary opportunity line
     if (copy.weakestId) {
       const sectionGain = ESTIMATED_IMPACT[copy.weakestId] || '';
       const bullets = [
-        'Higher search rankings and organic visibility',
+        'Higher search rankings and greater organic visibility',
         'Increased qualified traffic from search and AI channels',
-        'Better user engagement and lower bounce rates',
-        'More conversions, leads, and completed actions',
+        'Better user engagement and lower drop-off rates',
+        'Stronger trust signals and improved brand credibility',
+        'More conversions, leads, enquiries, or sales',
       ];
-      if (sectionGain) bullets.push(sectionGain.replace('Primary expected gain: ', ''));
-      const eiH = 12 + bullets.length * 5;
+      const closingLine = `The primary opportunity lies in improving ${WEAKEST_MEANING[copy.weakestId] || copy.weakestId}, which directly affects overall performance.`;
+      const eiH = 13 + bullets.length * 5 + 7;
       doc.setFillColor(232,250,244);
       doc.roundedRect(M, y, W - 2*M, eiH, 2, 2, 'F');
       doc.setFillColor(16,185,129);
@@ -1179,9 +1184,14 @@ function downloadPDF(config, auditUrl, score, results) {
       doc.setFontSize(6); doc.setFont('helvetica','bold'); doc.setTextColor(6,120,90);
       doc.text('ESTIMATED IMPACT — if priority issues are resolved', M + 6, y + 5.5);
       doc.setFontSize(7); doc.setFont('helvetica','normal'); doc.setTextColor(22,60,50);
+      doc.text('If the priority issues are fixed, this can lead to:', M + 6, y + 10.5);
       bullets.forEach((b, bi) => {
-        doc.text(`•  ${b}`, M + 6, y + 10.5 + bi * 5);
+        doc.text(`•  ${b}`, M + 8, y + 16 + bi * 5);
       });
+      const closingY = y + 16 + bullets.length * 5 + 1;
+      doc.setFontSize(6.5); doc.setFont('helvetica','italic'); doc.setTextColor(6,100,75);
+      const closingWrapped = doc.splitTextToSize(closingLine, W - 2*M - 12);
+      doc.text(closingWrapped, M + 6, closingY);
       y += eiH + 4;
     }
   }
@@ -1218,7 +1228,10 @@ function downloadPDF(config, auditUrl, score, results) {
     doc.text('Top Priority Issues', M, y);
     doc.setFontSize(6); doc.setFont('helvetica','normal'); doc.setTextColor(155,160,178);
     doc.text(`${enrichedIssues.length} issue${enrichedIssues.length>1?'s':''} · impact-sorted`, W - M, y, {align:'right'});
-    y += 4;
+    y += 5;
+    doc.setFontSize(7); doc.setFont('helvetica','italic'); doc.setTextColor(110,115,135);
+    doc.text('These issues are ranked by impact and represent the fastest path to improving performance.', M, y);
+    y += 5;
     doc.setDrawColor(215,218,228); doc.setLineWidth(0.2);
     doc.line(M, y, W - M, y);
     y += 3;
@@ -1447,7 +1460,13 @@ function downloadPDF(config, auditUrl, score, results) {
     y += stepH + 3;
   });
 
-  y += 5;
+  // Closing line
+  y += 4;
+  checkPageBreak(12);
+  doc.setFontSize(7.5); doc.setFont('helvetica','italic'); doc.setTextColor(75,80,100);
+  doc.text('This report provides a clear starting point. Prioritising the critical issues will deliver the fastest measurable results.', M, y, { maxWidth: W - 2*M });
+  y += 10;
+
   checkPageBreak(18);
   doc.setFillColor(...brandLight);
   doc.roundedRect(M, y, W - 2*M, 16, 2, 2, 'F');
