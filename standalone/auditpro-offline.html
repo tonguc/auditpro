@@ -31729,10 +31729,20 @@ function DashboardView({
       marginTop: 6
     }
   }, partialItems.length > 0 && /*#__PURE__*/React.createElement("span", {
+    onClick: e => {
+      e.stopPropagation();
+      setIssueFilter('Partial');
+      setTimeout(() => issuesRef.current?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start'
+      }), 50);
+    },
     style: {
-      color: C.amber
+      color: C.amber,
+      cursor: 'pointer',
+      textDecoration: 'underline'
     }
-  }, partialItems.length, " partial \xB7 "), /*#__PURE__*/React.createElement("span", {
+  }, partialItems.length, " partial"), partialItems.length > 0 && /*#__PURE__*/React.createElement("span", null, " \xB7 "), /*#__PURE__*/React.createElement("span", {
     style: {
       color: C.accent
     }
@@ -31900,75 +31910,103 @@ function DashboardView({
       color: C.muted,
       fontSize: 13
     }
-  }, issueFilter === 'Fail' && (totalEval === 0 ? 'Complete some audit items to see issues.' : '🎉 No failures found in reviewed items.'), issueFilter === 'Partial' && '✅ No partial items found.', issueFilter === 'Blank' && '✅ All items have been reviewed.') : filteredIssues.map((issue, i) => {
-    const statusColor = issue.status === 'Fail' ? C.red : issue.status === 'Partial' ? C.amber : C.muted;
-    const howTo = issue.howTo;
-    return /*#__PURE__*/React.createElement("div", {
-      key: issue.id,
+  }, issueFilter === 'Fail' && (totalEval === 0 ? 'Complete some audit items to see issues.' : '🎉 No failures found in reviewed items.'), issueFilter === 'Partial' && '✅ No partial items found.', issueFilter === 'Blank' && '✅ All items have been reviewed.') : (() => {
+    // Group by category
+    const groups = [];
+    filteredIssues.forEach(issue => {
+      const last = groups[groups.length - 1];
+      if (last && last.category === issue.category) last.items.push(issue);else groups.push({
+        category: issue.category,
+        catColor: issue.catColor,
+        items: [issue]
+      });
+    });
+    return groups.map(group => /*#__PURE__*/React.createElement("div", {
+      key: group.category
+    }, /*#__PURE__*/React.createElement("div", {
       style: {
-        padding: '12px 20px',
-        borderBottom: i < filteredIssues.length - 1 ? `1px solid ${C.border}` : 'none',
+        padding: '7px 20px',
+        background: `${group.catColor}18`,
+        borderTop: `1px solid ${C.border}`,
+        borderBottom: `1px solid ${group.catColor}33`,
         display: 'flex',
-        alignItems: 'flex-start',
-        gap: 12,
-        background: i % 2 === 0 ? 'transparent' : `${C.bg}55`
+        alignItems: 'center',
+        gap: 8
       }
     }, /*#__PURE__*/React.createElement("div", {
       style: {
         width: 8,
         height: 8,
         borderRadius: '50%',
-        marginTop: 5,
-        flexShrink: 0,
-        background: issue.status ? statusColor : C.border
-      }
-    }), /*#__PURE__*/React.createElement("div", {
-      style: {
-        flex: 1,
-        minWidth: 0
-      }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 13,
-        color: C.text,
-        marginBottom: 2
-      }
-    }, issue.item), howTo && /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 11,
-        color: C.muted,
-        fontStyle: 'italic',
-        lineHeight: 1.5
-      }
-    }, "\uD83D\uDCA1 ", howTo)), /*#__PURE__*/React.createElement("div", {
-      style: {
-        display: 'flex',
-        gap: 8,
-        alignItems: 'center',
+        background: group.catColor,
         flexShrink: 0
       }
-    }, /*#__PURE__*/React.createElement("div", {
+    }), /*#__PURE__*/React.createElement("span", {
       style: {
-        fontSize: 10,
-        color: C.muted,
-        background: `${issue.catColor}22`,
-        borderRadius: 6,
-        padding: '3px 8px',
-        whiteSpace: 'nowrap',
-        color: issue.catColor
-      }
-    }, issue.category), /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 10,
+        fontSize: 11,
         fontWeight: 700,
-        color: SEV[issue.priority] ?? C.muted,
+        color: group.catColor,
         textTransform: 'uppercase',
-        background: `${SEV[issue.priority]}22`,
-        borderRadius: 6,
-        padding: '3px 8px'
+        letterSpacing: '0.06em'
       }
-    }, issue.priority)));
-  })));
+    }, group.category), /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 11,
+        color: C.muted
+      }
+    }, "\u2014 ", group.items.length, " item", group.items.length > 1 ? 's' : '')), group.items.map((issue, i) => {
+      const statusColor = issue.status === 'Fail' ? C.red : issue.status === 'Partial' ? C.amber : C.muted;
+      return /*#__PURE__*/React.createElement("div", {
+        key: issue.id,
+        style: {
+          padding: '11px 20px 11px 36px',
+          borderBottom: i < group.items.length - 1 ? `1px solid ${C.border}` : 'none',
+          display: 'flex',
+          alignItems: 'flex-start',
+          gap: 12,
+          background: i % 2 === 0 ? 'transparent' : `${C.bg}55`
+        }
+      }, /*#__PURE__*/React.createElement("div", {
+        style: {
+          width: 7,
+          height: 7,
+          borderRadius: '50%',
+          marginTop: 5,
+          flexShrink: 0,
+          background: issue.status ? statusColor : C.border
+        }
+      }), /*#__PURE__*/React.createElement("div", {
+        style: {
+          flex: 1,
+          minWidth: 0
+        }
+      }, /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontSize: 13,
+          color: C.text,
+          marginBottom: 2
+        }
+      }, issue.item), issue.howTo && /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontSize: 11,
+          color: C.muted,
+          fontStyle: 'italic',
+          lineHeight: 1.5
+        }
+      }, "\uD83D\uDCA1 ", issue.howTo)), /*#__PURE__*/React.createElement("div", {
+        style: {
+          fontSize: 10,
+          fontWeight: 700,
+          color: SEV[issue.priority] ?? C.muted,
+          textTransform: 'uppercase',
+          background: `${SEV[issue.priority]}22`,
+          borderRadius: 6,
+          padding: '3px 8px',
+          flexShrink: 0
+        }
+      }, issue.priority));
+    })));
+  })()));
 }
 function AuditView({
   onComplete,

@@ -925,7 +925,11 @@ function DashboardView({ score, auditUrl, results, setPage, onEdit, audits, onSe
           <div style={{ fontSize:10, color:C.muted, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:8 }}>Issues Found</div>
           <div style={{ fontSize:36, fontWeight:800, color: failItems.length > 0 ? C.red : C.muted, lineHeight:1 }}>{failItems.length}</div>
           <div style={{ fontSize:11, color:C.muted, marginTop:6 }}>
-            {partialItems.length > 0 && <span style={{ color:C.amber }}>{partialItems.length} partial · </span>}
+            {partialItems.length > 0 && (
+              <span onClick={e => { e.stopPropagation(); setIssueFilter('Partial'); setTimeout(() => issuesRef.current?.scrollIntoView({ behavior:'smooth', block:'start' }), 50); }}
+                style={{ color:C.amber, cursor:'pointer', textDecoration:'underline' }}>{partialItems.length} partial</span>
+            )}
+            {partialItems.length > 0 && <span> · </span>}
             <span style={{ color:C.accent }}>view details ↓</span>
           </div>
         </div>
@@ -994,29 +998,47 @@ function DashboardView({ score, auditUrl, results, setPage, onEdit, audits, onSe
             {issueFilter === 'Partial' && '✅ No partial items found.'}
             {issueFilter === 'Blank'   && '✅ All items have been reviewed.'}
           </div>
-        ) : filteredIssues.map((issue, i) => {
-          const statusColor = issue.status === 'Fail' ? C.red : issue.status === 'Partial' ? C.amber : C.muted;
-          const howTo = issue.howTo;
-          return (
-            <div key={issue.id} style={{ padding:'12px 20px',
-              borderBottom: i < filteredIssues.length - 1 ? `1px solid ${C.border}` : 'none',
-              display:'flex', alignItems:'flex-start', gap:12,
-              background: i % 2 === 0 ? 'transparent' : `${C.bg}55` }}>
-              <div style={{ width:8, height:8, borderRadius:'50%', marginTop:5, flexShrink:0,
-                background: issue.status ? statusColor : C.border }} />
-              <div style={{ flex:1, minWidth:0 }}>
-                <div style={{ fontSize:13, color:C.text, marginBottom:2 }}>{issue.item}</div>
-                {howTo && <div style={{ fontSize:11, color:C.muted, fontStyle:'italic', lineHeight:1.5 }}>💡 {howTo}</div>}
+        ) : (() => {
+          // Group by category
+          const groups = [];
+          filteredIssues.forEach(issue => {
+            const last = groups[groups.length - 1];
+            if (last && last.category === issue.category) last.items.push(issue);
+            else groups.push({ category: issue.category, catColor: issue.catColor, items: [issue] });
+          });
+          return groups.map(group => (
+            <div key={group.category}>
+              <div style={{ padding:'7px 20px', background:`${group.catColor}18`,
+                borderTop:`1px solid ${C.border}`, borderBottom:`1px solid ${group.catColor}33`,
+                display:'flex', alignItems:'center', gap:8 }}>
+                <div style={{ width:8, height:8, borderRadius:'50%', background:group.catColor, flexShrink:0 }} />
+                <span style={{ fontSize:11, fontWeight:700, color:group.catColor, textTransform:'uppercase', letterSpacing:'0.06em' }}>
+                  {group.category}
+                </span>
+                <span style={{ fontSize:11, color:C.muted }}>— {group.items.length} item{group.items.length > 1 ? 's' : ''}</span>
               </div>
-              <div style={{ display:'flex', gap:8, alignItems:'center', flexShrink:0 }}>
-                <div style={{ fontSize:10, color:C.muted, background:`${issue.catColor}22`,
-                  borderRadius:6, padding:'3px 8px', whiteSpace:'nowrap', color:issue.catColor }}>{issue.category}</div>
-                <div style={{ fontSize:10, fontWeight:700, color:SEV[issue.priority] ?? C.muted,
-                  textTransform:'uppercase', background:`${SEV[issue.priority]}22`, borderRadius:6, padding:'3px 8px' }}>{issue.priority}</div>
-              </div>
+              {group.items.map((issue, i) => {
+                const statusColor = issue.status === 'Fail' ? C.red : issue.status === 'Partial' ? C.amber : C.muted;
+                return (
+                  <div key={issue.id} style={{ padding:'11px 20px 11px 36px',
+                    borderBottom: i < group.items.length - 1 ? `1px solid ${C.border}` : 'none',
+                    display:'flex', alignItems:'flex-start', gap:12,
+                    background: i % 2 === 0 ? 'transparent' : `${C.bg}55` }}>
+                    <div style={{ width:7, height:7, borderRadius:'50%', marginTop:5, flexShrink:0,
+                      background: issue.status ? statusColor : C.border }} />
+                    <div style={{ flex:1, minWidth:0 }}>
+                      <div style={{ fontSize:13, color:C.text, marginBottom:2 }}>{issue.item}</div>
+                      {issue.howTo && <div style={{ fontSize:11, color:C.muted, fontStyle:'italic', lineHeight:1.5 }}>💡 {issue.howTo}</div>}
+                    </div>
+                    <div style={{ fontSize:10, fontWeight:700, color:SEV[issue.priority] ?? C.muted,
+                      textTransform:'uppercase', background:`${SEV[issue.priority]}22`,
+                      borderRadius:6, padding:'3px 8px', flexShrink:0 }}>{issue.priority}</div>
+                  </div>
+                );
+              })}
             </div>
-          );
-        })}
+          ));
+        })()}
       </div>
     </div>
   );
