@@ -931,11 +931,32 @@ function downloadPDF(config, auditUrl, score, results) {
   let y = 0;
   const copy = generateReportCopy(score, results);
 
+  // Sanitize text for jsPDF helvetica — removes/replaces characters outside
+  // Latin-1 that cause encoding artifacts (em-dash, bullets, smart quotes, etc.)
+  function st(str) {
+    if (!str && str !== 0) return '';
+    return String(str)
+      .replace(/[‘’`´]/g, "'")  // smart/fancy single quotes
+      .replace(/[“”]/g, '"')               // smart double quotes
+      .replace(/—|―/g, ' - ')              // em/horizontal dash
+      .replace(/–/g, '-')                       // en dash
+      .replace(/•|·|●/g, '-')         // bullets
+      .replace(/…/g, '...')                     // ellipsis
+      .replace(/ /g, ' ')                       // non-breaking space
+      .replace(/[^\x00-\xFF]/g, '');                 // strip any remaining non-Latin-1
+  }
+
+  // Safe date string — short format, never wraps
+  const dateShort = new Date().toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'});
+  const dateLong  = new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  // Truncate long URLs for header/footer
+  const urlShortened = auditUrl.length > 55 ? auditUrl.slice(0, 52) + '...' : auditUrl;
+
   function addPage() { doc.addPage(); y = M; drawFooter(); }
   function drawFooter() {
     doc.setFontSize(6.5); doc.setTextColor(170,172,180); doc.setFont('helvetica','normal');
-    doc.text(auditUrl, W - M, H - 6, { align:'right' });
-    doc.text(new Date().toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}), M, H - 6);
+    doc.text(st(urlShortened), W - M, H - 6, { align:'right' });
+    doc.text(dateShort, M, H - 6);
     doc.setDrawColor(220,222,228); doc.setLineWidth(0.2);
     doc.line(M, H - 10, W - M, H - 10);
   }
@@ -991,18 +1012,18 @@ function downloadPDF(config, auditUrl, score, results) {
   if (clientLogo) addLogoToDoc(clientLogo, W - M, 4, 36, 13, true);
   doc.setTextColor(...onBrand);
   doc.setFontSize(clientName ? 16 : 18); doc.setFont('helvetica','bold');
-  doc.text(clientName || config.agencyName, M, 14);
+  doc.text(st(clientName || config.agencyName), M, 14);
   doc.setFontSize(8.5); doc.setFont('helvetica','normal');
   doc.text('UX + SEO Audit Report', M, 23);
   doc.setFontSize(7); doc.setTextColor(...onBrandMuted);
-  doc.text(auditUrl, M, 31);
+  doc.text(st(urlShortened), M, 31);
   doc.setFontSize(6); doc.setTextColor(...onBrandFaint);
   doc.text('Powered by', M, 43);
   if (agencyLogo) {
     addLogoToDoc(agencyLogo, M + 22, 38, 30, 9, false);
   } else {
     doc.setFontSize(7.5); doc.setFont('helvetica','bold'); doc.setTextColor(...onDarkMuted);
-    doc.text(config.agencyName, M + 22, 43);
+    doc.text(st(config.agencyName), M + 22, 43);
     doc.setFont('helvetica','normal');
   }
 
@@ -1017,23 +1038,23 @@ function downloadPDF(config, auditUrl, score, results) {
   doc.setFontSize(6); doc.setFont('helvetica','bold'); doc.setTextColor(155,160,178);
   doc.text('PREPARED BY', M + 5, y + 6);
   doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.setTextColor(25,30,48);
-  doc.text(config.agencyName, M + 5, y + 12);
-  if (agencyTitle) { doc.setFontSize(7.5); doc.setFont('helvetica','normal'); doc.setTextColor(90,95,115); doc.text(agencyTitle, M + 5, y + 17); }
-  const contactLine = [agencyWebsite, agencyEmail].filter(Boolean).join('  ·  ');
-  if (contactLine) { doc.setFontSize(7); doc.setTextColor(125,130,150); doc.text(contactLine, M + 5, agencyTitle ? y + 21 : y + 17); }
+  doc.text(st(config.agencyName), M + 5, y + 12);
+  if (agencyTitle) { doc.setFontSize(7.5); doc.setFont('helvetica','normal'); doc.setTextColor(90,95,115); doc.text(st(agencyTitle), M + 5, y + 17); }
+  const contactLine = [agencyWebsite, agencyEmail].filter(Boolean).join('  |  ');
+  if (contactLine) { doc.setFontSize(7); doc.setTextColor(125,130,150); doc.text(st(contactLine), M + 5, agencyTitle ? y + 21 : y + 17); }
   // Divider
   doc.setDrawColor(210,215,228); doc.line(M + halfW + 2, y + 4, M + halfW + 2, y + 19);
   // Right: Prepared for
   const rx = M + halfW + 6;
   doc.setFontSize(6); doc.setFont('helvetica','bold'); doc.setTextColor(155,160,178);
   doc.text('PREPARED FOR', rx, y + 6);
+  // Date right-aligned — short format, never wraps
+  doc.text(dateShort, W - M, y + 6, {align:'right'});
   doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.setTextColor(25,30,48);
-  doc.text(clientName || '—', rx, y + 12);
+  doc.text(st(clientName || '-'), rx, y + 12);
   doc.setFontSize(7.5); doc.setFont('helvetica','normal'); doc.setTextColor(90,95,115);
-  const urlShort = auditUrl.replace(/https?:\/\/(www\.)?/, '');
+  const urlShort = auditUrl.replace(/https?:\/\/(www\.)?/, '').slice(0, 40);
   doc.text(urlShort, rx, y + 17);
-  doc.setFontSize(6); doc.setTextColor(155,160,178);
-  doc.text(new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}), W - M, y + 6, {align:'right'});
 
   // ── Client Snapshot box ───────────────────────────────────────────────────
   y += 28;
@@ -1054,18 +1075,17 @@ function downloadPDF(config, auditUrl, score, results) {
     const highSnap = AUDIT_CATEGORIES.flatMap(cat => cat.sections.flatMap(sec =>
       sec.items.filter(it => results[it.id] === 'Fail' && it.priority === 'High')
     )).length;
-    const urgencySnap = critSnap > 0 ? `${critSnap} Critical issue${critSnap>1?'s':''}` : highSnap > 0 ? `${highSnap} High-priority issue${highSnap>1?'s':''}` : 'No critical blockers';
-    const oppSnap = weakestSnap ? weakestSnap.label.replace('AI & SERP Visibility','AI Visibility') + ` (${weakestSnap.score}/100)` : '—';
-    const scopeSnap = `Full UX + SEO Audit · ${score.categories.reduce((s,c)=>s+c.total,0)} checkpoints`;
-    const dateSnap  = new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+    const urgencySnap = critSnap > 0 ? `${critSnap} Critical issue${critSnap>1?'s':''}` : highSnap > 0 ? `${highSnap} High issue${highSnap>1?'s':''}` : 'No critical blockers';
+    const oppSnap = weakestSnap ? weakestSnap.label.replace('AI & SERP Visibility','AI Visibility') + ` (${weakestSnap.score}/100)` : 'N/A';
+    const scopeSnap = `Full UX + SEO Audit - ${score.categories.reduce((s,c)=>s+c.total,0)} checkpoints`;
 
     const snapCols = [
-      { label:'Client',            val: clientName || '—' },
-      { label:'Website',           val: auditUrl.replace(/https?:\/\/(www\.)?/,'') },
+      { label:'Client',            val: st(clientName || '-') },
+      { label:'Website',           val: auditUrl.replace(/https?:\/\/(www\.)?/,'').slice(0, 38) },
       { label:'Audit Scope',       val: scopeSnap },
-      { label:'Reviewed',          val: dateSnap },
-      { label:'Main Opportunity',  val: oppSnap },
-      { label:'Urgency',           val: urgencySnap },
+      { label:'Reviewed',          val: dateLong },
+      { label:'Main Opportunity',  val: st(oppSnap) },
+      { label:'Urgency',           val: st(urgencySnap) },
     ];
     const colW = (W - 2*M - 6) / 3;
     snapCols.forEach((col, i) => {
@@ -1141,12 +1161,12 @@ function downloadPDF(config, auditUrl, score, results) {
     y += interpLines.length * 3.8 + 3;
 
     // Executive Summary box — paragraphs separated by \n\n
-    const execParas = copy.executiveSummary.split('\n\n');
+    const execParas = st(copy.executiveSummary).split('\n\n');
     const execAllLines = [];
     execParas.forEach((para, pi) => {
       const pLines = doc.splitTextToSize(para, W - 2*M - 10);
       pLines.forEach(l => execAllLines.push(l));
-      if (pi < execParas.length - 1) execAllLines.push(''); // blank gap line
+      if (pi < execParas.length - 1) execAllLines.push('');
     });
     const execH = Math.max(22, 12 + execAllLines.length * 4.2);
     doc.setFillColor(...brandLight);
@@ -1160,14 +1180,13 @@ function downloadPDF(config, auditUrl, score, results) {
     y += execH + 4;
 
     // Confidence text
-    const confLines = doc.splitTextToSize(copy.confidenceText, W - 2*M);
+    const confLines = doc.splitTextToSize(st(copy.confidenceText), W - 2*M);
     doc.setFontSize(6.5); doc.setFont('helvetica','italic'); doc.setTextColor(145,150,168);
     doc.text(confLines, M, y);
     y += confLines.length * 3.8 + 3;
 
-    // Estimated Impact box — intro + bullets + primary opportunity line
+    // Estimated Impact box — intro + clean ASCII bullets + closing line
     if (copy.weakestId) {
-      const sectionGain = ESTIMATED_IMPACT[copy.weakestId] || '';
       const bullets = [
         'Higher search rankings and greater organic visibility',
         'Increased qualified traffic from search and AI channels',
@@ -1175,18 +1194,19 @@ function downloadPDF(config, auditUrl, score, results) {
         'Stronger trust signals and improved brand credibility',
         'More conversions, leads, enquiries, or sales',
       ];
-      const closingLine = `The primary opportunity lies in improving ${WEAKEST_MEANING[copy.weakestId] || copy.weakestId}, which directly affects overall performance.`;
+      const rawClosing = `The primary opportunity lies in improving ${WEAKEST_MEANING[copy.weakestId] || copy.weakestId}, which directly affects overall performance.`;
+      const closingLine = st(rawClosing);
       const eiH = 13 + bullets.length * 5 + 7;
       doc.setFillColor(232,250,244);
       doc.roundedRect(M, y, W - 2*M, eiH, 2, 2, 'F');
       doc.setFillColor(16,185,129);
       doc.roundedRect(M, y, 2.5, eiH, 1, 0, 'F');
       doc.setFontSize(6); doc.setFont('helvetica','bold'); doc.setTextColor(6,120,90);
-      doc.text('ESTIMATED IMPACT — if priority issues are resolved', M + 6, y + 5.5);
+      doc.text('ESTIMATED IMPACT - if priority issues are resolved', M + 6, y + 5.5);
       doc.setFontSize(7); doc.setFont('helvetica','normal'); doc.setTextColor(22,60,50);
       doc.text('If the priority issues are fixed, this can lead to:', M + 6, y + 10.5);
       bullets.forEach((b, bi) => {
-        doc.text(`•  ${b}`, M + 8, y + 16 + bi * 5);
+        doc.text(`- ${b}`, M + 8, y + 16 + bi * 5);
       });
       const closingY = y + 16 + bullets.length * 5 + 1;
       doc.setFontSize(6.5); doc.setFont('helvetica','italic'); doc.setTextColor(6,100,75);
@@ -1227,17 +1247,29 @@ function downloadPDF(config, auditUrl, score, results) {
     doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.setTextColor(30,35,45);
     doc.text('Top Priority Issues', M, y);
     doc.setFontSize(6); doc.setFont('helvetica','normal'); doc.setTextColor(155,160,178);
-    doc.text(`${enrichedIssues.length} issue${enrichedIssues.length>1?'s':''} · impact-sorted`, W - M, y, {align:'right'});
+    doc.text(`${enrichedIssues.length} issue${enrichedIssues.length>1?'s':''}  impact-sorted`, W - M, y, {align:'right'});
     y += 5;
     doc.setFontSize(7); doc.setFont('helvetica','italic'); doc.setTextColor(110,115,135);
-    doc.text('These issues are ranked by impact and represent the fastest path to improving performance.', M, y);
+    doc.text('These issues are ranked by impact and represent the fastest path to improving performance.', M, y, { maxWidth: W - 2*M });
     y += 5;
     doc.setDrawColor(215,218,228); doc.setLineWidth(0.2);
     doc.line(M, y, W - M, y);
     y += 3;
 
     enrichedIssues.slice(0, 6).forEach((item, i) => {
-      const rowH = 28;
+      const tw = W - 2*M - 6;
+      // Pre-measure all text to compute dynamic row height
+      doc.setFontSize(8); doc.setFont('helvetica','bold');
+      const titleLines = doc.splitTextToSize(st(item.item), tw).slice(0, 2);
+      doc.setFontSize(6.5); doc.setFont('helvetica','normal');
+      const impLines  = doc.splitTextToSize(`Why it matters: ${st(item.impact)}`, tw).slice(0, 2);
+      const bizLines  = item.businessImpact
+        ? doc.splitTextToSize(`Business impact: ${st(item.businessImpact)}`, tw).slice(0, 1)
+        : [];
+      const fixLines  = doc.splitTextToSize(`Action: ${st(item.fix)}`, tw).slice(0, 2);
+      // rowH = badge area (9) + title + gap (2) + impact + biz + fix + bottom pad (3)
+      const rowH = 9 + titleLines.length * 4.5 + 2
+        + impLines.length * 4 + (bizLines.length ? 4 : 0) + fixLines.length * 4 + 3;
       checkPageBreak(rowH + 2);
       if (i % 2 === 0) { doc.setFillColor(247,248,252); doc.rect(M, y, W - 2*M, rowH, 'F'); }
       // Priority badge
@@ -1251,29 +1283,30 @@ function downloadPDF(config, auditUrl, score, results) {
         .replace('UX Heuristics','UX').replace('Conversion & CTA','CRO').replace('AI & SERP Visibility','AI/SERP');
       doc.setFontSize(5.5); doc.setFont('helvetica','normal'); doc.setTextColor(...item.catRgb);
       doc.text(shortCat, M + 27, y + 5.5);
-      // Item title — what is wrong
-      doc.setFontSize(8.5); doc.setFont('helvetica','bold'); doc.setTextColor(22,28,48);
-      const titleLine = doc.splitTextToSize(item.item, W - 2*M - 5);
-      doc.text(titleLine[0], M + 2, y + 12);
-      // Why it matters
+      // Content starts below badge area
+      let ry = y + 9;
+      // Title (up to 2 lines)
+      doc.setFontSize(8); doc.setFont('helvetica','bold'); doc.setTextColor(22,28,48);
+      doc.text(titleLines, M + 2, ry);
+      ry += titleLines.length * 4.5 + 2;
+      // Why it matters (up to 2 lines)
       doc.setFontSize(6.5); doc.setFont('helvetica','normal'); doc.setTextColor(80,85,105);
-      const impactLine = doc.splitTextToSize(`Why it matters: ${item.impact}`, W - 2*M - 5);
-      doc.text(impactLine[0], M + 2, y + 17);
-      // Business impact
-      if (item.businessImpact) {
-        doc.setFontSize(6.5); doc.setFont('helvetica','italic'); doc.setTextColor(100,110,135);
-        const bizLine = doc.splitTextToSize(`Business impact: ${item.businessImpact}`, W - 2*M - 5);
-        doc.text(bizLine[0], M + 2, y + 21);
+      doc.text(impLines, M + 2, ry);
+      ry += impLines.length * 4 + 0.5;
+      // Business impact (1 line, italic)
+      if (bizLines.length) {
+        doc.setFont('helvetica','italic'); doc.setTextColor(100,110,135);
+        doc.text(bizLines, M + 2, ry);
+        ry += 4;
       }
-      // Action
-      const fixLine = doc.splitTextToSize(`Action: ${item.fix}`, W - 2*M - 5);
-      doc.setFont('helvetica','normal'); doc.setTextColor(110,120,145);
-      doc.text(fixLine[0], M + 2, y + 25.5);
+      // Action (up to 2 lines)
+      doc.setFont('helvetica','normal'); doc.setTextColor(95,108,138);
+      doc.text(fixLines, M + 2, ry);
       y += rowH;
     });
     if (enrichedIssues.length > 6) {
       doc.setFontSize(6.5); doc.setFont('helvetica','italic'); doc.setTextColor(158,163,180);
-      doc.text(`+ ${enrichedIssues.length - 6} more issues in the detailed sections below.`, M + 2, y + 4);
+      doc.text(`+ ${enrichedIssues.length - 6} more issues in the sections below.`, M + 2, y + 4);
       y += 7;
     }
   }
@@ -1292,7 +1325,7 @@ function downloadPDF(config, auditUrl, score, results) {
     const onCatMuted = contrastMuted(catColor);
     const onCatDark  = contrastText(catDark);
     doc.setTextColor(...onCat); doc.setFontSize(13); doc.setFont('helvetica','bold');
-    doc.text(`${cat.icon}  ${cat.label}`, M, 13);
+    doc.text(st(cat.label), M, 13);
     const catScore = score.categories.find(c => c.id === cat.id);
     // AI Visibility NEW badge
     if (cat.id === 'serp') {
@@ -1304,7 +1337,7 @@ function downloadPDF(config, auditUrl, score, results) {
     // Score + evaluation state
     if (catScore) {
       const scoreStr = catScore.evaluated > 0
-        ? `${catScore.score}/100 — Grade ${catScore.grade}`
+        ? `${catScore.score}/100  Grade ${catScore.grade}`
         : 'Not evaluated';
       const scoreX = cat.id === 'serp' ? W - M - 20 : W - M;
       doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.setTextColor(...onCat);
@@ -1312,7 +1345,7 @@ function downloadPDF(config, auditUrl, score, results) {
       // Low confidence warning
       if (catScore.evaluated > 0 && catScore.evaluated < catScore.total * 0.3) {
         doc.setFontSize(6); doc.setFont('helvetica','italic'); doc.setTextColor(...onCatDark);
-        doc.text(`Low confidence — only ${catScore.evaluated}/${catScore.total} items reviewed`, M, 22.5);
+        doc.text(`Low confidence - only ${catScore.evaluated}/${catScore.total} items reviewed`, M, 22.5);
       }
     }
     // AI Visibility subtitle
@@ -1324,7 +1357,7 @@ function downloadPDF(config, auditUrl, score, results) {
     y = 32;
     // Section insight from rule engine
     if (copy && copy.sectionInsights[cat.id]) {
-      const insightTxt = copy.sectionInsights[cat.id];
+      const insightTxt = st(copy.sectionInsights[cat.id]);
       const iLines = doc.splitTextToSize(insightTxt, W - 2*M - 6);
       const iH = Math.max(10, 5 + iLines.length * 4);
       doc.setFillColor(...lighten(catColor, 0.92));
@@ -1339,7 +1372,7 @@ function downloadPDF(config, auditUrl, score, results) {
     // AI Visibility intro paragraph
     if (cat.id === 'serp') {
       const catScore = score.categories.find(c => c.id === 'serp');
-      const introTxt = AI_SERP_INTRO(catScore ? catScore.score : 0);
+      const introTxt = st(AI_SERP_INTRO(catScore ? catScore.score : 0));
       const introParas = introTxt.split('\n\n');
       introParas.forEach(para => {
         checkPageBreak(14);
@@ -1356,7 +1389,7 @@ function downloadPDF(config, auditUrl, score, results) {
       doc.setFillColor(...lighten(catColor, 0.88));
       doc.rect(M, y, W - 2*M, 8, 'F');
       doc.setFontSize(8.5); doc.setFont('helvetica','bold'); doc.setTextColor(...catColor);
-      doc.text(sec.label, M + 3, y + 5.5);
+      doc.text(st(sec.label), M + 3, y + 5.5);
       if (sec.advanced) {
         doc.setFontSize(5); doc.setFont('helvetica','bold');
         doc.text('ADVANCED', W - M - 3, y + 5.5, {align:'right'});
@@ -1385,7 +1418,7 @@ function downloadPDF(config, auditUrl, score, results) {
         doc.text(`${item.num}`, M + 3, y + 5.5);
         doc.setFontSize(7.5); doc.setFont('helvetica', status === 'Fail' ? 'bold' : 'normal');
         doc.setTextColor(35,40,55);
-        const itemText = doc.splitTextToSize(item.item, W - 2*M - 40);
+        const itemText = doc.splitTextToSize(st(item.item), W - 2*M - 40);
         doc.text(itemText[0], M + 12, y + 5.5);
         doc.setFillColor(...statusColor);
         const badgeX = W - M - 22;
@@ -1432,11 +1465,11 @@ function downloadPDF(config, auditUrl, score, results) {
       ? { num:'1', title:`Fix ${critCount} Critical Issue${critCount>1?'s':''}`, body:'These failures have the highest impact on performance, user experience, and search visibility. Address them before anything else.', hot:true }
       : { num:'1', title:'Resolve All Failed Items', body:'Work through each failed item in the detailed sections. Sort by priority — Critical and High items first.', hot:false },
     weakestCat
-      ? { num:'2', title:`Strengthen ${weakestCat.label.replace('AI & SERP Visibility','AI Visibility')} — Score: ${weakestCat.score}/100`, body:'This is the weakest area in the audit. A focused effort here will have the highest impact on overall site health and score.', hot:false }
+      ? { num:'2', title:`Strengthen ${weakestCat.label.replace('AI & SERP Visibility','AI Visibility')} - Score: ${weakestCat.score}/100`, body:'This is the weakest area in the audit. A focused effort here will have the highest impact on overall site health and score.', hot:false }
       : { num:'2', title:'Complete Unevaluated Sections', body:'Several sections have not been fully reviewed. Complete them to get a reliable overall score and more actionable insights.', hot:false },
-    { num:'3', title:'Work Through the Top Priority Issues', body:'Each priority issue in this report includes a specific how-to action. These are your clearest, most actionable next steps.', hot:false },
-    { num:'4', title:'Strengthen AI Visibility & E-E-A-T', body:'AI search engines (ChatGPT, Perplexity, Google AI Overviews) increasingly drive organic traffic. Ensure your brand, authors, and content are optimised for this layer.', hot:false },
-    { num:'5', title:'Re-run This Audit in 4–8 Weeks', body:'Track your progress by re-running the audit after implementing changes. Use the score difference to demonstrate the value of your work to stakeholders.', hot:false },
+    { num:'3', title:'Work Through the Top Priority Issues', body:'Each priority issue in this report includes a specific action step. These are your clearest, most actionable next steps.', hot:false },
+    { num:'4', title:'Strengthen AI Visibility and Trust Signals', body:'AI search engines (ChatGPT, Perplexity, Google AI Overviews) are becoming major traffic sources. Ensure your brand, authors, and content are optimised for this layer.', hot:false },
+    { num:'5', title:'Re-run This Audit in 4 to 8 Weeks', body:'Track your progress by re-running the audit after implementing changes. Use the score difference to demonstrate the value of your work to stakeholders.', hot:false },
   ];
 
   steps.forEach((step) => {
@@ -1453,9 +1486,9 @@ function downloadPDF(config, auditUrl, score, results) {
     doc.setFontSize(8.5); doc.setFont('helvetica','bold'); doc.setTextColor(...contrastText(sColor));
     doc.text(step.num, M + 8, y + stepH/2 + 3, {align:'center'});
     doc.setFontSize(8.5); doc.setFont('helvetica','bold'); doc.setTextColor(25,30,48);
-    doc.text(step.title, M + 17, y + 8.5);
+    doc.text(st(step.title), M + 17, y + 8.5);
     doc.setFontSize(7); doc.setFont('helvetica','normal'); doc.setTextColor(75,80,100);
-    const bodyLines = doc.splitTextToSize(step.body, W - 2*M - 20);
+    const bodyLines = doc.splitTextToSize(st(step.body), W - 2*M - 20);
     doc.text(bodyLines, M + 17, y + 14);
     y += stepH + 3;
   });
@@ -1531,11 +1564,11 @@ function downloadPDF(config, auditUrl, score, results) {
   y += 6;
   doc.setFontSize(8); doc.setFont('helvetica','normal'); doc.setTextColor(85,90,112);
   const disclaimer = doc.splitTextToSize(
-    `This UX + SEO audit was conducted for ${auditUrl} on ${new Date().toLocaleDateString()}. ` +
-    `It covers ${score.categories.reduce((s,c)=>s+c.total,0)} checkpoints across Technical SEO, On-Page & Content, UX Heuristics, Conversion & CTA, and AI Visibility. ` +
-    `Scores are based on evaluated items only — blank and N/A items are excluded from scoring. ` +
+    st(`This UX + SEO audit was conducted for ${auditUrl} on ${dateShort}. ` +
+    `It covers ${score.categories.reduce((s,c)=>s+c.total,0)} checkpoints across Technical SEO, On-Page Content, UX Heuristics, Conversion and CTA, and AI Visibility. ` +
+    `Scores are based on evaluated items only - blank and N/A items are excluded from scoring. ` +
     `Some checks require verification with external tools (Google Search Console, PageSpeed Insights, Screaming Frog, etc.). ` +
-    `This report is intended as a professional client deliverable and should be reviewed in the context of the site's specific goals.`,
+    `This report is intended as a professional client deliverable and should be reviewed in the context of the site's specific goals.`),
     W - 2*M
   );
   doc.text(disclaimer, M, y);
