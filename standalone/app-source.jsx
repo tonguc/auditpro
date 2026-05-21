@@ -715,6 +715,20 @@ function Sidebar({ page, setPage, isDark, onToggleTheme }) {
             <span style={{ fontSize:13, fontWeight: page === n.id ? 600 : 400 }}>{n.label}</span>
           </div>
         ))}
+        <div style={{ borderTop:`1px solid ${C.border}`, margin:'10px 0' }} />
+        <div style={{ display:'flex', background:C.bg, border:`1px solid ${C.border}`,
+          borderRadius:8, padding:3, gap:2 }}>
+          <button onClick={() => !isDark && onToggleTheme()} style={{
+            flex:1, padding:'6px 0', borderRadius:6, border:'none', cursor:'pointer',
+            background: isDark ? C.surface : 'transparent',
+            color: isDark ? C.text : C.muted,
+            fontSize:12, fontWeight: isDark ? 600 : 400 }}>🌙 Dark</button>
+          <button onClick={() => isDark && onToggleTheme()} style={{
+            flex:1, padding:'6px 0', borderRadius:6, border:'none', cursor:'pointer',
+            background: !isDark ? C.surface : 'transparent',
+            color: !isDark ? C.text : C.muted,
+            fontSize:12, fontWeight: !isDark ? 600 : 400 }}>☀️ Light</button>
+        </div>
       </nav>
       <div style={{ padding:'12px 16px', borderTop:`1px solid ${C.border}` }}>
         <div style={{ fontSize:10, color:C.muted, textAlign:'center' }}>AuditPro v2.5</div>
@@ -1505,28 +1519,6 @@ function WhiteLabelView({ audits, currentUrl, currentClientName, score, results,
             {saved ? '✓ Saved!' : 'Save Settings'}
           </button>
 
-          {/* Theme toggle */}
-          <div style={{ marginTop:16, paddingTop:16, borderTop:`1px solid ${C.border}` }}>
-            <div style={{ fontSize:11, fontWeight:700, color:C.muted, textTransform:'uppercase',
-              letterSpacing:'0.08em', marginBottom:10 }}>Appearance</div>
-            <div style={{ display:'flex', background:C.bg, border:`1px solid ${C.border}`,
-              borderRadius:8, padding:3, gap:3 }}>
-              <button onClick={() => !isDark && onToggleTheme()} style={{
-                flex:1, padding:'7px 0', borderRadius:6, border:'none', cursor:'pointer',
-                background: isDark ? C.accent : 'transparent',
-                color: isDark ? '#fff' : C.muted,
-                fontSize:12, fontWeight: isDark ? 700 : 400 }}>
-                🌙 Dark
-              </button>
-              <button onClick={() => isDark && onToggleTheme()} style={{
-                flex:1, padding:'7px 0', borderRadius:6, border:'none', cursor:'pointer',
-                background: !isDark ? C.accent : 'transparent',
-                color: !isDark ? '#fff' : C.muted,
-                fontSize:12, fontWeight: !isDark ? 700 : 400 }}>
-                ☀️ Light
-              </button>
-            </div>
-          </div>
         </div>
 
         <div style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:12, padding:24 }}>

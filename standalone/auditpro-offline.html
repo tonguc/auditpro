@@ -31189,7 +31189,47 @@ function Sidebar({
       fontSize: 13,
       fontWeight: page === n.id ? 600 : 400
     }
-  }, n.label)))), /*#__PURE__*/React.createElement("div", {
+  }, n.label))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      borderTop: `1px solid ${C.border}`,
+      margin: '10px 0'
+    }
+  }), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      background: C.bg,
+      border: `1px solid ${C.border}`,
+      borderRadius: 8,
+      padding: 3,
+      gap: 2
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => !isDark && onToggleTheme(),
+    style: {
+      flex: 1,
+      padding: '6px 0',
+      borderRadius: 6,
+      border: 'none',
+      cursor: 'pointer',
+      background: isDark ? C.surface : 'transparent',
+      color: isDark ? C.text : C.muted,
+      fontSize: 12,
+      fontWeight: isDark ? 600 : 400
+    }
+  }, "\uD83C\uDF19 Dark"), /*#__PURE__*/React.createElement("button", {
+    onClick: () => isDark && onToggleTheme(),
+    style: {
+      flex: 1,
+      padding: '6px 0',
+      borderRadius: 6,
+      border: 'none',
+      cursor: 'pointer',
+      background: !isDark ? C.surface : 'transparent',
+      color: !isDark ? C.text : C.muted,
+      fontSize: 12,
+      fontWeight: !isDark ? 600 : 400
+    }
+  }, "\u2600\uFE0F Light"))), /*#__PURE__*/React.createElement("div", {
     style: {
       padding: '12px 16px',
       borderTop: `1px solid ${C.border}`
@@ -32934,57 +32974,7 @@ function WhiteLabelView({
       width: '100%',
       cursor: 'pointer'
     }
-  }, saved ? '✓ Saved!' : 'Save Settings'), /*#__PURE__*/React.createElement("div", {
-    style: {
-      marginTop: 16,
-      paddingTop: 16,
-      borderTop: `1px solid ${C.border}`
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 11,
-      fontWeight: 700,
-      color: C.muted,
-      textTransform: 'uppercase',
-      letterSpacing: '0.08em',
-      marginBottom: 10
-    }
-  }, "Appearance"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: 'flex',
-      background: C.bg,
-      border: `1px solid ${C.border}`,
-      borderRadius: 8,
-      padding: 3,
-      gap: 3
-    }
-  }, /*#__PURE__*/React.createElement("button", {
-    onClick: () => !isDark && onToggleTheme(),
-    style: {
-      flex: 1,
-      padding: '7px 0',
-      borderRadius: 6,
-      border: 'none',
-      cursor: 'pointer',
-      background: isDark ? C.accent : 'transparent',
-      color: isDark ? '#fff' : C.muted,
-      fontSize: 12,
-      fontWeight: isDark ? 700 : 400
-    }
-  }, "\uD83C\uDF19 Dark"), /*#__PURE__*/React.createElement("button", {
-    onClick: () => isDark && onToggleTheme(),
-    style: {
-      flex: 1,
-      padding: '7px 0',
-      borderRadius: 6,
-      border: 'none',
-      cursor: 'pointer',
-      background: !isDark ? C.accent : 'transparent',
-      color: !isDark ? '#fff' : C.muted,
-      fontSize: 12,
-      fontWeight: !isDark ? 700 : 400
-    }
-  }, "\u2600\uFE0F Light")))), /*#__PURE__*/React.createElement("div", {
+  }, saved ? '✓ Saved!' : 'Save Settings')), /*#__PURE__*/React.createElement("div", {
     style: {
       background: C.surface,
       border: `1px solid ${C.border}`,
