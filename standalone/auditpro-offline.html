@@ -30835,6 +30835,60 @@ function downloadPDF(config, auditUrl, score, results) {
     });
   });
   drawFooter();
+
+  // ── Top Priority Issues ───────────────────────────────────────────────────────
+  const reviewedCount = Object.keys(results).length;
+  const priorityFails = AUDIT_CATEGORIES.flatMap(cat => cat.sections.flatMap(sec => sec.items.filter(it => results[it.id] === 'Fail' && (it.priority === 'Critical' || it.priority === 'High')).map(it => ({
+    ...it,
+    catColor: hexToRgb(cat.color),
+    priorityOrder: it.priority === 'Critical' ? 0 : 1
+  })))).sort((a, b) => a.priorityOrder - b.priorityOrder);
+  if (priorityFails.length > 0) {
+    y += 24;
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(30, 30, 30);
+    doc.text('Top Priority Issues', M, y);
+    doc.setFontSize(6.5);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(150, 150, 150);
+    doc.text(`Critical & High severity · based on ${reviewedCount} of ${totalItems} items reviewed`, W - M, y, {
+      align: 'right'
+    });
+    y += 5;
+    // Thin divider
+    doc.setDrawColor(220, 220, 220);
+    doc.setLineWidth(0.3);
+    doc.line(M, y, W - M, y);
+    y += 4;
+    priorityFails.forEach((item, i) => {
+      if (y > H - 30) return; // don't overflow cover page
+      const rowH = 8;
+      if (i % 2 === 0) {
+        doc.setFillColor(248, 249, 252);
+        doc.rect(M, y, W - 2 * M, rowH, 'F');
+      }
+      doc.setFillColor(...item.catColor);
+      doc.circle(M + 3, y + rowH / 2, 1.5, 'F');
+      const badgeColor = item.priority === 'Critical' ? [220, 53, 69] : [255, 140, 0];
+      doc.setFillColor(...badgeColor);
+      doc.roundedRect(M + 7, y + 1.5, 20, 4.5, 1, 1, 'F');
+      doc.setFontSize(5);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(255, 255, 255);
+      doc.text(item.priority.toUpperCase(), M + 17, y + 4.8, {
+        align: 'center'
+      });
+      doc.setFontSize(7);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(40, 40, 40);
+      doc.text(item.item, M + 30, y + 5.5, {
+        maxWidth: W - 2 * M - 32
+      });
+      y += rowH;
+    });
+  }
+  drawFooter();
   AUDIT_CATEGORIES.forEach(cat => {
     addPage();
     const catColor = hexToRgb(cat.color);
