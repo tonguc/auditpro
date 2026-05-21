@@ -1068,27 +1068,85 @@ function DashboardView({ score, auditUrl, results, setPage, onEdit, audits, onSe
       </div>
 
       {/* Category cards */}
-      {score && (
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(5, 1fr)', gap:12, marginBottom:20 }}>
-          {score.categories.map(cat => (
-            <div key={cat.id} onClick={() => setDetailCat(cat.id)}
-              onMouseEnter={e => e.currentTarget.style.borderColor = cat.color}
-              onMouseLeave={e => e.currentTarget.style.borderColor = C.border}
-              style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:12,
-                padding:'14px 16px', cursor:'pointer', transition:'border-color 0.15s' }}>
-              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:8 }}>
-                <div style={{ fontSize:10, color:C.muted, fontWeight:700, textTransform:'uppercase', flex:1, lineHeight:1.3 }}>{cat.icon} {cat.label.replace('Technical SEO','Tech SEO').replace('On-Page & Content','On-Page').replace('UX Heuristics','UX').replace('Conversion & CTA','CRO').replace('AI & SERP Visibility','AI/SERP')}</div>
-                <div style={{ background:`${cat.color}22`, borderRadius:6, padding:'2px 8px',
-                  fontSize:14, fontWeight:800, color:cat.color, flexShrink:0 }}>{cat.grade}</div>
-              </div>
-              <div style={{ fontSize:24, fontWeight:800, color:C.text, lineHeight:1, marginBottom:4 }}>
-                {cat.evaluated > 0 ? cat.score : '—'}<span style={{ fontSize:11, color:C.muted }}>{cat.evaluated > 0 ? '/100' : ''}</span>
-              </div>
-              <div style={{ background:C.border, borderRadius:3, height:3, marginBottom:6 }}>
-                <div style={{ height:3, borderRadius:3, background:cat.color, width:`${cat.score}%` }} />
-              </div>
-              <div style={{ fontSize:10, color:C.muted }}>
-                {cat.evaluated > 0 ? `${cat.passed}✓ ${cat.failed}✗ ${cat.evaluated} reviewed` : 'Not started'}
+      {score && (() => {
+        const evaluated = score.categories.filter(c => c.evaluated > 0);
+        const weakestId = evaluated.length > 0
+          ? evaluated.reduce((a, b) => b.score < a.score ? b : a).id
+          : null;
+        return (
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(5, 1fr)', gap:12, marginBottom:20 }}>
+            {score.categories.map(cat => {
+              const isWeakest = cat.id === weakestId;
+              return (
+                <div key={cat.id} onClick={() => setDetailCat(cat.id)}
+                  onMouseEnter={e => e.currentTarget.style.borderColor = cat.color}
+                  onMouseLeave={e => e.currentTarget.style.borderColor = isWeakest ? C.red : C.border}
+                  style={{ background:C.surface,
+                    border:`1px solid ${isWeakest ? C.red : C.border}`,
+                    borderRadius:12, padding:'14px 16px', cursor:'pointer',
+                    transition:'border-color 0.15s',
+                    boxShadow: isWeakest ? `0 0 0 2px ${C.red}33` : 'none' }}>
+                  <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:8 }}>
+                    <div style={{ fontSize:10, color:C.muted, fontWeight:700, textTransform:'uppercase', flex:1, lineHeight:1.3 }}>
+                      {cat.icon} {cat.label.replace('Technical SEO','Tech SEO').replace('On-Page & Content','On-Page').replace('UX Heuristics','UX').replace('Conversion & CTA','CRO').replace('AI & SERP Visibility','AI/SERP')}
+                    </div>
+                    <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:3, flexShrink:0 }}>
+                      {isWeakest && (
+                        <span style={{ fontSize:8, fontWeight:800, padding:'1px 5px', borderRadius:3,
+                          background:`${C.red}22`, color:C.red, letterSpacing:'0.5px' }}>WEAKEST</span>
+                      )}
+                      <div style={{ background:`${cat.color}22`, borderRadius:6, padding:'2px 8px',
+                        fontSize:14, fontWeight:800, color:cat.color }}>{cat.grade}</div>
+                    </div>
+                  </div>
+                  <div style={{ fontSize:24, fontWeight:800, color:C.text, lineHeight:1, marginBottom:4 }}>
+                    {cat.evaluated > 0 ? cat.score : '—'}<span style={{ fontSize:11, color:C.muted }}>{cat.evaluated > 0 ? '/100' : ''}</span>
+                  </div>
+                  <div style={{ background:C.border, borderRadius:3, height:3, marginBottom:6 }}>
+                    <div style={{ height:3, borderRadius:3, background:cat.color, width:`${cat.score}%` }} />
+                  </div>
+                  <div style={{ fontSize:10, color:C.muted }}>
+                    {cat.evaluated > 0 ? `${cat.passed}✓ ${cat.failed}✗ ${cat.evaluated} reviewed` : 'Not started'}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        );
+      })()}
+
+      {/* Top 5 Fixes */}
+      {failItems.length > 0 && (
+        <div style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:12,
+          overflow:'hidden', marginBottom:16 }}>
+          <div style={{ padding:'12px 20px', borderBottom:`1px solid ${C.border}`,
+            display:'flex', alignItems:'center', gap:8 }}>
+            <span style={{ fontSize:14 }}>🔧</span>
+            <span style={{ fontSize:13, fontWeight:700, color:C.text }}>Top 5 Fixes</span>
+            <span style={{ fontSize:11, color:C.muted, marginLeft:4 }}>highest-impact issues to address first</span>
+          </div>
+          {failItems.slice(0, 5).map((item, i) => (
+            <div key={item.id} style={{ display:'flex', alignItems:'flex-start', gap:12,
+              padding:'10px 20px', borderBottom: i < Math.min(failItems.length, 5) - 1 ? `1px solid ${C.border}` : 'none',
+              background: i % 2 === 0 ? C.surface : C.surfaceHover }}>
+              <div style={{ width:20, height:20, borderRadius:'50%', flexShrink:0,
+                background:`${SEV[item.priority]}22`, border:`1px solid ${SEV[item.priority]}55`,
+                display:'flex', alignItems:'center', justifyContent:'center',
+                fontSize:10, fontWeight:800, color:SEV[item.priority] }}>{i + 1}</div>
+              <div style={{ flex:1, minWidth:0 }}>
+                <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:2, flexWrap:'wrap' }}>
+                  <span style={{ fontSize:12, fontWeight:600, color:C.text }}>{item.item}</span>
+                  <span style={{ fontSize:9, padding:'1px 5px', borderRadius:3, flexShrink:0,
+                    background:`${SEV[item.priority]}22`, color:SEV[item.priority], fontWeight:700 }}>
+                    {item.priority}
+                  </span>
+                  <span style={{ fontSize:9, padding:'1px 5px', borderRadius:3, flexShrink:0,
+                    background: item.catColor + '22', color: item.catColor, fontWeight:600 }}>
+                    {item.category.replace('Technical SEO','Tech SEO').replace('On-Page & Content','On-Page')
+                      .replace('UX Heuristics','UX').replace('Conversion & CTA','CRO').replace('AI & SERP Visibility','AI/SERP')}
+                  </span>
+                </div>
+                <div style={{ fontSize:10, color:C.muted, fontStyle:'italic', lineHeight:1.4 }}>{item.howTo}</div>
               </div>
             </div>
           ))}
@@ -1355,16 +1413,32 @@ function AuditView({ onComplete, initialUrl = '', initialClientName = '', initia
             )}
             {!isCollapsed && sec.items.map((item, i) => {
               const s = results[item.id];
+              const isFail = s === 'Fail';
+              const impactColor = SEV[item.priority];
               return (
                 <div key={item.id} style={{ display:'flex', alignItems:'flex-start', gap:14,
-                  padding:'11px 14px', background: i % 2 === 0 ? C.surface : C.surfaceHover,
-                  borderBottom:`1px solid ${C.border}` }}>
+                  padding:'11px 14px',
+                  background: isFail ? `${impactColor}0A` : i % 2 === 0 ? C.surface : C.surfaceHover,
+                  borderBottom:`1px solid ${C.border}`,
+                  borderLeft: isFail ? `3px solid ${impactColor}` : '3px solid transparent' }}>
                   <div style={{ width:24, height:24, borderRadius:'50%', flexShrink:0,
                     background:`${SEV[item.priority]}22`, border:`1px solid ${SEV[item.priority]}44`,
                     display:'flex', alignItems:'center', justifyContent:'center',
                     fontSize:9, fontWeight:700, color:SEV[item.priority] }}>{item.num}</div>
                   <div style={{ flex:1, minWidth:0 }}>
-                    <div style={{ fontSize:13, fontWeight:600, color:C.text, marginBottom:2 }}>{item.item}</div>
+                    <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:2 }}>
+                      <span style={{ fontSize:13, fontWeight:600, color:C.text }}>{item.item}</span>
+                      {isFail && (
+                        <span style={{ fontSize:9, fontWeight:800, padding:'2px 6px', borderRadius:4,
+                          background: `${impactColor}22`, color: impactColor,
+                          textTransform:'uppercase', letterSpacing:'0.5px', flexShrink:0 }}>
+                          {item.priority === 'Critical' ? '🔥 Critical Impact'
+                            : item.priority === 'High'   ? '⚠️ High Impact'
+                            : item.priority === 'Medium' ? '· Medium Impact'
+                            :                              '· Low Impact'}
+                        </span>
+                      )}
+                    </div>
                     <div style={{ fontSize:11, color:C.muted, fontStyle:'italic', lineHeight:1.5 }}>{item.howTo}</div>
                   </div>
                   <div style={{ display:'flex', gap:4, flexShrink:0 }}>
