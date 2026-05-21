@@ -31702,12 +31702,12 @@ function downloadPDF(config, auditUrl, score, results) {
       doc.setTextColor(6, 100, 75);
       const closingWrapped = doc.splitTextToSize(closingLine, W - 2 * M - 12);
       doc.text(closingWrapped, M + 6, closingY);
-      y += eiH + 4;
+      y += eiH + 12;
     }
   }
 
   // ── Audit Summary stats ───────────────────────────────────────────────────
-  checkPageBreak(35);
+  checkPageBreak(40);
   doc.setFontSize(9);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(30, 35, 45);
@@ -31751,12 +31751,12 @@ function downloadPDF(config, auditUrl, score, results) {
       align: 'center'
     });
   });
-  y += 21;
+  y += 26;
 
   // ── Top Priority Issues (enriched via rule engine) ────────────────────────
   const enrichedIssues = copy ? copy.priorityIssues : [];
   if (enrichedIssues.length > 0) {
-    checkPageBreak(25);
+    checkPageBreak(30);
     doc.setFontSize(9);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(30, 35, 45);
@@ -34225,9 +34225,9 @@ function WhiteLabelView({
   }, "Customize branding on client-facing PDF reports."), /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'grid',
-      gridTemplateColumns: '1fr 1fr',
+      gridTemplateColumns: '320px 1fr',
       gap: 20,
-      maxWidth: 720
+      maxWidth: 960
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -34588,14 +34588,7 @@ function WhiteLabelView({
       color: C.text,
       marginBottom: 20
     }
-  }, "PDF Preview"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      background: C.bg,
-      borderRadius: 10,
-      padding: 20,
-      border: `1px solid ${C.border}`
-    }
-  }, (() => {
+  }, "PDF Preview"), (() => {
     const [r, g, b] = hexToRgb(color);
     const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
     const isLight = lum > 0.55;
@@ -34603,158 +34596,89 @@ function WhiteLabelView({
     const pMuted = isLight ? 'rgba(20,25,50,0.62)' : 'rgba(255,255,255,0.70)';
     const pFaint = isLight ? 'rgba(20,25,50,0.40)' : 'rgba(255,255,255,0.50)';
     const pBorder = isLight ? 'rgba(20,25,50,0.12)' : 'rgba(255,255,255,0.20)';
+    const gradeC = hasAudit && activeScore ? (GRADE_COLOR[activeScore.grade] || color) : color;
+    const totalPass = hasAudit && activeScore ? activeScore.categories.reduce((s,c)=>s+c.passed,0) : 0;
+    const totalFail = hasAudit && activeScore ? activeScore.categories.reduce((s,c)=>s+c.failed,0) : 0;
+    const totalPartial = hasAudit && activeScore ? activeScore.categories.reduce((s,c)=>s+c.partial,0) : 0;
+    const totalEvaluated = totalPass + totalFail + totalPartial;
+    const topIssues = hasAudit && activeScore ? Object.entries(activeResults||{}).filter(([,v])=>v==='Fail').slice(0,3).map(([id])=>AUDIT_CATEGORIES.flatMap(c=>c.sections.flatMap(s=>s.items)).find(it=>it.id===id)).filter(Boolean) : [];
     return /*#__PURE__*/React.createElement("div", {
       style: {
-        background: color,
-        borderRadius: 8,
-        padding: '14px 18px 10px',
-        marginBottom: 10,
-        position: 'relative',
-        boxShadow: isLight ? '0 0 0 1px rgba(0,0,0,0.12)' : 'none'
+        background: '#f5f6fa',
+        borderRadius: 10,
+        border: '1px solid #d8dce8',
+        overflow: 'hidden',
+        boxShadow: '0 4px 24px rgba(0,0,0,0.18)'
       }
-    }, /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 14,
-        fontWeight: 800,
-        color: pText
-      }
-    }, activeClient || (hasAudit ? activeUrl : 'Client Name')), /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 10,
-        color: pMuted,
-        marginTop: 2
-      }
-    }, "UX + SEO Audit Report"), hasAudit && /*#__PURE__*/React.createElement("div", {
-      style: {
-        fontSize: 9,
-        color: pFaint,
-        marginTop: 2
-      }
-    }, activeUrl), clientLogo && /*#__PURE__*/React.createElement("img", {
-      src: clientLogo,
-      alt: "client",
-      style: {
-        position: 'absolute',
-        top: 8,
-        right: 12,
-        height: 22,
-        maxWidth: 55,
-        objectFit: 'contain',
-        background: 'rgba(128,128,128,0.15)',
-        borderRadius: 4,
-        padding: 2
-      }
-    }), /*#__PURE__*/React.createElement("div", {
-      style: {
-        marginTop: 8,
-        paddingTop: 6,
-        borderTop: `1px solid ${pBorder}`,
-        display: 'flex',
-        alignItems: 'center',
-        gap: 6
-      }
-    }, /*#__PURE__*/React.createElement("span", {
-      style: {
-        fontSize: 8,
-        color: pFaint
-      }
-    }, "Powered by"), agencyLogo ? /*#__PURE__*/React.createElement("img", {
-      src: agencyLogo,
-      alt: "agency",
-      style: {
-        height: 12,
-        maxWidth: 36,
-        objectFit: 'contain',
-        opacity: 0.75
-      }
-    }) : /*#__PURE__*/React.createElement("span", {
-      style: {
-        fontSize: 9,
-        fontWeight: 700,
-        color: pMuted
-      }
-    }, name || 'Agency Name')));
-  })(), hasAudit && activeScore ? /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
-    style: {
-      textAlign: 'center',
-      marginBottom: 12
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 28,
-      fontWeight: 800,
-      color,
-      lineHeight: 1
-    }
-  }, activeScore.weighted), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 9,
-      color: C.muted,
-      marginTop: 2
-    }
-  }, "Weighted Score \u2014 Grade ", activeScore.grade)), /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: 'flex',
-      gap: 6
-    }
-  }, catScores.map(cat => /*#__PURE__*/React.createElement("div", {
-    key: cat.id,
-    style: {
-      flex: 1,
-      background: C.surface,
-      borderRadius: 6,
-      padding: 8,
-      textAlign: 'center'
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 15,
-      fontWeight: 800,
-      color,
-      lineHeight: 1
-    }
-  }, cat.score), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 8,
-      color: C.muted,
-      marginTop: 2
-    }
-  }, cat.label.replace('Technical SEO', 'Tech SEO').replace('On-Page & Content', 'On-Page').replace('UX Heuristics', 'UX').replace('Conversion & CTA', 'CRO')))))) : /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: 'flex',
-      gap: 6,
-      flexWrap: 'wrap'
-    }
-  }, AUDIT_CATEGORIES.map(cat => /*#__PURE__*/React.createElement("div", {
-    key: cat.id,
-    style: {
-      flex: '1 1 60px',
-      background: C.surface,
-      borderRadius: 6,
-      padding: 8,
-      textAlign: 'center'
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 15,
-      fontWeight: 800,
-      color,
-      lineHeight: 1
-    }
-  }, "--"), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 9,
-      color: C.muted,
-      marginTop: 2
-    }
-  }, cat.label.replace('Technical SEO', 'Tech SEO').replace('On-Page & Content', 'On-Page').replace('UX Heuristics', 'UX').replace('Conversion & CTA', 'CRO').replace('AI & SERP Visibility', 'AI/SERP')))))), !hasAudit && /*#__PURE__*/React.createElement("div", {
-    style: {
-      marginTop: 8,
-      fontSize: 11,
-      color: C.amber,
-      textAlign: 'center'
-    }
-  }, "Complete an audit to see real scores in the preview"))), showClearModal && /*#__PURE__*/React.createElement(ClearAllModal, {
+    },
+    /* \u2500\u2500 PDF Header \u2500\u2500 */
+    /*#__PURE__*/React.createElement("div", {
+      style: { background: color, padding: '12px 16px 8px', position: 'relative' }
+    },
+      /*#__PURE__*/React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: pText } }, activeClient || (hasAudit ? activeUrl : 'Client Name')),
+      /*#__PURE__*/React.createElement("div", { style: { fontSize: 9, color: pMuted, marginTop: 1 } }, "UX + SEO Audit Report"),
+      hasAudit && /*#__PURE__*/React.createElement("div", { style: { fontSize: 8, color: pFaint, marginTop: 1 } }, activeUrl),
+      clientLogo && /*#__PURE__*/React.createElement("img", { src: clientLogo, alt: "client", style: { position: 'absolute', top: 8, right: 12, height: 20, maxWidth: 50, objectFit: 'contain' } }),
+      /*#__PURE__*/React.createElement("div", { style: { marginTop: 6, paddingTop: 5, borderTop: `1px solid ${pBorder}`, display: 'flex', alignItems: 'center', gap: 5 } },
+        /*#__PURE__*/React.createElement("span", { style: { fontSize: 7, color: pFaint } }, "Powered by"),
+        agencyLogo
+          ? /*#__PURE__*/React.createElement("img", { src: agencyLogo, alt: "agency", style: { height: 10, maxWidth: 30, objectFit: 'contain', opacity: 0.8 } })
+          : /*#__PURE__*/React.createElement("span", { style: { fontSize: 8, fontWeight: 700, color: pMuted } }, name || 'Agency Name')
+      )
+    ),
+    /* \u2500\u2500 Score Row \u2500\u2500 */
+    /*#__PURE__*/React.createElement("div", {
+      style: { background: '#fff', padding: '10px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #e8eaf0' }
+    },
+      /*#__PURE__*/React.createElement("div", null,
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 32, fontWeight: 900, color: gradeC, lineHeight: 1 } }, hasAudit && activeScore ? activeScore.weighted : '\u2014'),
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 9, color: '#8a90a8', marginTop: 2 } }, "/100  Weighted Score")
+      ),
+      /*#__PURE__*/React.createElement("div", { style: { textAlign: 'right' } },
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 42, fontWeight: 900, lineHeight: 1, color: gradeC, textShadow: `0 0 16px ${gradeC}66` } }, hasAudit && activeScore ? activeScore.grade : '\u2014'),
+        /*#__PURE__*/React.createElement("div", { style: { fontSize: 8, color: '#8a90a8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' } }, "Grade")
+      )
+    ),
+    /* \u2500\u2500 Section Scores \u2500\u2500 */
+    /*#__PURE__*/React.createElement("div", { style: { background: '#fff', padding: '8px 16px 10px', borderBottom: '1px solid #e8eaf0' } },
+      /*#__PURE__*/React.createElement("div", { style: { fontSize: 8, fontWeight: 700, color: '#9298b0', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 } }, "Section Scores"),
+      /*#__PURE__*/React.createElement("div", { style: { display: 'flex', gap: 5 } },
+        (hasAudit && catScores.length > 0 ? catScores : AUDIT_CATEGORIES.map(c=>({...c,score:'--',grade:'\u2014',evaluated:0}))).map((cat,i) =>
+          /*#__PURE__*/React.createElement("div", { key: i, style: { flex: 1, background: `${cat.color}15`, border: `1px solid ${cat.color}44`, borderRadius: 5, padding: '5px 3px', textAlign: 'center' } },
+            /*#__PURE__*/React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: cat.color, lineHeight: 1 } }, cat.score),
+            /*#__PURE__*/React.createElement("div", { style: { fontSize: 7, color: '#8a90a8', marginTop: 2 } }, cat.label.replace('Technical SEO','Tech').replace('On-Page & Content','On-Page').replace('UX Heuristics','UX').replace('Conversion & CTA','CRO').replace('AI & SERP Visibility','AI/SERP'))
+          )
+        )
+      )
+    ),
+    /* \u2500\u2500 Audit Summary Stats \u2500\u2500 */
+    /*#__PURE__*/React.createElement("div", { style: { background: '#fff', padding: '8px 16px 10px', borderBottom: '1px solid #e8eaf0' } },
+      /*#__PURE__*/React.createElement("div", { style: { fontSize: 8, fontWeight: 700, color: '#9298b0', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 } }, "Audit Summary"),
+      /*#__PURE__*/React.createElement("div", { style: { display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 4 } },
+        [
+          { label: 'Evaluated', val: totalEvaluated || '\u2014', c: '#4a5070' },
+          { label: 'Pass',      val: totalPass || '\u2014',      c: '#10B981' },
+          { label: 'Partial',   val: totalPartial || '\u2014',   c: '#F59E0B' },
+          { label: 'Fail',      val: totalFail || '\u2014',      c: '#EF4444' },
+        ].map((s,i) => /*#__PURE__*/React.createElement("div", { key: i, style: { background: '#f5f6fa', borderRadius: 4, padding: '5px 4px', textAlign: 'center' } },
+          /*#__PURE__*/React.createElement("div", { style: { fontSize: 14, fontWeight: 800, color: s.c, lineHeight: 1 } }, s.val),
+          /*#__PURE__*/React.createElement("div", { style: { fontSize: 7, color: '#9298b0', marginTop: 2 } }, s.label)
+        ))
+      )
+    ),
+    /* \u2500\u2500 Top Issues preview \u2500\u2500 */
+    /*#__PURE__*/React.createElement("div", { style: { background: '#fff', padding: '8px 16px 10px' } },
+      /*#__PURE__*/React.createElement("div", { style: { fontSize: 8, fontWeight: 700, color: '#9298b0', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 5 } }, "Top Priority Issues"),
+      topIssues.length > 0
+        ? topIssues.map((it,i) => /*#__PURE__*/React.createElement("div", { key: i, style: { display: 'flex', alignItems: 'center', gap: 6, padding: '4px 0', borderBottom: i < topIssues.length-1 ? '1px solid #eceef4' : 'none' } },
+            /*#__PURE__*/React.createElement("div", { style: { width: 6, height: 6, borderRadius: '50%', flexShrink: 0, background: it.p==='Critical'?'#EF4444':it.p==='High'?'#F59E0B':'#0EA5E9' } }),
+            /*#__PURE__*/React.createElement("div", { style: { fontSize: 8, color: '#2a3048', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, it.item),
+            /*#__PURE__*/React.createElement("div", { style: { fontSize: 7, fontWeight: 700, color: it.p==='Critical'?'#EF4444':it.p==='High'?'#F59E0B':'#0EA5E9', flexShrink: 0 } }, it.p)
+          ))
+        : /*#__PURE__*/React.createElement("div", { style: { fontSize: 9, color: '#9298b0', fontStyle: 'italic', padding: '4px 0' } }, hasAudit ? "No failed items yet" : "Complete an audit to see issues")
+    )
+    );
+  })()), showClearModal && /*#__PURE__*/React.createElement(ClearAllModal, {
     count: audits.length,
     onConfirm: () => {
       setShowClearModal(false);
