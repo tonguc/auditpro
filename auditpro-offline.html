@@ -34579,14 +34579,21 @@ function WhiteLabelView({
       background: C.surface,
       border: `1px solid ${C.border}`,
       borderRadius: 12,
-      padding: 24
+      padding: 24,
+      overflowY: 'auto',
+      maxHeight: 600
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 13,
       fontWeight: 700,
       color: C.text,
-      marginBottom: 20
+      marginBottom: 20,
+      position: 'sticky',
+      top: 0,
+      background: C.surface,
+      zIndex: 1,
+      paddingBottom: 8
     }
   }, "PDF Preview"), (() => {
     const [r, g, b] = hexToRgb(color);
