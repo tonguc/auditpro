@@ -897,7 +897,7 @@ function AuditView({ onComplete, initialUrl = '', initialClientName = '', initia
   const catIdx = AUDIT_CATEGORIES.findIndex(c => c.id === activeCat);
 
   return (
-    <div ref={scrollRef} style={{ flex:1, overflowY:'auto', display:'flex', flexDirection:'column' }}>
+    <div ref={scrollRef} style={{ flex:1, overflowY:'auto' }}>
       {/* Sticky header */}
       <div style={{ position:'sticky', top:0, zIndex:20, background:C.bg,
         borderBottom:`1px solid ${C.border}`, padding:'16px 36px 12px' }}>
@@ -958,7 +958,7 @@ function AuditView({ onComplete, initialUrl = '', initialClientName = '', initia
       </div>
 
       {/* Category content */}
-      <div style={{ padding:'20px 36px 32px', flex:1 }}>
+      <div style={{ padding:'20px 36px 32px' }}>
         {cat.sections.map(sec => (
           <div key={sec.id} style={{ marginBottom:14 }}>
             <div style={{ padding:'8px 14px', background:cat.color + '22',
