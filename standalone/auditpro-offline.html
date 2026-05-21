@@ -33077,14 +33077,8 @@ function DashboardView({
   }, confidence, " Confidence \xB7 ", completionPct, "% reviewed")), totalEval > 0 ? /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
-      alignItems: 'center',
-      gap: 20
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: 'flex',
-      alignItems: 'baseline',
-      gap: 4
+      alignItems: 'flex-end',
+      gap: 12
     }
   }, /*#__PURE__*/React.createElement("span", {
     style: {
@@ -33093,45 +33087,39 @@ function DashboardView({
       color: C.accent,
       lineHeight: 1
     }
-  }, score.weighted), /*#__PURE__*/React.createElement("span", {
+  }, score.weighted), /*#__PURE__*/React.createElement("div", {
     style: {
-      fontSize: 20,
+      paddingBottom: 6
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 15,
       fontWeight: 500,
       color: C.muted,
       lineHeight: 1
     }
-  }, "/100")), /*#__PURE__*/React.createElement("div", {
+  }, "/100"), /*#__PURE__*/React.createElement("div", {
     style: {
-      borderLeft: `1px solid ${C.border}`,
-      paddingLeft: 20
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 22,
-      fontWeight: 800,
+      fontSize: 13,
+      fontWeight: 700,
       color: C.text,
-      lineHeight: 1.1
+      marginTop: 3,
+      whiteSpace: 'nowrap'
     }
-  }, "Grade ", score.grade), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 12,
-      color: C.muted,
-      marginTop: 4
-    }
-  }, score.rating))) : /*#__PURE__*/React.createElement("div", {
+  }, "Grade ", score.grade, " \xB7 ", score.rating))) : /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 36,
       fontWeight: 800,
       color: C.muted,
       lineHeight: 1
     }
-  }, "\u2014"), !totalEval && /*#__PURE__*/React.createElement("div", {
+  }, "\u2014"), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 12,
       color: C.muted,
       marginTop: 8
     }
-  }, "No items reviewed yet")), /*#__PURE__*/React.createElement("div", {
+  }, "No items reviewed yet"))), /*#__PURE__*/React.createElement("div", {
     onClick: () => scrollToIssues('Blank'),
     style: {
       background: C.surface,

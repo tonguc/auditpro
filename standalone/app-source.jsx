@@ -1951,20 +1951,19 @@ function DashboardView({ score, auditUrl, results, setPage, onEdit, audits, onSe
             )}
           </div>
           {totalEval > 0 ? (
-            <div style={{ display:'flex', alignItems:'center', gap:20 }}>
-              <div style={{ display:'flex', alignItems:'baseline', gap:4 }}>
-                <span style={{ fontSize:56, fontWeight:800, color:C.accent, lineHeight:1 }}>{score.weighted}</span>
-                <span style={{ fontSize:20, fontWeight:500, color:C.muted, lineHeight:1 }}>/100</span>
-              </div>
-              <div style={{ borderLeft:`1px solid ${C.border}`, paddingLeft:20 }}>
-                <div style={{ fontSize:22, fontWeight:800, color:C.text, lineHeight:1.1 }}>Grade {score.grade}</div>
-                <div style={{ fontSize:12, color:C.muted, marginTop:4 }}>{score.rating}</div>
+            <div style={{ display:'flex', alignItems:'flex-end', gap:12 }}>
+              <span style={{ fontSize:56, fontWeight:800, color:C.accent, lineHeight:1 }}>{score.weighted}</span>
+              <div style={{ paddingBottom:6 }}>
+                <div style={{ fontSize:15, fontWeight:500, color:C.muted, lineHeight:1 }}>/100</div>
+                <div style={{ fontSize:13, fontWeight:700, color:C.text, marginTop:3, whiteSpace:'nowrap' }}>Grade {score.grade} · {score.rating}</div>
               </div>
             </div>
           ) : (
-            <div style={{ fontSize:36, fontWeight:800, color:C.muted, lineHeight:1 }}>—</div>
+            <div>
+              <div style={{ fontSize:36, fontWeight:800, color:C.muted, lineHeight:1 }}>—</div>
+              <div style={{ fontSize:12, color:C.muted, marginTop:8 }}>No items reviewed yet</div>
+            </div>
           )}
-          {!totalEval && <div style={{ fontSize:12, color:C.muted, marginTop:8 }}>No items reviewed yet</div>}
         </div>
         {/* Completion — click to see blank items */}
         <div onClick={() => scrollToIssues('Blank')}
