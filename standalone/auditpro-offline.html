@@ -31773,11 +31773,11 @@ function downloadPDF(config, auditUrl, score, results) {
       // Priority badge
       const bCol = item.priority === 'Critical' ? [214, 45, 60] : item.priority === 'High' ? [205, 112, 0] : item.priority === 'Medium' ? [12, 145, 210] : [14, 172, 118];
       doc.setFillColor(...bCol);
-      doc.roundedRect(M + 2, y + 2, 22, 5, 1, 1, 'F');
+      doc.roundedRect(M, y + 2, 26, 5, 1, 1, 'F');
       doc.setFontSize(5.5);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(255, 255, 255);
-      doc.text(item.priority.toUpperCase(), M + 13, y + 5.5, {
+      doc.text(item.priority.toUpperCase(), M + 13, y + 5.1, {
         align: 'center'
       });
       // Category tag
@@ -31785,7 +31785,7 @@ function downloadPDF(config, auditUrl, score, results) {
       doc.setFontSize(5.5);
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(...item.catRgb);
-      doc.text(shortCat, M + 27, y + 5.5);
+      doc.text(shortCat, M + 29, y + 5.1);
       // Content starts below badge area
       let ry = y + 9;
       // Title (up to 2 lines)
@@ -32057,7 +32057,7 @@ function downloadPDF(config, auditUrl, score, results) {
     doc.setFontSize(8.5);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...contrastText(sColor));
-    doc.text(step.num, M + 8, y + stepH / 2 + 3, {
+    doc.text(step.num, M + 8, y + stepH / 2 + 1.2, {
       align: 'center'
     });
     doc.setFontSize(8.5);

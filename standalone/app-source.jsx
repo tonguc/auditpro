@@ -1285,14 +1285,14 @@ function downloadPDF(config, auditUrl, score, results) {
       // Priority badge
       const bCol = item.priority==='Critical'?[214,45,60]:item.priority==='High'?[205,112,0]:item.priority==='Medium'?[12,145,210]:[14,172,118];
       doc.setFillColor(...bCol);
-      doc.roundedRect(M + 2, y + 2, 22, 5, 1, 1, 'F');
+      doc.roundedRect(M, y + 2, 26, 5, 1, 1, 'F');
       doc.setFontSize(5.5); doc.setFont('helvetica','bold'); doc.setTextColor(255,255,255);
-      doc.text(item.priority.toUpperCase(), M + 13, y + 5.5, {align:'center'});
+      doc.text(item.priority.toUpperCase(), M + 13, y + 5.1, {align:'center'});
       // Category tag
       const shortCat = item.catLabel.replace('Technical SEO','Tech SEO').replace('On-Page & Content','On-Page')
         .replace('UX Heuristics','UX').replace('Conversion & CTA','CRO').replace('AI & SERP Visibility','AI/SERP');
       doc.setFontSize(5.5); doc.setFont('helvetica','normal'); doc.setTextColor(...item.catRgb);
-      doc.text(shortCat, M + 27, y + 5.5);
+      doc.text(shortCat, M + 29, y + 5.1);
       // Content starts below badge area
       let ry = y + 9;
       // Title (up to 2 lines)
@@ -1494,7 +1494,7 @@ function downloadPDF(config, auditUrl, score, results) {
     doc.setFillColor(...sColor);
     doc.circle(M + 8, y + stepH/2, 4.5, 'F');
     doc.setFontSize(8.5); doc.setFont('helvetica','bold'); doc.setTextColor(...contrastText(sColor));
-    doc.text(step.num, M + 8, y + stepH/2 + 3, {align:'center'});
+    doc.text(step.num, M + 8, y + stepH/2 + 1.2, {align:'center'});
     doc.setFontSize(8.5); doc.setFont('helvetica','bold'); doc.setTextColor(25,30,48);
     doc.text(st(step.title), M + 17, y + 8.5);
     doc.setFontSize(7); doc.setFont('helvetica','normal'); doc.setTextColor(75,80,100);
