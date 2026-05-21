@@ -31288,6 +31288,7 @@ function downloadPDF(config, auditUrl, score, results) {
     H = 297,
     M = 15;
   const brandRgb = hexToRgb(config.brandColor);
+  const brandHex = config.brandColor || '#1a56db';
   const brandLight = lighten(brandRgb, 0.92);
   const clientName = config.clientName || '';
   const agencyLogo = config.agencyLogo || null;
@@ -31338,27 +31339,35 @@ function downloadPDF(config, auditUrl, score, results) {
   function checkPageBreak(needed) {
     if (y + needed > H - 18) addPage();
   }
-  function addLogoToDoc(b64, x, yPos, maxW, maxH, alignRight) {
+  function addLogoToDoc(b64, x, yPos, maxW, maxH, alignRight, bgHex) {
     try {
-      const props = doc.getImageProperties(b64);
-      const ratio = props.width / props.height;
-      let w = maxW,
-        h = maxW / ratio;
-      if (h > maxH) {
-        h = maxH;
-        w = maxH * ratio;
+      let imgData = b64;
+      let fmt = 'PNG';
+      // Composite PNG onto background colour so transparent areas don't turn white
+      if (bgHex && b64.startsWith('data:image/png')) {
+        const img = new Image();
+        img.src = b64;
+        if (img.naturalWidth > 0) {
+          const cv = document.createElement('canvas');
+          cv.width = img.naturalWidth;
+          cv.height = img.naturalHeight;
+          const ctx = cv.getContext('2d');
+          ctx.fillStyle = bgHex;
+          ctx.fillRect(0, 0, cv.width, cv.height);
+          ctx.drawImage(img, 0, 0);
+          imgData = cv.toDataURL('image/jpeg', 0.95);
+          fmt = 'JPEG';
+        }
       }
+      const props = doc.getImageProperties(imgData);
+      const ratio = props.width / props.height;
+      let w = maxW, h = maxW / ratio;
+      if (h > maxH) { h = maxH; w = maxH * ratio; }
       const drawX = alignRight ? x - w : x;
-      doc.addImage(b64, 'PNG', drawX, yPos, w, h);
-      return {
-        w,
-        h
-      };
+      doc.addImage(imgData, fmt, drawX, yPos, w, h);
+      return { w, h };
     } catch {
-      return {
-        w: 0,
-        h: 0
-      };
+      return { w: 0, h: 0 };
     }
   }
 
@@ -31391,7 +31400,7 @@ function downloadPDF(config, auditUrl, score, results) {
   const onBrandFaint = contrastFaint(brandRgb);
   const onDark = contrastText(darkRgb);
   const onDarkMuted = contrastMuted(darkRgb);
-  if (clientLogo) addLogoToDoc(clientLogo, W - M, 4, 36, 13, true);
+  if (clientLogo) addLogoToDoc(clientLogo, W - M, 4, 36, 13, true, brandHex);
   doc.setTextColor(...onBrand);
   doc.setFontSize(clientName ? 16 : 18);
   doc.setFont('helvetica', 'bold');
@@ -31406,7 +31415,7 @@ function downloadPDF(config, auditUrl, score, results) {
   doc.setTextColor(...onBrandFaint);
   doc.text('Powered by', M, 43);
   if (agencyLogo) {
-    addLogoToDoc(agencyLogo, M + 22, 38, 30, 9, false);
+    addLogoToDoc(agencyLogo, M + 22, 38, 30, 9, false, brandHex);
   } else {
     doc.setFontSize(7.5);
     doc.setFont('helvetica', 'bold');
@@ -32135,7 +32144,7 @@ function downloadPDF(config, auditUrl, score, results) {
   doc.setTextColor(150, 155, 175);
   doc.text('PREPARED BY', M + 5, y + 7);
   if (agencyLogo) {
-    addLogoToDoc(agencyLogo, M + 5, y + 10, 30, 11, false);
+    addLogoToDoc(agencyLogo, M + 5, y + 10, 30, 11, false, '#f4f6fc');
     doc.setFontSize(9.5);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(20, 25, 45);
@@ -32172,7 +32181,7 @@ function downloadPDF(config, auditUrl, score, results) {
   doc.setTextColor(150, 155, 175);
   doc.text('PREPARED FOR', rx2 + 5, y + 7);
   if (clientLogo) {
-    addLogoToDoc(clientLogo, rx2 + 5, y + 10, 30, 11, false);
+    addLogoToDoc(clientLogo, rx2 + 5, y + 10, 30, 11, false, '#f4f6fc');
     doc.setFontSize(9.5);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(20, 25, 45);
@@ -34645,7 +34654,7 @@ function WhiteLabelView({
     const SCALE  = 0.80;
     /* page fills wrapper absolutely so it never pushes grid height */
     return /*#__PURE__*/React.createElement("div", {
-      style: { flex: 1, position: 'relative', overflow: 'hidden', background: '#c8ccd8', borderRadius: 8, minHeight: 160 }
+      style: { flex: 1, position: 'relative', overflow: 'hidden', background: '#eef0f6', backgroundImage: 'radial-gradient(circle, #c4c8d8 1px, transparent 1px)', backgroundSize: '18px 18px', borderRadius: 8, minHeight: 160 }
     },
       /*#__PURE__*/React.createElement("div", {
         style: {
