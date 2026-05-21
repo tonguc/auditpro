@@ -1057,9 +1057,6 @@ function downloadPDF(config, auditUrl, score, results) {
   doc.setFontSize(7.5); doc.setFont('helvetica','normal'); doc.setTextColor(90,95,115);
   const urlShort = auditUrl.replace(/https?:\/\/(www\.)?/, '').slice(0, 40);
   doc.text(urlShort, rx, y + 17);
-  doc.setFontSize(6); doc.setFont('helvetica','normal'); doc.setTextColor(155,160,178);
-  doc.text(dateShort, rx, y + 22);
-
   // ── Client Snapshot box ───────────────────────────────────────────────────
   y += 28;
   {
@@ -1337,13 +1334,6 @@ function downloadPDF(config, auditUrl, score, results) {
     doc.setTextColor(...onCat); doc.setFontSize(13); doc.setFont('helvetica','bold');
     doc.text(st(cat.label), M, 13);
     const catScore = score.categories.find(c => c.id === cat.id);
-    // AI Visibility NEW badge
-    if (cat.id === 'serp') {
-      doc.setFillColor(255,255,255);
-      doc.roundedRect(W - M - 16, 5.5, 13, 5, 1, 1, 'F');
-      doc.setFontSize(5); doc.setFont('helvetica','bold'); doc.setTextColor(...catColor);
-      doc.text('NEW', W - M - 9.5, 8.6, {align:'center'});
-    }
     // Score + evaluation state
     if (catScore) {
       const scoreStr = catScore.evaluated > 0
@@ -2254,11 +2244,6 @@ function AuditView({ onComplete, initialUrl = '', initialClientName = '', initia
                 fontSize:12, fontWeight: active ? 700 : 400, cursor:'pointer',
                 transition:'background 0.15s, color 0.15s', position:'relative' }}>
                 {c.icon} {c.label}
-                {c.id === 'serp' && (
-                  <span style={{ fontSize:8, fontWeight:800, padding:'1px 5px', borderRadius:3,
-                    background: active ? 'rgba(255,255,255,0.3)' : '#06B6D4', color:'#fff',
-                    marginLeft:4, letterSpacing:'0.5px', verticalAlign:'middle' }}>NEW</span>
-                )}
                 {done && !active && (
                   <span style={{ position:'absolute', top:-4, right:-4, width:10, height:10,
                     borderRadius:'50%', background:c.color, border:`2px solid ${C.bg}` }} />
