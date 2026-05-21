@@ -925,11 +925,7 @@ function DashboardView({ score, auditUrl, results, setPage, onEdit, audits, onSe
           <div style={{ fontSize:10, color:C.muted, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:8 }}>Issues Found</div>
           <div style={{ fontSize:36, fontWeight:800, color: failItems.length > 0 ? C.red : C.muted, lineHeight:1 }}>{failItems.length}</div>
           <div style={{ fontSize:11, color:C.muted, marginTop:6 }}>
-            {partialItems.length > 0 && (
-              <span onClick={e => { e.stopPropagation(); setIssueFilter('Partial'); setTimeout(() => issuesRef.current?.scrollIntoView({ behavior:'smooth', block:'start' }), 50); }}
-                style={{ color:C.amber, cursor:'pointer', textDecoration:'underline' }}>{partialItems.length} partial</span>
-            )}
-            {partialItems.length > 0 && <span> · </span>}
+            {partialItems.length > 0 && <span style={{ color:C.amber }}>{partialItems.length} partial · </span>}
             <span style={{ color:C.accent }}>view details ↓</span>
           </div>
         </div>

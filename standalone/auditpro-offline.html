@@ -31729,20 +31729,10 @@ function DashboardView({
       marginTop: 6
     }
   }, partialItems.length > 0 && /*#__PURE__*/React.createElement("span", {
-    onClick: e => {
-      e.stopPropagation();
-      setIssueFilter('Partial');
-      setTimeout(() => issuesRef.current?.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start'
-      }), 50);
-    },
     style: {
-      color: C.amber,
-      cursor: 'pointer',
-      textDecoration: 'underline'
+      color: C.amber
     }
-  }, partialItems.length, " partial"), partialItems.length > 0 && /*#__PURE__*/React.createElement("span", null, " \xB7 "), /*#__PURE__*/React.createElement("span", {
+  }, partialItems.length, " partial \xB7 "), /*#__PURE__*/React.createElement("span", {
     style: {
       color: C.accent
     }
