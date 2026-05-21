@@ -34255,7 +34255,8 @@ function WhiteLabelView({
       display: 'grid',
       gridTemplateColumns: '320px 1fr',
       gap: 20,
-      maxWidth: 960
+      maxWidth: 960,
+      alignItems: 'stretch'
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -34608,110 +34609,150 @@ function WhiteLabelView({
       border: `1px solid ${C.border}`,
       borderRadius: 12,
       padding: 24,
-      overflowY: 'auto',
-      maxHeight: 380
+      display: 'flex',
+      flexDirection: 'column'
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 13,
       fontWeight: 700,
       color: C.text,
-      marginBottom: 20,
-      position: 'sticky',
-      top: 0,
-      background: C.surface,
-      zIndex: 1,
-      paddingBottom: 8
+      marginBottom: 16,
+      flexShrink: 0
     }
   }, "PDF Preview"), (() => {
     const [r, g, b] = hexToRgb(color);
     const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
     const isLight = lum > 0.55;
-    const pText = isLight ? '#16181e' : '#ffffff';
+    const pText  = isLight ? '#16181e' : '#ffffff';
     const pMuted = isLight ? 'rgba(20,25,50,0.62)' : 'rgba(255,255,255,0.70)';
     const pFaint = isLight ? 'rgba(20,25,50,0.40)' : 'rgba(255,255,255,0.50)';
-    const pBorder = isLight ? 'rgba(20,25,50,0.12)' : 'rgba(255,255,255,0.20)';
-    const gradeC = hasAudit && activeScore ? (GRADE_COLOR[activeScore.grade] || color) : color;
-    const totalPass = hasAudit && activeScore ? activeScore.categories.reduce((s,c)=>s+c.passed,0) : 0;
-    const totalFail = hasAudit && activeScore ? activeScore.categories.reduce((s,c)=>s+c.failed,0) : 0;
-    const totalPartial = hasAudit && activeScore ? activeScore.categories.reduce((s,c)=>s+c.partial,0) : 0;
-    const totalEvaluated = totalPass + totalFail + totalPartial;
-    const topIssues = hasAudit && activeScore ? Object.entries(activeResults||{}).filter(([,v])=>v==='Fail').slice(0,3).map(([id])=>AUDIT_CATEGORIES.flatMap(c=>c.sections.flatMap(s=>s.items)).find(it=>it.id===id)).filter(Boolean) : [];
+    const pBdr   = isLight ? 'rgba(20,25,50,0.12)' : 'rgba(255,255,255,0.20)';
+    const gradeC = hasAudit && activeScore ? (GRADE_COLOR[activeScore.grade] || color) : '#9298b0';
+    const tPass    = hasAudit && activeScore ? activeScore.categories.reduce((s,c)=>s+c.passed,0) : 0;
+    const tFail    = hasAudit && activeScore ? activeScore.categories.reduce((s,c)=>s+c.failed,0) : 0;
+    const tPartial = hasAudit && activeScore ? activeScore.categories.reduce((s,c)=>s+c.partial,0) : 0;
+    const tEval    = tPass + tFail + tPartial;
+    const allItems = AUDIT_CATEGORIES.flatMap(c=>c.sections.flatMap(s=>s.items));
+    const topIssues = hasAudit && activeScore
+      ? Object.entries(activeResults||{}).filter(([,v])=>v==='Fail').slice(0,5)
+          .map(([id])=>allItems.find(it=>it.id===id)).filter(Boolean)
+      : [];
+    const cats = hasAudit && catScores.length > 0
+      ? catScores
+      : AUDIT_CATEGORIES.map(c=>({...c, score:'--', grade:'\u2014', evaluated:0, passed:0, failed:0, partial:0, total:c.sections.flatMap(s=>s.items).length}));
+    const PAGE_W = 680;
+    const SCALE  = 0.80;
+    /* page fills wrapper absolutely so it never pushes grid height */
     return /*#__PURE__*/React.createElement("div", {
-      style: {
-        background: '#f5f6fa',
-        borderRadius: 10,
-        border: '1px solid #d8dce8',
-        overflow: 'hidden',
-        boxShadow: '0 4px 24px rgba(0,0,0,0.18)'
-      }
+      style: { flex: 1, position: 'relative', overflow: 'hidden', background: '#c8ccd8', borderRadius: 8, minHeight: 160 }
     },
-    /* \u2500\u2500 PDF Header \u2500\u2500 */
-    /*#__PURE__*/React.createElement("div", {
-      style: { background: color, padding: '12px 16px 8px', position: 'relative' }
-    },
-      /*#__PURE__*/React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: pText } }, activeClient || (hasAudit ? activeUrl : 'Client Name')),
-      /*#__PURE__*/React.createElement("div", { style: { fontSize: 9, color: pMuted, marginTop: 1 } }, "UX + SEO Audit Report"),
-      hasAudit && /*#__PURE__*/React.createElement("div", { style: { fontSize: 8, color: pFaint, marginTop: 1 } }, activeUrl),
-      clientLogo && /*#__PURE__*/React.createElement("img", { src: clientLogo, alt: "client", style: { position: 'absolute', top: 8, right: 12, height: 20, maxWidth: 50, objectFit: 'contain' } }),
-      /*#__PURE__*/React.createElement("div", { style: { marginTop: 6, paddingTop: 5, borderTop: `1px solid ${pBorder}`, display: 'flex', alignItems: 'center', gap: 5 } },
-        /*#__PURE__*/React.createElement("span", { style: { fontSize: 7, color: pFaint } }, "Powered by"),
-        agencyLogo
-          ? /*#__PURE__*/React.createElement("img", { src: agencyLogo, alt: "agency", style: { height: 10, maxWidth: 30, objectFit: 'contain', opacity: 0.8 } })
-          : /*#__PURE__*/React.createElement("span", { style: { fontSize: 8, fontWeight: 700, color: pMuted } }, name || 'Agency Name')
-      )
-    ),
-    /* \u2500\u2500 Score Row \u2500\u2500 */
-    /*#__PURE__*/React.createElement("div", {
-      style: { background: '#fff', padding: '10px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '1px solid #e8eaf0' }
-    },
-      /*#__PURE__*/React.createElement("div", null,
-        /*#__PURE__*/React.createElement("div", { style: { fontSize: 32, fontWeight: 900, color: gradeC, lineHeight: 1 } }, hasAudit && activeScore ? activeScore.weighted : '\u2014'),
-        /*#__PURE__*/React.createElement("div", { style: { fontSize: 9, color: '#8a90a8', marginTop: 2 } }, "/100  Weighted Score")
-      ),
-      /*#__PURE__*/React.createElement("div", { style: { textAlign: 'right' } },
-        /*#__PURE__*/React.createElement("div", { style: { fontSize: 42, fontWeight: 900, lineHeight: 1, color: gradeC, textShadow: `0 0 16px ${gradeC}66` } }, hasAudit && activeScore ? activeScore.grade : '\u2014'),
-        /*#__PURE__*/React.createElement("div", { style: { fontSize: 8, color: '#8a90a8', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' } }, "Grade")
-      )
-    ),
-    /* \u2500\u2500 Section Scores \u2500\u2500 */
-    /*#__PURE__*/React.createElement("div", { style: { background: '#fff', padding: '8px 16px 10px', borderBottom: '1px solid #e8eaf0' } },
-      /*#__PURE__*/React.createElement("div", { style: { fontSize: 8, fontWeight: 700, color: '#9298b0', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 } }, "Section Scores"),
-      /*#__PURE__*/React.createElement("div", { style: { display: 'flex', gap: 5 } },
-        (hasAudit && catScores.length > 0 ? catScores : AUDIT_CATEGORIES.map(c=>({...c,score:'--',grade:'\u2014',evaluated:0}))).map((cat,i) =>
-          /*#__PURE__*/React.createElement("div", { key: i, style: { flex: 1, background: `${cat.color}15`, border: `1px solid ${cat.color}44`, borderRadius: 5, padding: '5px 3px', textAlign: 'center' } },
-            /*#__PURE__*/React.createElement("div", { style: { fontSize: 13, fontWeight: 800, color: cat.color, lineHeight: 1 } }, cat.score),
-            /*#__PURE__*/React.createElement("div", { style: { fontSize: 7, color: '#8a90a8', marginTop: 2 } }, cat.label.replace('Technical SEO','Tech').replace('On-Page & Content','On-Page').replace('UX Heuristics','UX').replace('Conversion & CTA','CRO').replace('AI & SERP Visibility','AI/SERP'))
+      /*#__PURE__*/React.createElement("div", {
+        style: {
+          position: 'absolute', top: 10, left: 10,
+          width: PAGE_W,
+          background: '#ffffff',
+          boxShadow: '0 6px 32px rgba(0,0,0,0.28)',
+          borderRadius: 3,
+          overflow: 'hidden',
+          transform: `scale(${SCALE})`,
+          transformOrigin: 'top left'
+        }
+      },
+        /* \u2500\u2500 Header \u2500\u2500 */
+        /*#__PURE__*/React.createElement("div", { style: { background: color, padding: '14px 20px 10px', position: 'relative', borderBottom: `3px solid ${pBdr}` } },
+          clientLogo && /*#__PURE__*/React.createElement("img", { src: clientLogo, alt: "", style: { position:'absolute', top:10, right:16, height:24, maxWidth:64, objectFit:'contain' } }),
+          /*#__PURE__*/React.createElement("div", { style: { fontSize:15, fontWeight:800, color:pText, lineHeight:1.2 } }, activeClient || (hasAudit ? activeUrl : 'Client Name')),
+          /*#__PURE__*/React.createElement("div", { style: { fontSize:10, color:pMuted, marginTop:3 } }, "UX + SEO Audit Report \u00b7 ", new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'})),
+          /*#__PURE__*/React.createElement("div", { style: { marginTop:8, paddingTop:7, borderTop:`1px solid ${pBdr}`, display:'flex', alignItems:'center', gap:6 } },
+            /*#__PURE__*/React.createElement("span", { style:{fontSize:8, color:pFaint} }, "Prepared by"),
+            agencyLogo
+              ? /*#__PURE__*/React.createElement("img", { src:agencyLogo, alt:"", style:{height:12, maxWidth:40, objectFit:'contain', opacity:0.85} })
+              : /*#__PURE__*/React.createElement("span", { style:{fontSize:9, fontWeight:700, color:pMuted} }, name || 'Agency Name')
           )
+        ),
+        /* \u2500\u2500 Score Summary \u2500\u2500 */
+        /*#__PURE__*/React.createElement("div", { style: { padding:'16px 20px 14px', display:'flex', alignItems:'center', justifyContent:'space-between', borderBottom:'2px solid #eceef4', background:'#fafbff' } },
+          /*#__PURE__*/React.createElement("div", null,
+            /*#__PURE__*/React.createElement("div", { style:{fontSize:10, fontWeight:700, color:'#9298b0', textTransform:'uppercase', letterSpacing:'0.07em', marginBottom:6} }, hasAudit ? (activeScore.completionPct < 20 ? 'Preliminary Score' : activeScore.completionPct < 60 ? 'Indicative Score' : 'Overall Score') : 'Overall Score'),
+            /*#__PURE__*/React.createElement("div", { style:{display:'flex', alignItems:'flex-end', gap:8} },
+              /*#__PURE__*/React.createElement("div", { style:{fontSize:52, fontWeight:900, color:gradeC, lineHeight:1} }, hasAudit && activeScore ? activeScore.weighted : '\u2014'),
+              /*#__PURE__*/React.createElement("div", { style:{fontSize:13, color:'#9298b0', marginBottom:6} }, "/100")
+            ),
+            /*#__PURE__*/React.createElement("div", { style:{fontSize:11, color:gradeC, fontWeight:600, marginTop:4} }, hasAudit && activeScore ? activeScore.rating : '\u2014')
+          ),
+          /*#__PURE__*/React.createElement("div", { style:{textAlign:'center', background:`${gradeC}12`, border:`2px solid ${gradeC}44`, borderRadius:12, padding:'12px 20px'} },
+            /*#__PURE__*/React.createElement("div", { style:{fontSize:64, fontWeight:900, color:gradeC, lineHeight:1, textShadow:`0 0 20px ${gradeC}55`} }, hasAudit && activeScore ? activeScore.grade : '\u2014'),
+            /*#__PURE__*/React.createElement("div", { style:{fontSize:9, color:'#9298b0', fontWeight:700, textTransform:'uppercase', letterSpacing:'0.1em', marginTop:4} }, "Grade")
+          )
+        ),
+        /* \u2500\u2500 Section Scores \u2500\u2500 */
+        /*#__PURE__*/React.createElement("div", { style:{padding:'14px 20px', borderBottom:'1px solid #eceef4'} },
+          /*#__PURE__*/React.createElement("div", { style:{fontSize:9, fontWeight:700, color:'#9298b0', textTransform:'uppercase', letterSpacing:'0.07em', marginBottom:10} }, "Section Scores"),
+          /*#__PURE__*/React.createElement("div", { style:{display:'flex', gap:8} },
+            cats.map((cat,i) =>
+              /*#__PURE__*/React.createElement("div", { key:i, style:{flex:1, background:`${cat.color}12`, border:`1px solid ${cat.color}44`, borderRadius:6, padding:'8px 4px', textAlign:'center'} },
+                /*#__PURE__*/React.createElement("div", { style:{fontSize:18, fontWeight:900, color:cat.color, lineHeight:1} }, cat.score),
+                /*#__PURE__*/React.createElement("div", { style:{fontSize:8, fontWeight:700, color:cat.color, opacity:0.8, marginTop:2, letterSpacing:'0.02em'} }, cat.grade),
+                /*#__PURE__*/React.createElement("div", { style:{fontSize:7, color:'#9298b0', marginTop:3, lineHeight:1.3} }, cat.label.replace('Technical SEO','Tech SEO').replace('On-Page & Content','On-Page').replace('UX Heuristics','UX').replace('Conversion & CTA','CRO').replace('AI & SERP Visibility','AI/SERP'))
+              )
+            )
+          )
+        ),
+        /* \u2500\u2500 Audit Summary \u2500\u2500 */
+        /*#__PURE__*/React.createElement("div", { style:{padding:'14px 20px', borderBottom:'1px solid #eceef4', background:'#fafbff'} },
+          /*#__PURE__*/React.createElement("div", { style:{fontSize:9, fontWeight:700, color:'#9298b0', textTransform:'uppercase', letterSpacing:'0.07em', marginBottom:10} }, "Audit Summary"),
+          /*#__PURE__*/React.createElement("div", { style:{display:'grid', gridTemplateColumns:'repeat(4,1fr)', gap:8} },
+            [
+              {label:'Evaluated', val: tEval||'\u2014',    c:'#4a5070'},
+              {label:'Pass',      val: tPass||'\u2014',    c:'#10B981'},
+              {label:'Partial',   val: tPartial||'\u2014', c:'#F59E0B'},
+              {label:'Fail',      val: tFail||'\u2014',    c:'#EF4444'},
+            ].map((s,i) =>
+              /*#__PURE__*/React.createElement("div", { key:i, style:{background:'#fff', border:'1px solid #eceef4', borderRadius:6, padding:'8px 6px', textAlign:'center'} },
+                /*#__PURE__*/React.createElement("div", { style:{fontSize:20, fontWeight:800, color:s.c, lineHeight:1} }, s.val),
+                /*#__PURE__*/React.createElement("div", { style:{fontSize:8, color:'#9298b0', marginTop:3, fontWeight:600} }, s.label)
+              )
+            )
+          )
+        ),
+        /* \u2500\u2500 Top Priority Issues \u2500\u2500 */
+        /*#__PURE__*/React.createElement("div", { style:{padding:'14px 20px', borderBottom:'1px solid #eceef4'} },
+          /*#__PURE__*/React.createElement("div", { style:{fontSize:9, fontWeight:700, color:'#9298b0', textTransform:'uppercase', letterSpacing:'0.07em', marginBottom:8} }, "Top Priority Issues"),
+          topIssues.length > 0
+            ? topIssues.map((it,i) => {
+                const pc = it.priority==='Critical'?'#EF4444':it.priority==='High'?'#F59E0B':'#0EA5E9';
+                return /*#__PURE__*/React.createElement("div", { key:i, style:{display:'flex', alignItems:'center', gap:8, padding:'6px 0', borderBottom: i < topIssues.length-1 ? '1px solid #f0f1f5' : 'none'} },
+                  /*#__PURE__*/React.createElement("div", { style:{width:7, height:7, borderRadius:'50%', flexShrink:0, background:pc} }),
+                  /*#__PURE__*/React.createElement("div", { style:{fontSize:9, color:'#2a3048', flex:1, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap'} }, it.item),
+                  /*#__PURE__*/React.createElement("div", { style:{fontSize:8, fontWeight:700, color:pc, flexShrink:0, background:`${pc}15`, padding:'2px 6px', borderRadius:4} }, it.priority)
+                );
+              })
+            : /*#__PURE__*/React.createElement("div", { style:{fontSize:9, color:'#9298b0', fontStyle:'italic'} }, hasAudit ? 'No failed items found' : 'Complete audit items to see issues')
+        ),
+        /* \u2500\u2500 Category Detail Rows \u2500\u2500 */
+        /*#__PURE__*/React.createElement("div", { style:{padding:'14px 20px 18px'} },
+          /*#__PURE__*/React.createElement("div", { style:{fontSize:9, fontWeight:700, color:'#9298b0', textTransform:'uppercase', letterSpacing:'0.07em', marginBottom:10} }, "Category Breakdown"),
+          cats.map((cat,i) => {
+            const pct = cat.evaluated > 0 ? Math.round(cat.passed / cat.evaluated * 100) : 0;
+            return /*#__PURE__*/React.createElement("div", { key:i, style:{marginBottom: i < cats.length-1 ? 10 : 0} },
+              /*#__PURE__*/React.createElement("div", { style:{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:4} },
+                /*#__PURE__*/React.createElement("div", { style:{display:'flex', alignItems:'center', gap:6} },
+                  /*#__PURE__*/React.createElement("span", { style:{fontSize:11} }, cat.icon),
+                  /*#__PURE__*/React.createElement("span", { style:{fontSize:9, fontWeight:600, color:'#3a4060'} }, cat.label.replace('Technical SEO','Tech SEO').replace('On-Page & Content','On-Page').replace('UX Heuristics','UX Heuristics').replace('Conversion & CTA','Conversion & CTA').replace('AI & SERP Visibility','AI & SERP'))
+                ),
+                /*#__PURE__*/React.createElement("div", { style:{display:'flex', alignItems:'center', gap:8, fontSize:9, color:'#9298b0'} },
+                  /*#__PURE__*/React.createElement("span", null, cat.evaluated > 0 ? `${cat.passed}\u2713  ${cat.failed}\u2717  ${cat.partial}~` : 'Not started'),
+                  /*#__PURE__*/React.createElement("span", { style:{fontWeight:700, color:cat.color, minWidth:28, textAlign:'right'} }, cat.evaluated > 0 ? `${cat.score}` : '\u2014')
+                )
+              ),
+              /*#__PURE__*/React.createElement("div", { style:{height:5, background:'#eceef4', borderRadius:3, overflow:'hidden'} },
+                /*#__PURE__*/React.createElement("div", { style:{height:'100%', width:`${pct}%`, background:cat.color, borderRadius:3} })
+              )
+            );
+          })
         )
       )
-    ),
-    /* \u2500\u2500 Audit Summary Stats \u2500\u2500 */
-    /*#__PURE__*/React.createElement("div", { style: { background: '#fff', padding: '8px 16px 10px', borderBottom: '1px solid #e8eaf0' } },
-      /*#__PURE__*/React.createElement("div", { style: { fontSize: 8, fontWeight: 700, color: '#9298b0', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 } }, "Audit Summary"),
-      /*#__PURE__*/React.createElement("div", { style: { display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 4 } },
-        [
-          { label: 'Evaluated', val: totalEvaluated || '\u2014', c: '#4a5070' },
-          { label: 'Pass',      val: totalPass || '\u2014',      c: '#10B981' },
-          { label: 'Partial',   val: totalPartial || '\u2014',   c: '#F59E0B' },
-          { label: 'Fail',      val: totalFail || '\u2014',      c: '#EF4444' },
-        ].map((s,i) => /*#__PURE__*/React.createElement("div", { key: i, style: { background: '#f5f6fa', borderRadius: 4, padding: '5px 4px', textAlign: 'center' } },
-          /*#__PURE__*/React.createElement("div", { style: { fontSize: 14, fontWeight: 800, color: s.c, lineHeight: 1 } }, s.val),
-          /*#__PURE__*/React.createElement("div", { style: { fontSize: 7, color: '#9298b0', marginTop: 2 } }, s.label)
-        ))
-      )
-    ),
-    /* \u2500\u2500 Top Issues preview \u2500\u2500 */
-    /*#__PURE__*/React.createElement("div", { style: { background: '#fff', padding: '8px 16px 10px' } },
-      /*#__PURE__*/React.createElement("div", { style: { fontSize: 8, fontWeight: 700, color: '#9298b0', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 5 } }, "Top Priority Issues"),
-      topIssues.length > 0
-        ? topIssues.map((it,i) => /*#__PURE__*/React.createElement("div", { key: i, style: { display: 'flex', alignItems: 'center', gap: 6, padding: '4px 0', borderBottom: i < topIssues.length-1 ? '1px solid #eceef4' : 'none' } },
-            /*#__PURE__*/React.createElement("div", { style: { width: 6, height: 6, borderRadius: '50%', flexShrink: 0, background: it.p==='Critical'?'#EF4444':it.p==='High'?'#F59E0B':'#0EA5E9' } }),
-            /*#__PURE__*/React.createElement("div", { style: { fontSize: 8, color: '#2a3048', flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' } }, it.item),
-            /*#__PURE__*/React.createElement("div", { style: { fontSize: 7, fontWeight: 700, color: it.p==='Critical'?'#EF4444':it.p==='High'?'#F59E0B':'#0EA5E9', flexShrink: 0 } }, it.p)
-          ))
-        : /*#__PURE__*/React.createElement("div", { style: { fontSize: 9, color: '#9298b0', fontStyle: 'italic', padding: '4px 0' } }, hasAudit ? "No failed items yet" : "Complete an audit to see issues")
-    )
     );
   })())), showClearModal && /*#__PURE__*/React.createElement(ClearAllModal, {
     count: audits.length,
