@@ -121,7 +121,7 @@ async function safeFetch(url: string, timeoutMs = 10000): Promise<Response | nul
 
 // ─── HTML Parser ────────────────────────────────────────────────────────────
 
-function parseHTML(html: string, siteUrl: string): ParsedHTML {
+export function parseHTML(html: string, siteUrl: string): ParsedHTML {
   const titleMatch = html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)
   const title = titleMatch ? titleMatch[1].trim() : null
 
