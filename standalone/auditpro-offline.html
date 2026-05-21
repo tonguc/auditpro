@@ -30709,6 +30709,162 @@ const STATUS_COLORS_PDF = {
   'N/A': [107, 122, 153]
 };
 
+// ── REPORT COPY ENGINE ─────────────────────────────────────────────────────────
+// Rule-based, deterministic. DATA → INSIGHT → IMPACT → ACTION. No API calls.
+
+const PERF_LEVEL = s => s >= 85 ? 'strong' : s >= 70 ? 'good' : s >= 50 ? 'below average' : 'poor';
+const PERF_MEANING = s => s >= 85 ? 'strong performance with minor areas for refinement' : s >= 70 ? 'solid performance with clear opportunities for improvement' : s >= 50 ? 'below-average performance with missed opportunities in visibility, experience, and conversion' : 'poor performance that is likely harming both search rankings and user experience';
+const WEAKEST_MEANING = {
+  technical: 'technical foundation and search crawlability',
+  onpage: 'content quality and on-page search visibility',
+  ux: 'user experience and usability',
+  cro: 'conversion performance and call-to-action effectiveness',
+  serp: 'visibility in AI-driven search engines'
+};
+const SECTION_INSIGHTS = {
+  technical: s => s >= 80 ? 'Technical SEO is in good shape. Core infrastructure is solid and well-crawlable. Minor tweaks may still yield gains.' : s >= 60 ? 'Technical SEO has gaps that could limit how search engines discover and index the site. Resolving these improves the foundation for all other SEO efforts.' : 'Technical SEO is underperforming and is likely suppressing search visibility. Issues here affect every other aspect of site performance.',
+  onpage: s => s >= 80 ? 'On-Page SEO is well-optimised. Content is structured and targeted effectively for search engines.' : s >= 60 ? 'On-Page SEO needs attention. Weak meta data and heading structure are reducing click-through rates and search relevance.' : 'On-Page SEO is significantly lacking. Poor or missing titles, descriptions, and headings directly reduce organic traffic and search rankings.',
+  ux: s => s >= 80 ? 'User experience is strong. The site is accessible, navigable, and well-structured for visitors.' : s >= 60 ? 'UX has usability gaps that may frustrate visitors and increase bounce rates, affecting both engagement and conversions.' : 'User experience is poor and is likely causing high drop-off. Visitors are struggling to navigate, read, or trust the site.',
+  cro: s => s >= 80 ? 'Conversion optimisation is solid. Clear CTAs and effective trust signals support user decision-making.' : s >= 60 ? 'Conversion performance has weaknesses. Unclear calls-to-action and missing trust signals are reducing the site\'s ability to convert visitors into customers.' : 'Conversion rate optimisation is significantly underperforming. The site is likely losing substantial revenue due to poor CTA design and weak trust signals.',
+  serp: s => s >= 80 ? 'AI Visibility is well-established. The brand has strong signals for AI-driven search engines and content that supports citation and discovery.' : s >= 60 ? 'AI Visibility has gaps. While some signals are in place, the brand may be absent from AI-generated answers in key categories.' : 'AI Visibility is weak. The site is poorly positioned for AI-driven search (ChatGPT, Perplexity, Google AI Overviews) — a rapidly growing traffic channel.'
+};
+const IMPACT_MAP = [{
+  keys: ['lcp', 'loading speed', 'page speed', 'core web vitals', 'cls', 'fid', 'inp', 'slow'],
+  impact: 'Slow loading directly reduces search rankings and increases user drop-off. Google treats Core Web Vitals as a ranking signal.',
+  fix: 'Optimise images, defer unused JavaScript, and improve server response time. Target LCP under 2.5s.'
+}, {
+  keys: ['https', 'ssl', 'mixed content', 'security', 'http'],
+  impact: 'Security issues reduce user trust and negatively impact SEO. Google marks non-HTTPS pages as "Not Secure".',
+  fix: 'Ensure all pages redirect to HTTPS and remove any mixed content references.'
+}, {
+  keys: ['meta description', 'description missing'],
+  impact: 'Missing or duplicate meta descriptions reduce click-through rates from search results, lowering organic traffic.',
+  fix: 'Write unique, compelling meta descriptions (140–160 characters) for all key pages.'
+}, {
+  keys: ['title tag', 'page title', 'title missing', 'title duplicate'],
+  impact: 'Weak or missing title tags reduce search visibility and click-through rates from search results.',
+  fix: 'Write unique, keyword-rich title tags (50–60 characters) for every important page.'
+}, {
+  keys: ['schema', 'structured data', 'json-ld', 'markup'],
+  impact: 'Missing structured data reduces eligibility for rich search results, lowering visibility and CTR.',
+  fix: 'Implement appropriate Schema.org markup (Organization, Product, Article, FAQ) for key content types.'
+}, {
+  keys: ['robots', 'ai crawler', 'gptbot', 'claudebot', 'perplexitybot', 'crawl blocked'],
+  impact: 'Blocking AI crawlers prevents the site from being indexed by AI-driven search engines — a fast-growing traffic source.',
+  fix: 'Review robots.txt and allow GPTBot, ClaudeBot, and PerplexityBot unless intentionally blocking them.'
+}, {
+  keys: ['mobile', 'responsive', 'viewport', 'touch'],
+  impact: 'Poor mobile experience drives away the majority of web users and impacts Google\'s mobile-first ranking.',
+  fix: 'Ensure all pages are fully responsive with correct viewport settings and touch-friendly interactive elements.'
+}, {
+  keys: ['h1', 'heading structure', 'headings', 'h2', 'h3'],
+  impact: 'Poor heading structure confuses search engines and makes content harder to scan for users.',
+  fix: 'Use a clear heading hierarchy: one H1 per page, followed by descriptive H2 and H3 sub-sections.'
+}, {
+  keys: ['canonical', 'duplicate content', 'duplicate url'],
+  impact: 'Duplicate content dilutes ranking signals and may cause search engines to index the wrong page version.',
+  fix: 'Add canonical tags to all pages and resolve duplicate content issues at the URL level.'
+}, {
+  keys: ['alt text', 'image alt', 'alt attribute'],
+  impact: 'Missing alt text harms accessibility and prevents images from appearing in image search results.',
+  fix: 'Add descriptive, keyword-relevant alt text to all meaningful images on the site.'
+}, {
+  keys: ['author', 'byline', 'bio', 'authorship'],
+  impact: 'Missing author attribution weakens E-E-A-T signals, reducing trust with both users and AI search engines.',
+  fix: 'Add author names, credentials, and biographical information to all content and article pages.'
+}, {
+  keys: ['llms.txt', 'ai-readable', 'ai content structure'],
+  impact: 'Without AI-readable content structure, AI tools cannot easily parse, cite, or recommend your content.',
+  fix: 'Add an /llms.txt file and structure key content with clear headings, direct answers, and summary introductions.'
+}, {
+  keys: ['brand', 'knowledge graph', 'entity', 'wikidata'],
+  impact: 'Weak entity signals make it harder for AI search engines to identify, trust, and recommend your brand.',
+  fix: 'Create a Google Business Profile, add Organization schema with sameAs links, and build brand mentions on authoritative sites.'
+}, {
+  keys: ['cta', 'call to action', 'primary button'],
+  impact: 'Unclear or missing calls-to-action directly reduce conversions and revenue from existing traffic.',
+  fix: 'Ensure each key page has one clear primary CTA, with action-oriented language and strong visual contrast.'
+}, {
+  keys: ['trust', 'review', 'testimonial', 'social proof', 'credibility'],
+  impact: 'Lack of trust signals increases visitor doubt and reduces conversion rates, especially for first-time visitors.',
+  fix: 'Add customer testimonials, reviews, case studies, or trust badges to key landing and conversion pages.'
+}, {
+  keys: ['404', 'broken link', 'error page'],
+  impact: 'Broken links damage user experience and waste crawl budget, reducing overall SEO performance.',
+  fix: 'Fix or redirect all broken internal links. Ensure the 404 page is helpful and links back to key content.'
+}, {
+  keys: ['sitemap', 'xml sitemap'],
+  impact: 'A missing or outdated sitemap makes it harder for search engines to discover and index all pages.',
+  fix: 'Generate an updated XML sitemap and submit it via Google Search Console.'
+}, {
+  keys: ['internal link', 'internal linking'],
+  impact: 'Poor internal linking limits how link authority flows through the site and reduces discoverability of key pages.',
+  fix: 'Add contextual internal links from high-traffic pages to key conversion or category pages.'
+}];
+function getImpactAndFix(itemText, howTo) {
+  const combined = (itemText + ' ' + (howTo || '')).toLowerCase();
+  for (const entry of IMPACT_MAP) {
+    if (entry.keys.some(k => combined.includes(k))) {
+      return {
+        impact: entry.impact,
+        fix: entry.fix
+      };
+    }
+  }
+  return {
+    impact: 'This issue is reducing site performance and should be resolved to improve overall quality and user experience.',
+    fix: howTo || 'Review and address this item based on the audit guidance provided.'
+  };
+}
+function generateReportCopy(score, results) {
+  const evaluated = score.categories.filter(c => c.evaluated > 0);
+  if (evaluated.length === 0) return null;
+  const overall = score.weighted;
+  const weakest = evaluated.reduce((a, b) => b.score < a.score ? b : a);
+  const weakestMeaning = WEAKEST_MEANING[weakest.id] || weakest.label.toLowerCase();
+  const compRate = score.completionPct;
+  const evalCount = score.totalEvaluated;
+  const totalCount = score.totalAll;
+  const critCount = AUDIT_CATEGORIES.flatMap(cat => cat.sections.flatMap(sec => sec.items.filter(it => results[it.id] === 'Fail' && it.priority === 'Critical'))).length;
+  const highCount = AUDIT_CATEGORIES.flatMap(cat => cat.sections.flatMap(sec => sec.items.filter(it => results[it.id] === 'Fail' && it.priority === 'High'))).length;
+  const urgencyText = critCount > 3 ? `${critCount} critical issues that require urgent attention` : critCount > 0 ? `${critCount} critical issue${critCount > 1 ? 's' : ''} that need immediate resolution` : highCount > 0 ? `${highCount} high-priority issue${highCount > 1 ? 's' : ''} that should be addressed soon` : 'no critical blockers — improvements are available but not urgent';
+  const executiveSummary = `This website demonstrates ${PERF_LEVEL(overall)} performance with an overall score of ${overall}/100 (Grade ${score.grade}). ` + `The biggest opportunity lies in improving ${weakestMeaning}, which is the weakest area in this audit. ` + `There are ${urgencyText}. ` + `Addressing the top priority issues first will deliver the fastest, most measurable improvements to both search performance and user experience.`;
+  const performanceInterpretation = `This score indicates ${PERF_MEANING(overall)}.`;
+  const confLevel = compRate < 20 ? 'directional rather than definitive — review more items for reliable conclusions' : compRate < 60 ? 'moderately reliable — results give a useful picture of site health, though some areas may need further review' : 'reliable — a strong majority of checkpoints have been reviewed, making this a solid basis for action';
+  const confidenceText = `This audit covers ${compRate}% of all checkpoints (${evalCount} of ${totalCount} items reviewed). Results should be treated as ${confLevel}.`;
+  const sectionInsights = {};
+  score.categories.forEach(cat => {
+    const fn = SECTION_INSIGHTS[cat.id];
+    sectionInsights[cat.id] = cat.evaluated > 0 ? fn ? fn(cat.score) : `${cat.label} has areas for improvement that merit further review.` : `${cat.label} was not evaluated in this audit and should be assessed in a follow-up.`;
+  });
+  const PSCORE = {
+    Critical: 4,
+    High: 3,
+    Medium: 2,
+    Low: 1
+  };
+  const priorityIssues = AUDIT_CATEGORIES.flatMap(cat => cat.sections.flatMap(sec => sec.items.filter(it => results[it.id] === 'Fail').map(it => {
+    const {
+      impact,
+      fix
+    } = getImpactAndFix(it.item, it.howTo);
+    return {
+      ...it,
+      catLabel: cat.label,
+      catRgb: hexToRgb(cat.color),
+      impact,
+      fix
+    };
+  }))).sort((a, b) => (PSCORE[b.priority] ?? 0) - (PSCORE[a.priority] ?? 0));
+  return {
+    executiveSummary,
+    performanceInterpretation,
+    confidenceText,
+    sectionInsights,
+    priorityIssues
+  };
+}
+
 // Normalise image through canvas — fixes indexed-colour PNG issues while
 // preserving transparency. Always outputs PNG so logos on coloured backgrounds
 // remain transparent in the PDF.
@@ -30740,6 +30896,7 @@ function downloadPDF(config, auditUrl, score, results) {
   const agencyWebsite = config.agencyWebsite || '';
   const agencyTitle = config.agencyTitle || '';
   let y = 0;
+  const copy = generateReportCopy(score, results);
   function addPage() {
     doc.addPage();
     y = M;
@@ -30971,25 +31128,38 @@ function downloadPDF(config, auditUrl, score, results) {
     }
   });
 
-  // ── Executive Insight ─────────────────────────────────────────────────────
+  // ── Executive Summary (rule engine) ──────────────────────────────────────
   y += 34;
-  const insight = generateInsight();
-  if (insight) {
-    const insightLines = doc.splitTextToSize(insight, W - 2 * M - 10);
-    const insightH = Math.max(18, 11 + insightLines.length * 4.2);
-    doc.setFillColor(...brandLight);
-    doc.roundedRect(M, y, W - 2 * M, insightH, 2, 2, 'F');
-    doc.setFillColor(...brandRgb);
-    doc.roundedRect(M, y, 2.5, insightH, 1, 0, 'F');
+  if (copy) {
+    // Performance interpretation — one line above the box
     doc.setFontSize(7);
+    doc.setFont('helvetica', 'italic');
+    doc.setTextColor(110, 115, 135);
+    doc.text(copy.performanceInterpretation, M, y);
+    y += 5;
+    // Executive Summary box
+    const execLines = doc.splitTextToSize(copy.executiveSummary, W - 2 * M - 10);
+    const execH = Math.max(20, 12 + execLines.length * 4.2);
+    doc.setFillColor(...brandLight);
+    doc.roundedRect(M, y, W - 2 * M, execH, 2, 2, 'F');
+    doc.setFillColor(...brandRgb);
+    doc.roundedRect(M, y, 2.5, execH, 1, 0, 'F');
+    doc.setFontSize(6.5);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...brandRgb);
     doc.text('Executive Summary', M + 6, y + 6);
     doc.setFont('helvetica', 'normal');
     doc.setFontSize(7.5);
-    doc.setTextColor(45, 50, 65);
-    doc.text(insightLines, M + 6, y + 12);
-    y += insightH + 5;
+    doc.setTextColor(42, 48, 65);
+    doc.text(execLines, M + 6, y + 12);
+    y += execH + 4;
+    // Confidence text
+    const confLines = doc.splitTextToSize(copy.confidenceText, W - 2 * M);
+    doc.setFontSize(6.5);
+    doc.setFont('helvetica', 'italic');
+    doc.setTextColor(145, 150, 168);
+    doc.text(confLines, M, y);
+    y += confLines.length * 3.8 + 3;
   }
 
   // ── Audit Summary stats ───────────────────────────────────────────────────
@@ -31038,19 +31208,9 @@ function downloadPDF(config, auditUrl, score, results) {
   });
   y += 21;
 
-  // ── Top Priority Issues ───────────────────────────────────────────────────
-  const PSCORE_PDF = {
-    Critical: 4,
-    High: 3,
-    Medium: 2,
-    Low: 1
-  };
-  const priorityFails = AUDIT_CATEGORIES.flatMap(cat => cat.sections.flatMap(sec => sec.items.filter(it => results[it.id] === 'Fail').map(it => ({
-    ...it,
-    catLabel: cat.label,
-    catRgb: hexToRgb(cat.color)
-  })))).sort((a, b) => (PSCORE_PDF[b.priority] ?? 0) - (PSCORE_PDF[a.priority] ?? 0));
-  if (priorityFails.length > 0) {
+  // ── Top Priority Issues (enriched via rule engine) ────────────────────────
+  const enrichedIssues = copy ? copy.priorityIssues : [];
+  if (enrichedIssues.length > 0) {
     doc.setFontSize(9);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(30, 35, 45);
@@ -31058,7 +31218,7 @@ function downloadPDF(config, auditUrl, score, results) {
     doc.setFontSize(6);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(155, 160, 178);
-    doc.text(`${priorityFails.length} issue${priorityFails.length > 1 ? 's' : ''} · sorted by impact`, W - M, y, {
+    doc.text(`${enrichedIssues.length} issue${enrichedIssues.length > 1 ? 's' : ''} · impact-sorted`, W - M, y, {
       align: 'right'
     });
     y += 4;
@@ -31066,24 +31226,21 @@ function downloadPDF(config, auditUrl, score, results) {
     doc.setLineWidth(0.2);
     doc.line(M, y, W - M, y);
     y += 3;
-    priorityFails.slice(0, 8).forEach((item, i) => {
-      const rowH = 17;
+    enrichedIssues.slice(0, 6).forEach((item, i) => {
+      const rowH = 22;
       checkPageBreak(rowH + 2);
       if (i % 2 === 0) {
         doc.setFillColor(247, 248, 252);
         doc.rect(M, y, W - 2 * M, rowH, 'F');
       }
-      // Category dot
-      doc.setFillColor(...item.catRgb);
-      doc.circle(M + 3, y + rowH / 2, 1.5, 'F');
       // Priority badge
-      const bCol = item.priority === 'Critical' ? [214, 45, 60] : item.priority === 'High' ? [210, 115, 5] : item.priority === 'Medium' ? [12, 155, 220] : [14, 180, 120];
+      const bCol = item.priority === 'Critical' ? [214, 45, 60] : item.priority === 'High' ? [205, 112, 0] : item.priority === 'Medium' ? [12, 145, 210] : [14, 172, 118];
       doc.setFillColor(...bCol);
-      doc.roundedRect(M + 7, y + 2, 20, 4.5, 1, 1, 'F');
-      doc.setFontSize(5);
+      doc.roundedRect(M + 2, y + 2, 22, 5, 1, 1, 'F');
+      doc.setFontSize(5.5);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(255, 255, 255);
-      doc.text(item.priority.toUpperCase(), M + 17, y + 5.2, {
+      doc.text(item.priority.toUpperCase(), M + 13, y + 5.5, {
         align: 'center'
       });
       // Category tag
@@ -31091,26 +31248,30 @@ function downloadPDF(config, auditUrl, score, results) {
       doc.setFontSize(5.5);
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(...item.catRgb);
-      doc.text(shortCat, M + 30, y + 5.2);
-      // Item title
-      doc.setFontSize(8);
+      doc.text(shortCat, M + 27, y + 5.5);
+      // Item title — what is wrong
+      doc.setFontSize(8.5);
       doc.setFont('helvetica', 'bold');
-      doc.setTextColor(25, 30, 45);
-      const titleLine = doc.splitTextToSize(item.item, W - 2 * M - 34);
-      doc.text(titleLine[0], M + 30, y + 10.5);
-      // HowTo hint
+      doc.setTextColor(22, 28, 48);
+      const titleLine = doc.splitTextToSize(item.item, W - 2 * M - 5);
+      doc.text(titleLine[0], M + 2, y + 11.5);
+      // Why it matters
       doc.setFontSize(6.5);
       doc.setFont('helvetica', 'normal');
-      doc.setTextColor(100, 105, 122);
-      const howLine = doc.splitTextToSize(item.howTo, W - 2 * M - 34);
-      doc.text(howLine[0], M + 30, y + 14.8);
+      doc.setTextColor(80, 85, 105);
+      const impactLine = doc.splitTextToSize(`Why it matters: ${item.impact}`, W - 2 * M - 5);
+      doc.text(impactLine[0], M + 2, y + 16.5);
+      // Action
+      const fixLine = doc.splitTextToSize(`Action: ${item.fix}`, W - 2 * M - 5);
+      doc.setTextColor(110, 120, 145);
+      doc.text(fixLine[0], M + 2, y + 20.5);
       y += rowH;
     });
-    if (priorityFails.length > 8) {
+    if (enrichedIssues.length > 6) {
       doc.setFontSize(6.5);
       doc.setFont('helvetica', 'italic');
-      doc.setTextColor(160, 165, 182);
-      doc.text(`+ ${priorityFails.length - 8} more issues in the detailed sections below.`, M + 7, y + 4);
+      doc.setTextColor(158, 163, 180);
+      doc.text(`+ ${enrichedIssues.length - 6} more issues in the detailed sections below.`, M + 2, y + 4);
       y += 7;
     }
   }
@@ -31169,6 +31330,21 @@ function downloadPDF(config, auditUrl, score, results) {
     doc.setFillColor(...brandRgb);
     doc.rect(0, 26, W, 0.7, 'F');
     y = 32;
+    // Section insight from rule engine
+    if (copy && copy.sectionInsights[cat.id]) {
+      const insightTxt = copy.sectionInsights[cat.id];
+      const iLines = doc.splitTextToSize(insightTxt, W - 2 * M - 6);
+      const iH = Math.max(10, 5 + iLines.length * 4);
+      doc.setFillColor(...lighten(catColor, 0.92));
+      doc.rect(M, y, W - 2 * M, iH, 'F');
+      doc.setFillColor(...catColor);
+      doc.rect(M, y, 2, iH, 'F');
+      doc.setFontSize(7);
+      doc.setFont('helvetica', 'italic');
+      doc.setTextColor(55, 60, 80);
+      doc.text(iLines, M + 5, y + 4.5 + (iLines.length > 1 ? 0 : 1));
+      y += iH + 4;
+    }
     cat.sections.forEach(sec => {
       checkPageBreak(20);
       doc.setFillColor(...lighten(catColor, 0.88));
