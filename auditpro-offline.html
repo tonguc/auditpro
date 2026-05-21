@@ -31441,27 +31441,27 @@ function downloadPDF(config, auditUrl, score, results) {
   doc.text(dateLong, W - M - clientLogoW, 13, { align: 'right' });
 
   // ZONE 2 — Branding strip (light, below header)
-  const bStripH = 14;
+  const bStripH = 18;
   doc.setFillColor(245, 247, 251);
   doc.rect(0, hBarH, W, bStripH, 'F');
 
   let agLogoEndX = M;
   if (agencyLogo) {
-    const al = addLogoToDoc(agencyLogo, M, hBarH + 2, 22, 9, false, '#f5f7fb');
-    agLogoEndX = M + al.w + 4;
+    const al = addLogoToDoc(agencyLogo, M, hBarH + 3, 20, 10, false, '#f5f7fb');
+    agLogoEndX = M + al.w + 5;
   }
 
   // "Prepared by" label
   doc.setFontSize(5.5);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(160, 165, 185);
-  doc.text('PREPARED BY', agLogoEndX, hBarH + 6);
+  doc.text('PREPARED BY', agLogoEndX, hBarH + 5);
 
   // Agency name
   doc.setFontSize(8.5);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(25, 30, 48);
-  doc.text(st(config.agencyName), agLogoEndX, hBarH + 11.5);
+  doc.text(st(config.agencyName), agLogoEndX, hBarH + 11);
 
   // Agency contact (title / website / email — one compact line)
   const contactParts = [agencyTitle, agencyWebsite, agencyEmail].filter(Boolean);
@@ -31469,7 +31469,7 @@ function downloadPDF(config, auditUrl, score, results) {
     doc.setFontSize(6.5);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(120, 125, 145);
-    doc.text(st(contactParts.join('  ·  ').slice(0, 70)), agLogoEndX, hBarH + bStripH - 1.5);
+    doc.text(st(contactParts.join('  ·  ').slice(0, 75)), agLogoEndX, hBarH + 16);
   }
 
   // ZONE 3 — Compact audit summary (no box, just text rows)
@@ -31529,7 +31529,7 @@ function downloadPDF(config, auditUrl, score, results) {
     doc.setFontSize(8);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(120, 75, 0);
-    doc.text('⚠  Low Confidence Result', M + 7, y + 8);
+    doc.text('LOW CONFIDENCE RESULT', M + 7, y + 8);
     doc.setFontSize(7);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(100, 65, 0);
@@ -31552,28 +31552,30 @@ function downloadPDF(config, auditUrl, score, results) {
   const isMedCovPDF = score.completionPct >= 20 && score.completionPct < 60;
   const scoreLabelPDF = copy?.scoreLabel || (isLowCovPDF ? 'Preliminary Score' : isMedCovPDF ? 'Indicative Score' : 'Overall Score');
   const labelColor = isLowCovPDF ? [180, 110, 0] : isMedCovPDF ? [14, 100, 160] : [...brandRgb];
-  // Score label (small, above number)
+  // Score label (small, above number) — measure width first so divider fits
   doc.setFontSize(6.5);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(...labelColor);
-  doc.text(scoreLabelPDF.toUpperCase(), M + 12, y + 8);
+  const labelW = doc.getTextWidth(scoreLabelPDF.toUpperCase());
+  doc.text(scoreLabelPDF.toUpperCase(), M + 6, y + 8);
   // Score number
-  const scoreBaseY = isLowCovPDF ? y + 24 : y + 26;
-  const scoreFontSize = isLowCovPDF ? 24 : 30;
+  const scoreBaseY = isLowCovPDF ? y + 26 : y + 28;
+  const scoreFontSize = isLowCovPDF ? 22 : 28;
   doc.setFontSize(scoreFontSize);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(...brandRgb);
-  doc.text(`${score.weighted}`, M + 12, scoreBaseY);
+  doc.text(`${score.weighted}`, M + 6, scoreBaseY);
   const numW = doc.getTextWidth(`${score.weighted}`);
-  const slashSize = isLowCovPDF ? 13 : 17;
+  const slashSize = isLowCovPDF ? 12 : 15;
   doc.setFontSize(slashSize);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(...brandRgb);
-  doc.text('/100', M + 12 + numW + 1, scoreBaseY);
+  doc.text('/100', M + 6 + numW + 1, scoreBaseY);
   const slashW = doc.getTextWidth('/100');
 
-  // Left divider after score
-  const divX = M + 12 + numW + slashW + 7;
+  // Left divider — placed after whichever is wider: label or score
+  const scoreRowW = numW + 1 + slashW;
+  const divX = M + 6 + Math.max(labelW, scoreRowW) + 8;
   doc.setDrawColor(215, 220, 232);
   doc.setLineWidth(0.3);
   doc.line(divX, y + 5, divX, y + boxH - 5);
