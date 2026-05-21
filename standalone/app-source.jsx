@@ -881,49 +881,25 @@ function AuditView({ onComplete, initialUrl = '', initialClientName = '', initia
   const [clientName, setClientName] = useState(initialClientName);
   const [results, setResults]       = useState(initialResults);
   const [activeCat, setActiveCat]   = useState(AUDIT_CATEGORIES[0].id);
+  const scrollRef = useRef(null);
 
-  const scrollRef  = useRef(null);
-  const headerRef  = useRef(null);
-  const sectionRefs = useRef({});
+  // Scroll to top when switching categories
+  const switchCat = (id) => {
+    setActiveCat(id);
+    if (scrollRef.current) scrollRef.current.scrollTop = 0;
+  };
 
   const totalItems = AUDIT_CATEGORIES.flatMap(c => c.sections.flatMap(s => s.items)).length;
   const filledItems = Object.keys(results).filter(k => results[k] !== null && results[k] !== undefined).length;
   const remaining = totalItems - filledItems;
   const canComplete = filledItems > 0;
-
-  // Scroll-spy: update active tab as user scrolls
-  useEffect(() => {
-    const container = scrollRef.current;
-    if (!container) return;
-    const onScroll = () => {
-      const headerH = (headerRef.current?.offsetHeight ?? 120) + 16;
-      const containerTop = container.getBoundingClientRect().top;
-      let current = AUDIT_CATEGORIES[0].id;
-      for (const cat of AUDIT_CATEGORIES) {
-        const el = sectionRefs.current[cat.id];
-        if (!el) continue;
-        const elTop = el.getBoundingClientRect().top - containerTop;
-        if (elTop <= headerH) current = cat.id;
-      }
-      setActiveCat(current);
-    };
-    container.addEventListener('scroll', onScroll, { passive: true });
-    return () => container.removeEventListener('scroll', onScroll);
-  }, []);
-
-  const scrollTo = (catId) => {
-    const container = scrollRef.current;
-    const el = sectionRefs.current[catId];
-    if (!container || !el) return;
-    const headerH = (headerRef.current?.offsetHeight ?? 120) + 8;
-    const containerTop = container.getBoundingClientRect().top;
-    const elTop = el.getBoundingClientRect().top - containerTop + container.scrollTop - headerH;
-    container.scrollTo({ top: Math.max(0, elTop), behavior: 'smooth' });
-  };
+  const cat = AUDIT_CATEGORIES.find(c => c.id === activeCat);
+  const catIdx = AUDIT_CATEGORIES.findIndex(c => c.id === activeCat);
 
   return (
     <div ref={scrollRef} style={{ flex:1, overflowY:'auto', display:'flex', flexDirection:'column' }}>
-      <div ref={headerRef} style={{ position:'sticky', top:0, zIndex:20, background:C.bg,
+      {/* Sticky header */}
+      <div style={{ position:'sticky', top:0, zIndex:20, background:C.bg,
         borderBottom:`1px solid ${C.border}`, padding:'16px 36px 12px' }}>
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:10 }}>
           <div>
@@ -958,64 +934,86 @@ function AuditView({ onComplete, initialUrl = '', initialClientName = '', initia
         </div>
         <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
           {AUDIT_CATEGORIES.map(c => {
+            const catFilled = c.sections.flatMap(s => s.items).filter(it => results[it.id]).length;
+            const catTotal  = c.sections.flatMap(s => s.items).length;
+            const done = catFilled === catTotal;
             const active = activeCat === c.id;
             return (
-              <button key={c.id} onClick={() => scrollTo(c.id)} style={{
+              <button key={c.id} onClick={() => switchCat(c.id)} style={{
                 background: active ? c.color : C.surface,
-                border:`1px solid ${active ? c.color : C.border}`,
+                border:`1px solid ${active ? c.color : done ? c.color + '55' : C.border}`,
                 borderRadius:8, padding:'6px 14px',
-                color: active ? '#fff' : C.muted,
+                color: active ? '#fff' : done ? c.color : C.muted,
                 fontSize:12, fontWeight: active ? 700 : 400, cursor:'pointer',
-                transition:'background 0.15s, color 0.15s' }}>
+                transition:'background 0.15s, color 0.15s', position:'relative' }}>
                 {c.icon} {c.label}
+                {done && !active && (
+                  <span style={{ position:'absolute', top:-4, right:-4, width:10, height:10,
+                    borderRadius:'50%', background:c.color, border:`2px solid ${C.bg}` }} />
+                )}
               </button>
             );
           })}
         </div>
       </div>
 
-      <div style={{ padding:'20px 36px 40px', flex:1 }}>
-        {AUDIT_CATEGORIES.map(cat => (
-          <div key={cat.id} ref={el => sectionRefs.current[cat.id] = el} style={{ marginBottom:32 }}>
-            <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:12 }}>
-              <div style={{ width:4, height:20, borderRadius:2, background:cat.color, flexShrink:0 }} />
-              <span style={{ fontSize:14, fontWeight:800, color:C.text }}>{cat.icon} {cat.label}</span>
-            </div>
-            {cat.sections.map(sec => (
-              <div key={sec.id} style={{ marginBottom:14 }}>
-                <div style={{ padding:'8px 14px', background:cat.color + '22',
-                  borderLeft:`3px solid ${cat.color}`, borderRadius:'0 6px 6px 0',
-                  fontSize:11, fontWeight:700, color:cat.color, marginBottom:0 }}>{sec.label}</div>
-                {sec.items.map((item, i) => {
-                  const s = results[item.id];
-                  return (
-                    <div key={item.id} style={{ display:'flex', alignItems:'flex-start', gap:14,
-                      padding:'11px 14px', background: i % 2 === 0 ? C.surface : C.surfaceHover,
-                      borderBottom:`1px solid ${C.border}` }}>
-                      <div style={{ width:24, height:24, borderRadius:'50%', flexShrink:0,
-                        background:`${SEV[item.priority]}22`, border:`1px solid ${SEV[item.priority]}44`,
-                        display:'flex', alignItems:'center', justifyContent:'center',
-                        fontSize:9, fontWeight:700, color:SEV[item.priority] }}>{item.num}</div>
-                      <div style={{ flex:1, minWidth:0 }}>
-                        <div style={{ fontSize:13, fontWeight:600, color:C.text, marginBottom:2 }}>{item.item}</div>
-                        <div style={{ fontSize:11, color:C.muted, fontStyle:'italic', lineHeight:1.5 }}>{item.howTo}</div>
-                      </div>
-                      <div style={{ display:'flex', gap:4, flexShrink:0 }}>
-                        {['Pass','Partial','Fail','N/A'].map(v => (
-                          <button key={v} onClick={() => setResults(r => ({ ...r, [item.id]: v }))} style={{
-                            padding:'4px 8px', borderRadius:6, fontSize:11, fontWeight:600, cursor:'pointer',
-                            border:`1px solid ${s === v ? STATUS_COLOR[v] : C.border}`,
-                            background: s === v ? STATUS_BG[v] : 'transparent',
-                            color: s === v ? STATUS_COLOR[v] : C.muted }}>{v}</button>
-                        ))}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ))}
+      {/* Category content */}
+      <div style={{ padding:'20px 36px 32px', flex:1 }}>
+        {cat.sections.map(sec => (
+          <div key={sec.id} style={{ marginBottom:14 }}>
+            <div style={{ padding:'8px 14px', background:cat.color + '22',
+              borderLeft:`3px solid ${cat.color}`, borderRadius:'0 6px 6px 0',
+              fontSize:11, fontWeight:700, color:cat.color }}>{sec.label}</div>
+            {sec.items.map((item, i) => {
+              const s = results[item.id];
+              return (
+                <div key={item.id} style={{ display:'flex', alignItems:'flex-start', gap:14,
+                  padding:'11px 14px', background: i % 2 === 0 ? C.surface : C.surfaceHover,
+                  borderBottom:`1px solid ${C.border}` }}>
+                  <div style={{ width:24, height:24, borderRadius:'50%', flexShrink:0,
+                    background:`${SEV[item.priority]}22`, border:`1px solid ${SEV[item.priority]}44`,
+                    display:'flex', alignItems:'center', justifyContent:'center',
+                    fontSize:9, fontWeight:700, color:SEV[item.priority] }}>{item.num}</div>
+                  <div style={{ flex:1, minWidth:0 }}>
+                    <div style={{ fontSize:13, fontWeight:600, color:C.text, marginBottom:2 }}>{item.item}</div>
+                    <div style={{ fontSize:11, color:C.muted, fontStyle:'italic', lineHeight:1.5 }}>{item.howTo}</div>
+                  </div>
+                  <div style={{ display:'flex', gap:4, flexShrink:0 }}>
+                    {['Pass','Partial','Fail','N/A'].map(v => (
+                      <button key={v} onClick={() => setResults(r => ({ ...r, [item.id]: v }))} style={{
+                        padding:'4px 8px', borderRadius:6, fontSize:11, fontWeight:600, cursor:'pointer',
+                        border:`1px solid ${s === v ? STATUS_COLOR[v] : C.border}`,
+                        background: s === v ? STATUS_BG[v] : 'transparent',
+                        color: s === v ? STATUS_COLOR[v] : C.muted }}>{v}</button>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         ))}
+
+        {/* Prev / Next navigation */}
+        <div style={{ display:'flex', justifyContent:'space-between', marginTop:24 }}>
+          <button
+            onClick={() => catIdx > 0 && switchCat(AUDIT_CATEGORIES[catIdx - 1].id)}
+            disabled={catIdx === 0}
+            style={{ background: catIdx > 0 ? C.surface : 'transparent',
+              border:`1px solid ${catIdx > 0 ? C.border : 'transparent'}`,
+              borderRadius:8, padding:'9px 18px', color: catIdx > 0 ? C.muted : 'transparent',
+              fontSize:13, cursor: catIdx > 0 ? 'pointer' : 'default' }}>
+            ← {catIdx > 0 ? AUDIT_CATEGORIES[catIdx - 1].label : ''}
+          </button>
+          <button
+            onClick={() => catIdx < AUDIT_CATEGORIES.length - 1 && switchCat(AUDIT_CATEGORIES[catIdx + 1].id)}
+            disabled={catIdx === AUDIT_CATEGORIES.length - 1}
+            style={{ background: catIdx < AUDIT_CATEGORIES.length - 1 ? cat.color : 'transparent',
+              border:'none', borderRadius:8, padding:'9px 18px',
+              color: catIdx < AUDIT_CATEGORIES.length - 1 ? '#fff' : 'transparent',
+              fontSize:13, fontWeight:600, cursor: catIdx < AUDIT_CATEGORIES.length - 1 ? 'pointer' : 'default' }}>
+            {catIdx < AUDIT_CATEGORIES.length - 1 ? AUDIT_CATEGORIES[catIdx + 1].label : ''} →
+          </button>
+        </div>
       </div>
     </div>
   );

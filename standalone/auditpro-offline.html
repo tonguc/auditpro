@@ -31673,46 +31673,18 @@ function AuditView({
   const [results, setResults] = useState(initialResults);
   const [activeCat, setActiveCat] = useState(AUDIT_CATEGORIES[0].id);
   const scrollRef = useRef(null);
-  const headerRef = useRef(null);
-  const sectionRefs = useRef({});
+
+  // Scroll to top when switching categories
+  const switchCat = id => {
+    setActiveCat(id);
+    if (scrollRef.current) scrollRef.current.scrollTop = 0;
+  };
   const totalItems = AUDIT_CATEGORIES.flatMap(c => c.sections.flatMap(s => s.items)).length;
   const filledItems = Object.keys(results).filter(k => results[k] !== null && results[k] !== undefined).length;
   const remaining = totalItems - filledItems;
   const canComplete = filledItems > 0;
-
-  // Scroll-spy: update active tab as user scrolls
-  useEffect(() => {
-    const container = scrollRef.current;
-    if (!container) return;
-    const onScroll = () => {
-      const headerH = (headerRef.current?.offsetHeight ?? 120) + 16;
-      const containerTop = container.getBoundingClientRect().top;
-      let current = AUDIT_CATEGORIES[0].id;
-      for (const cat of AUDIT_CATEGORIES) {
-        const el = sectionRefs.current[cat.id];
-        if (!el) continue;
-        const elTop = el.getBoundingClientRect().top - containerTop;
-        if (elTop <= headerH) current = cat.id;
-      }
-      setActiveCat(current);
-    };
-    container.addEventListener('scroll', onScroll, {
-      passive: true
-    });
-    return () => container.removeEventListener('scroll', onScroll);
-  }, []);
-  const scrollTo = catId => {
-    const container = scrollRef.current;
-    const el = sectionRefs.current[catId];
-    if (!container || !el) return;
-    const headerH = (headerRef.current?.offsetHeight ?? 120) + 8;
-    const containerTop = container.getBoundingClientRect().top;
-    const elTop = el.getBoundingClientRect().top - containerTop + container.scrollTop - headerH;
-    container.scrollTo({
-      top: Math.max(0, elTop),
-      behavior: 'smooth'
-    });
-  };
+  const cat = AUDIT_CATEGORIES.find(c => c.id === activeCat);
+  const catIdx = AUDIT_CATEGORIES.findIndex(c => c.id === activeCat);
   return /*#__PURE__*/React.createElement("div", {
     ref: scrollRef,
     style: {
@@ -31722,7 +31694,6 @@ function AuditView({
       flexDirection: 'column'
     }
   }, /*#__PURE__*/React.createElement("div", {
-    ref: headerRef,
     style: {
       position: 'sticky',
       top: 0,
@@ -31812,55 +31783,43 @@ function AuditView({
       flexWrap: 'wrap'
     }
   }, AUDIT_CATEGORIES.map(c => {
+    const catFilled = c.sections.flatMap(s => s.items).filter(it => results[it.id]).length;
+    const catTotal = c.sections.flatMap(s => s.items).length;
+    const done = catFilled === catTotal;
     const active = activeCat === c.id;
     return /*#__PURE__*/React.createElement("button", {
       key: c.id,
-      onClick: () => scrollTo(c.id),
+      onClick: () => switchCat(c.id),
       style: {
         background: active ? c.color : C.surface,
-        border: `1px solid ${active ? c.color : C.border}`,
+        border: `1px solid ${active ? c.color : done ? c.color + '55' : C.border}`,
         borderRadius: 8,
         padding: '6px 14px',
-        color: active ? '#fff' : C.muted,
+        color: active ? '#fff' : done ? c.color : C.muted,
         fontSize: 12,
         fontWeight: active ? 700 : 400,
         cursor: 'pointer',
-        transition: 'background 0.15s, color 0.15s'
+        transition: 'background 0.15s, color 0.15s',
+        position: 'relative'
       }
-    }, c.icon, " ", c.label);
+    }, c.icon, " ", c.label, done && !active && /*#__PURE__*/React.createElement("span", {
+      style: {
+        position: 'absolute',
+        top: -4,
+        right: -4,
+        width: 10,
+        height: 10,
+        borderRadius: '50%',
+        background: c.color,
+        border: `2px solid ${C.bg}`
+      }
+    }));
   }))), /*#__PURE__*/React.createElement("div", {
     style: {
-      padding: '20px 36px 40px',
+      padding: '20px 36px 32px',
       flex: 1
     }
-  }, AUDIT_CATEGORIES.map(cat => /*#__PURE__*/React.createElement("div", {
-    key: cat.id,
-    ref: el => sectionRefs.current[cat.id] = el,
-    style: {
-      marginBottom: 32
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      display: 'flex',
-      alignItems: 'center',
-      gap: 10,
-      marginBottom: 12
-    }
-  }, /*#__PURE__*/React.createElement("div", {
-    style: {
-      width: 4,
-      height: 20,
-      borderRadius: 2,
-      background: cat.color,
-      flexShrink: 0
-    }
-  }), /*#__PURE__*/React.createElement("span", {
-    style: {
-      fontSize: 14,
-      fontWeight: 800,
-      color: C.text
-    }
-  }, cat.icon, " ", cat.label)), cat.sections.map(sec => /*#__PURE__*/React.createElement("div", {
+  }, cat.sections.map(sec => /*#__PURE__*/React.createElement("div", {
     key: sec.id,
     style: {
       marginBottom: 14
@@ -31873,8 +31832,7 @@ function AuditView({
       borderRadius: '0 6px 6px 0',
       fontSize: 11,
       fontWeight: 700,
-      color: cat.color,
-      marginBottom: 0
+      color: cat.color
     }
   }, sec.label), sec.items.map((item, i) => {
     const s = results[item.id];
@@ -31945,7 +31903,38 @@ function AuditView({
         color: s === v ? STATUS_COLOR[v] : C.muted
       }
     }, v))));
-  })))))));
+  }))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      justifyContent: 'space-between',
+      marginTop: 24
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => catIdx > 0 && switchCat(AUDIT_CATEGORIES[catIdx - 1].id),
+    disabled: catIdx === 0,
+    style: {
+      background: catIdx > 0 ? C.surface : 'transparent',
+      border: `1px solid ${catIdx > 0 ? C.border : 'transparent'}`,
+      borderRadius: 8,
+      padding: '9px 18px',
+      color: catIdx > 0 ? C.muted : 'transparent',
+      fontSize: 13,
+      cursor: catIdx > 0 ? 'pointer' : 'default'
+    }
+  }, "\u2190 ", catIdx > 0 ? AUDIT_CATEGORIES[catIdx - 1].label : ''), /*#__PURE__*/React.createElement("button", {
+    onClick: () => catIdx < AUDIT_CATEGORIES.length - 1 && switchCat(AUDIT_CATEGORIES[catIdx + 1].id),
+    disabled: catIdx === AUDIT_CATEGORIES.length - 1,
+    style: {
+      background: catIdx < AUDIT_CATEGORIES.length - 1 ? cat.color : 'transparent',
+      border: 'none',
+      borderRadius: 8,
+      padding: '9px 18px',
+      color: catIdx < AUDIT_CATEGORIES.length - 1 ? '#fff' : 'transparent',
+      fontSize: 13,
+      fontWeight: 600,
+      cursor: catIdx < AUDIT_CATEGORIES.length - 1 ? 'pointer' : 'default'
+    }
+  }, catIdx < AUDIT_CATEGORIES.length - 1 ? AUDIT_CATEGORIES[catIdx + 1].label : '', " \u2192"))));
 }
 function WhiteLabelView({
   audits,
