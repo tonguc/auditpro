@@ -936,14 +936,18 @@ function downloadPDF(config, auditUrl, score, results) {
   function st(str) {
     if (!str && str !== 0) return '';
     return String(str)
-      .replace(/[‘’`´]/g, "'")  // smart/fancy single quotes
-      .replace(/[“”]/g, '"')               // smart double quotes
-      .replace(/—|―/g, ' - ')              // em/horizontal dash
-      .replace(/–/g, '-')                       // en dash
-      .replace(/•|·|●/g, '-')         // bullets
-      .replace(/…/g, '...')                     // ellipsis
-      .replace(/ /g, ' ')                       // non-breaking space
-      .replace(/[^\x00-\xFF]/g, '');                 // strip any remaining non-Latin-1
+      .replace(/[\u2018\u2019`\u00B4]/g, "'")
+      .replace(/[\u201C\u201D]/g, '"')
+      .replace(/[\u2014\u2015]/g, ' - ')
+      .replace(/\u2013/g, '-')
+      .replace(/[\u2022\u00B7\u25CF]/g, '-')
+      .replace(/\u2026/g, '...')
+      .replace(/\u2264/g, '<=')
+      .replace(/\u2265/g, '>=')
+      .replace(/[\u2192\u27F6]/g, '->')
+      .replace(/[\u2190\u27F5]/g, '<-')
+      .replace(/\u00A0/g, ' ')
+      .replace(/[^\x00-\xFF]/g, '');
   }
 
   // Safe date string — short format, never wraps
@@ -1196,7 +1200,11 @@ function downloadPDF(config, auditUrl, score, results) {
       ];
       const rawClosing = `The primary opportunity lies in improving ${WEAKEST_MEANING[copy.weakestId] || copy.weakestId}, which directly affects overall performance.`;
       const closingLine = st(rawClosing);
-      const eiH = 13 + bullets.length * 5 + 7;
+      // Pre-wrap closing line to compute accurate box height
+      doc.setFontSize(6.5); doc.setFont('helvetica','italic');
+      const closingWrappedCheck = doc.splitTextToSize(closingLine, W - 2*M - 12);
+      const eiH = 13 + bullets.length * 5 + 2 + closingWrappedCheck.length * 4.5;
+      checkPageBreak(eiH + 6);
       doc.setFillColor(232,250,244);
       doc.roundedRect(M, y, W - 2*M, eiH, 2, 2, 'F');
       doc.setFillColor(16,185,129);
@@ -1217,6 +1225,7 @@ function downloadPDF(config, auditUrl, score, results) {
   }
 
   // ── Audit Summary stats ───────────────────────────────────────────────────
+  checkPageBreak(35);
   doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.setTextColor(30,35,45);
   doc.text('Audit Summary', M, y);
   y += 5;
@@ -1244,6 +1253,7 @@ function downloadPDF(config, auditUrl, score, results) {
   const enrichedIssues = copy ? copy.priorityIssues : [];
 
   if (enrichedIssues.length > 0) {
+    checkPageBreak(25);
     doc.setFontSize(9); doc.setFont('helvetica','bold'); doc.setTextColor(30,35,45);
     doc.text('Top Priority Issues', M, y);
     doc.setFontSize(6); doc.setFont('helvetica','normal'); doc.setTextColor(155,160,178);
