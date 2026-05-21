@@ -30545,10 +30545,11 @@ function calculateScore(results) {
       fail = 0;
     allItems.forEach(item => {
       const s = results[item.id];
-      if (s === 'Pass') pass++;else if (s === 'Partial') partial++;else if (s === 'N/A') {/* excluded */} else fail++; // Fail OR blank → counts as Fail
+      if (s === 'Pass') pass++;else if (s === 'Partial') partial++;else if (s === 'Fail') fail++;
+      // blank and N/A → excluded from denominator
     });
-    const total = pass + partial + fail;
-    const score = total > 0 ? Math.round((pass * 2 + partial * 1) / (total * 2) * 100) : 0;
+    const evaluated = pass + partial + fail;
+    const score = evaluated > 0 ? Math.round((pass + partial * 0.5) / evaluated * 100) : 0;
     return {
       id: cat.id,
       label: cat.label,
@@ -30556,21 +30557,31 @@ function calculateScore(results) {
       color: cat.color,
       score,
       grade: getGrade(score),
-      weight: WEIGHTS[cat.id] ?? 0.25,
+      weight: WEIGHTS[cat.id] ?? 0.2,
       passed: pass,
       failed: fail,
       partial,
-      total
+      total: allItems.length,
+      evaluated
     };
   });
-  const weighted = Math.round(categories.reduce((sum, c) => sum + c.score * c.weight, 0));
-  const overall = Math.round(categories.reduce((sum, c) => sum + c.score, 0) / categories.length);
+  const totalEvaluated = categories.reduce((s, c) => s + c.evaluated, 0);
+  const totalAll = categories.reduce((s, c) => s + c.total, 0);
+  const activeCats = categories.filter(c => c.evaluated > 0);
+  const totalWeight = activeCats.reduce((s, c) => s + c.weight, 0);
+  const weighted = totalWeight > 0 ? Math.round(activeCats.reduce((sum, c) => sum + c.score * c.weight, 0) / totalWeight) : 0;
+  const completionPct = Math.round(totalEvaluated / totalAll * 100);
+  const confidence = completionPct < 20 ? 'Low' : completionPct < 80 ? 'Medium' : 'High';
   return {
-    overall,
+    overall: weighted,
     weighted,
-    grade: getGrade(weighted),
-    rating: getRating(weighted),
-    categories
+    grade: totalEvaluated > 0 ? getGrade(weighted) : '—',
+    rating: totalEvaluated > 0 ? getRating(weighted) : '—',
+    categories,
+    completionPct,
+    confidence,
+    totalEvaluated,
+    totalAll
   };
 }
 function getTopIssues(results, limit = 10) {
@@ -31373,7 +31384,6 @@ function CategoryDetail({
 }
 function DashboardView({
   score,
-  issues,
   auditUrl,
   results,
   setPage,
@@ -31382,11 +31392,68 @@ function DashboardView({
   onSelectAudit
 }) {
   const [detailCat, setDetailCat] = useState(null);
-  const totalItems = AUDIT_CATEGORIES.flatMap(c => c.sections.flatMap(s => s.items)).length;
-  const filledItems = Object.keys(results).filter(k => results[k] !== null && results[k] !== undefined).length;
-  const missingCount = totalItems - filledItems;
+  const [issueFilter, setIssueFilter] = useState('Fail');
+  const totalAll = AUDIT_CATEGORIES.flatMap(c => c.sections.flatMap(s => s.items)).length;
+  const totalEval = score?.totalEvaluated ?? 0;
+  const completionPct = score?.completionPct ?? 0;
+  const confidence = score?.confidence ?? 'Low';
+  const naCount = Object.values(results).filter(v => v === 'N/A').length;
+  const onlyNA = totalEval === 0 && naCount > 0;
+  const nothingDone = totalEval === 0 && naCount === 0;
+  const justStarted = totalEval > 0 && totalEval <= 2;
+  const firstIsFail = totalEval === 1 && Object.values(results).find(v => v !== 'N/A') === 'Fail';
   const activeId = audits?.find(a => a.url === auditUrl)?.id;
-  if (!score) return /*#__PURE__*/React.createElement("div", {
+  const confidenceColor = confidence === 'High' ? C.green : confidence === 'Medium' ? C.accent : C.amber;
+
+  // Smart message
+  const smartMsg = nothingDone ? {
+    text: "Start your audit to unlock your site's performance score.",
+    icon: '🚀'
+  } : onlyNA ? {
+    text: 'No applicable checkpoints reviewed yet. Try marking some items.',
+    icon: '💡'
+  } : firstIsFail ? {
+    text: "Good start — you've found your first issue. Keep going!",
+    icon: '💪'
+  } : justStarted ? {
+    text: 'Keep going to get a clearer picture of your site.',
+    icon: '📈'
+  } : null;
+
+  // All items with status for filter
+  const PSCORE = {
+    Critical: 4,
+    High: 3,
+    Medium: 2,
+    Low: 1
+  };
+  const allItems = AUDIT_CATEGORIES.flatMap(cat => cat.sections.flatMap(sec => sec.items.map(it => ({
+    ...it,
+    category: cat.label,
+    catColor: cat.color,
+    status: results[it.id] || null
+  }))));
+  const failItems = allItems.filter(it => it.status === 'Fail').sort((a, b) => (PSCORE[b.priority] ?? 0) - (PSCORE[a.priority] ?? 0));
+  const partialItems = allItems.filter(it => it.status === 'Partial').sort((a, b) => (PSCORE[b.priority] ?? 0) - (PSCORE[a.priority] ?? 0));
+  const blankItems = allItems.filter(it => !it.status);
+  const filteredIssues = issueFilter === 'Fail' ? failItems : issueFilter === 'Partial' ? partialItems : blankItems;
+  const FILTER_TABS = [{
+    key: 'Fail',
+    label: `Fail`,
+    count: failItems.length,
+    color: C.red
+  }, {
+    key: 'Partial',
+    label: `Partial`,
+    count: partialItems.length,
+    color: C.amber
+  }, {
+    key: 'Blank',
+    label: `Blank`,
+    count: blankItems.length,
+    color: C.muted
+  }];
+  if (!score && Object.keys(results).length === 0) return /*#__PURE__*/React.createElement("div", {
     style: {
       flex: 1,
       display: 'flex',
@@ -31426,7 +31493,7 @@ function DashboardView({
   }, "Start First Audit \u2192"));
   return /*#__PURE__*/React.createElement("div", {
     style: {
-      padding: '32px 36px',
+      padding: '28px 36px',
       flex: 1,
       overflowY: 'auto'
     }
@@ -31439,16 +31506,16 @@ function DashboardView({
       display: 'flex',
       justifyContent: 'space-between',
       alignItems: 'flex-start',
-      marginBottom: 28
+      marginBottom: 20
     }
   }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("h1", {
     style: {
-      fontSize: 26,
+      fontSize: 24,
       fontWeight: 800,
       color: C.text,
-      marginBottom: 10
+      marginBottom: 6
     }
-  }, "Audit Dashboard"), audits && audits.length > 1 && /*#__PURE__*/React.createElement("select", {
+  }, "Audit Dashboard"), audits && audits.length > 1 ? /*#__PURE__*/React.createElement("select", {
     value: activeId || '',
     onChange: e => {
       const a = audits.find(x => x.id === e.target.value);
@@ -31458,38 +31525,25 @@ function DashboardView({
       background: C.surface,
       border: `1px solid ${C.border}`,
       borderRadius: 8,
-      padding: '8px 12px',
+      padding: '7px 12px',
       color: C.text,
       fontSize: 13,
       cursor: 'pointer',
-      marginBottom: 8,
       maxWidth: 340,
       outline: 'none'
     }
   }, audits.map(a => /*#__PURE__*/React.createElement("option", {
     key: a.id,
     value: a.id
-  }, a.clientName ? `${a.clientName} — ` : '', a.url, "  (Grade ", a.score.grade, ")"))), audits && audits.length <= 1 && /*#__PURE__*/React.createElement("div", {
+  }, a.clientName ? `${a.clientName} — ` : '', a.url, " (Grade ", a.score.grade, ")"))) : /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 11,
       color: C.muted,
       fontWeight: 600,
       textTransform: 'uppercase',
-      letterSpacing: '0.08em',
-      marginBottom: 6
+      letterSpacing: '0.08em'
     }
-  }, auditUrl), missingCount > 0 && /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 12,
-      color: C.amber
-    }
-  }, "\u26A0 ", missingCount, " of ", totalItems, " items not yet reviewed \u2014", ' ', /*#__PURE__*/React.createElement("span", {
-    onClick: onEdit,
-    style: {
-      cursor: 'pointer',
-      textDecoration: 'underline'
-    }
-  }, "continue audit"))), /*#__PURE__*/React.createElement("div", {
+  }, auditUrl)), /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
       gap: 8
@@ -31500,29 +31554,62 @@ function DashboardView({
       background: 'transparent',
       border: `1px solid ${C.border}`,
       borderRadius: 8,
-      padding: '9px 18px',
+      padding: '8px 16px',
       color: C.muted,
       fontSize: 13,
       fontWeight: 600,
       cursor: 'pointer'
     }
-  }, "\u270E Edit Audit"), /*#__PURE__*/React.createElement("button", {
+  }, "\u270E Edit"), /*#__PURE__*/React.createElement("button", {
     onClick: () => setPage('audit'),
     style: {
       background: C.accent,
       border: 'none',
       borderRadius: 8,
-      padding: '9px 18px',
+      padding: '8px 16px',
       color: '#fff',
       fontSize: 13,
       fontWeight: 600,
       cursor: 'pointer'
     }
-  }, "+ New Audit"))), /*#__PURE__*/React.createElement("div", {
+  }, "+ New Audit"))), smartMsg && /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: `${C.accent}15`,
+      border: `1px solid ${C.accent}44`,
+      borderRadius: 10,
+      padding: '12px 18px',
+      marginBottom: 18,
+      display: 'flex',
+      alignItems: 'center',
+      gap: 10
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 18
+    }
+  }, smartMsg.icon), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 13,
+      color: C.text
+    }
+  }, smartMsg.text), nothingDone && /*#__PURE__*/React.createElement("button", {
+    onClick: onEdit,
+    style: {
+      marginLeft: 'auto',
+      background: C.accent,
+      border: 'none',
+      borderRadius: 7,
+      padding: '6px 14px',
+      color: '#fff',
+      fontSize: 12,
+      fontWeight: 600,
+      cursor: 'pointer'
+    }
+  }, "Start Audit \u2192")), /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'grid',
-      gridTemplateColumns: '200px 1fr',
-      gap: 20,
+      gridTemplateColumns: 'repeat(4, 1fr)',
+      gap: 12,
       marginBottom: 20
     }
   }, /*#__PURE__*/React.createElement("div", {
@@ -31530,37 +31617,153 @@ function DashboardView({
       background: C.surface,
       border: `1px solid ${C.border}`,
       borderRadius: 12,
-      padding: 24,
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      gap: 12
-    }
-  }, /*#__PURE__*/React.createElement(ScoreRing, {
-    score: score.weighted,
-    size: 130
-  }), /*#__PURE__*/React.createElement("div", {
-    style: {
-      textAlign: 'center'
+      padding: '18px 20px'
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      fontSize: 11,
+      fontSize: 10,
       color: C.muted,
-      fontWeight: 600,
-      textTransform: 'uppercase'
+      fontWeight: 700,
+      textTransform: 'uppercase',
+      letterSpacing: '0.08em',
+      marginBottom: 8
     }
-  }, "Weighted Score"), /*#__PURE__*/React.createElement("div", {
+  }, "Audit Score"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 36,
+      fontWeight: 800,
+      color: totalEval > 0 ? C.accent : C.muted,
+      lineHeight: 1
+    }
+  }, totalEval > 0 ? `${score.weighted}%` : '—'), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 12,
-      color: C.amber,
-      marginTop: 4
+      color: C.muted,
+      marginTop: 6
     }
-  }, score.rating))), /*#__PURE__*/React.createElement("div", {
+  }, totalEval > 0 ? `Grade ${score.grade} · ${score.rating}` : 'No items reviewed yet')), /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: C.surface,
+      border: `1px solid ${C.border}`,
+      borderRadius: 12,
+      padding: '18px 20px'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 10,
+      color: C.muted,
+      fontWeight: 700,
+      textTransform: 'uppercase',
+      letterSpacing: '0.08em',
+      marginBottom: 8
+    }
+  }, "Completion"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 36,
+      fontWeight: 800,
+      color: C.text,
+      lineHeight: 1
+    }
+  }, completionPct, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 18
+    }
+  }, "%")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 10,
+      background: C.border,
+      borderRadius: 4,
+      height: 5
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      height: 5,
+      borderRadius: 4,
+      background: C.accent,
+      width: `${completionPct}%`,
+      transition: 'width 0.4s ease'
+    }
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: C.muted,
+      marginTop: 5
+    }
+  }, totalEval, " / ", totalAll, " items")), /*#__PURE__*/React.createElement("div", {
+    onClick: () => setIssueFilter('Fail'),
+    style: {
+      background: C.surface,
+      border: `1px solid ${failItems.length > 0 ? C.red + '44' : C.border}`,
+      borderRadius: 12,
+      padding: '18px 20px',
+      cursor: 'pointer',
+      transition: 'border-color 0.15s'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 10,
+      color: C.muted,
+      fontWeight: 700,
+      textTransform: 'uppercase',
+      letterSpacing: '0.08em',
+      marginBottom: 8
+    }
+  }, "Issues Found"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 36,
+      fontWeight: 800,
+      color: failItems.length > 0 ? C.red : C.muted,
+      lineHeight: 1
+    }
+  }, failItems.length), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: C.muted,
+      marginTop: 6
+    }
+  }, partialItems.length > 0 && /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: C.amber
+    }
+  }, partialItems.length, " partial \xB7 "), /*#__PURE__*/React.createElement("span", {
+    style: {
+      color: C.accent
+    }
+  }, "view details \u2193"))), /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: C.surface,
+      border: `1px solid ${C.border}`,
+      borderRadius: 12,
+      padding: '18px 20px'
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 10,
+      color: C.muted,
+      fontWeight: 700,
+      textTransform: 'uppercase',
+      letterSpacing: '0.08em',
+      marginBottom: 8
+    }
+  }, "Confidence"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 36,
+      fontWeight: 800,
+      color: confidenceColor,
+      lineHeight: 1
+    }
+  }, confidence), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      color: C.muted,
+      marginTop: 6
+    }
+  }, confidence === 'Low' && 'Review more items for reliable results', confidence === 'Medium' && 'Good coverage — keep going', confidence === 'High' && 'Strong coverage — results are reliable'))), score && /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'grid',
-      gridTemplateColumns: '1fr 1fr',
-      gap: 12
+      gridTemplateColumns: 'repeat(5, 1fr)',
+      gap: 12,
+      marginBottom: 20
     }
   }, score.categories.map(cat => /*#__PURE__*/React.createElement("div", {
     key: cat.id,
@@ -31571,7 +31774,7 @@ function DashboardView({
       background: C.surface,
       border: `1px solid ${C.border}`,
       borderRadius: 12,
-      padding: '16px 20px',
+      padding: '14px 16px',
       cursor: 'pointer',
       transition: 'border-color 0.15s'
     }
@@ -31579,63 +31782,61 @@ function DashboardView({
     style: {
       display: 'flex',
       justifyContent: 'space-between',
-      alignItems: 'flex-start'
-    }
-  }, /*#__PURE__*/React.createElement("div", null, /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 11,
-      color: C.muted,
-      fontWeight: 600,
-      textTransform: 'uppercase',
-      marginBottom: 4
-    }
-  }, cat.icon, " ", cat.label), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 26,
-      fontWeight: 800,
-      color: C.text,
-      lineHeight: 1
-    }
-  }, cat.score, /*#__PURE__*/React.createElement("span", {
-    style: {
-      fontSize: 12,
-      color: C.muted
-    }
-  }, "/100")), /*#__PURE__*/React.createElement("div", {
-    style: {
-      fontSize: 11,
-      color: C.muted,
-      marginTop: 4
-    }
-  }, cat.passed, " pass \xB7 ", cat.failed, " fail \xB7 ", /*#__PURE__*/React.createElement("span", {
-    style: {
-      color: C.accent
-    }
-  }, "details \u2192"))), /*#__PURE__*/React.createElement("div", {
-    style: {
-      background: `${cat.color}22`,
-      border: `1px solid ${cat.color}44`,
-      borderRadius: 8,
-      padding: '4px 12px',
-      fontSize: 20,
-      fontWeight: 800,
-      color: cat.color
-    }
-  }, cat.grade)), /*#__PURE__*/React.createElement("div", {
-    style: {
-      marginTop: 12,
-      background: C.border,
-      borderRadius: 4,
-      height: 4
+      alignItems: 'flex-start',
+      marginBottom: 8
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      height: 4,
-      borderRadius: 4,
+      fontSize: 10,
+      color: C.muted,
+      fontWeight: 700,
+      textTransform: 'uppercase',
+      flex: 1,
+      lineHeight: 1.3
+    }
+  }, cat.icon, " ", cat.label.replace('Technical SEO', 'Tech SEO').replace('On-Page & Content', 'On-Page').replace('UX Heuristics', 'UX').replace('Conversion & CTA', 'CRO').replace('AI & SERP Visibility', 'AI/SERP')), /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: `${cat.color}22`,
+      borderRadius: 6,
+      padding: '2px 8px',
+      fontSize: 14,
+      fontWeight: 800,
+      color: cat.color,
+      flexShrink: 0
+    }
+  }, cat.grade)), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 24,
+      fontWeight: 800,
+      color: C.text,
+      lineHeight: 1,
+      marginBottom: 4
+    }
+  }, cat.evaluated > 0 ? cat.score : '—', /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 11,
+      color: C.muted
+    }
+  }, cat.evaluated > 0 ? '/100' : '')), /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: C.border,
+      borderRadius: 3,
+      height: 3,
+      marginBottom: 6
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      height: 3,
+      borderRadius: 3,
       background: cat.color,
       width: `${cat.score}%`
     }
-  })))))), /*#__PURE__*/React.createElement("div", {
+  })), /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 10,
+      color: C.muted
+    }
+  }, cat.evaluated > 0 ? `${cat.passed}✓ ${cat.failed}✗ ${cat.evaluated} reviewed` : 'Not started')))), /*#__PURE__*/React.createElement("div", {
     style: {
       background: C.surface,
       border: `1px solid ${C.border}`,
@@ -31644,10 +31845,11 @@ function DashboardView({
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
-      padding: '16px 24px',
+      padding: '14px 20px',
       borderBottom: `1px solid ${C.border}`,
       display: 'flex',
-      justifyContent: 'space-between'
+      alignItems: 'center',
+      gap: 12
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
@@ -31655,27 +31857,53 @@ function DashboardView({
       fontWeight: 700,
       color: C.text
     }
-  }, "\uD83C\uDFAF Top Priority Issues"), /*#__PURE__*/React.createElement("div", {
+  }, "\uD83C\uDFAF Issues & Gaps"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      gap: 6,
+      marginLeft: 'auto'
+    }
+  }, FILTER_TABS.map(tab => /*#__PURE__*/React.createElement("button", {
+    key: tab.key,
+    onClick: () => setIssueFilter(tab.key),
+    style: {
+      background: issueFilter === tab.key ? tab.color : 'transparent',
+      border: `1px solid ${issueFilter === tab.key ? tab.color : C.border}`,
+      borderRadius: 20,
+      padding: '4px 12px',
+      fontSize: 11,
+      fontWeight: 600,
+      color: issueFilter === tab.key ? '#fff' : C.muted,
+      cursor: 'pointer'
+    }
+  }, tab.label, " ", /*#__PURE__*/React.createElement("span", {
+    style: {
+      opacity: 0.75
+    }
+  }, "(", tab.count, ")")))), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 11,
-      color: C.muted,
-      textAlign: 'right'
+      color: C.muted
     }
-  }, issues.length, " found", filledItems < totalItems && /*#__PURE__*/React.createElement("span", {
+  }, "based on ", totalEval, "/", totalAll, " reviewed")), filteredIssues.length === 0 ? /*#__PURE__*/React.createElement("div", {
     style: {
-      color: C.amber
+      padding: '32px 24px',
+      textAlign: 'center',
+      color: C.muted,
+      fontSize: 13
     }
-  }, " \xB7 based on ", filledItems, "/", totalItems, " reviewed"))), issues.slice(0, 10).map((issue, i) => {
-    const howTo = AUDIT_CATEGORIES.flatMap(c => c.sections.flatMap(s => s.items)).find(it => it.id === issue.id)?.howTo;
+  }, issueFilter === 'Fail' && (totalEval === 0 ? 'Complete some audit items to see issues.' : '🎉 No failures found in reviewed items.'), issueFilter === 'Partial' && '✅ No partial items found.', issueFilter === 'Blank' && '✅ All items have been reviewed.') : filteredIssues.map((issue, i) => {
+    const statusColor = issue.status === 'Fail' ? C.red : issue.status === 'Partial' ? C.amber : C.muted;
+    const howTo = issue.howTo;
     return /*#__PURE__*/React.createElement("div", {
       key: issue.id,
       style: {
-        padding: '13px 24px',
-        borderBottom: i < 9 ? `1px solid ${C.border}` : 'none',
+        padding: '12px 20px',
+        borderBottom: i < filteredIssues.length - 1 ? `1px solid ${C.border}` : 'none',
         display: 'flex',
         alignItems: 'flex-start',
-        gap: 14,
-        background: i % 2 === 0 ? 'transparent' : `${C.bg}66`
+        gap: 12,
+        background: i % 2 === 0 ? 'transparent' : `${C.bg}55`
       }
     }, /*#__PURE__*/React.createElement("div", {
       style: {
@@ -31683,8 +31911,8 @@ function DashboardView({
         height: 8,
         borderRadius: '50%',
         marginTop: 5,
-        background: SEV[issue.priority] ?? C.muted,
-        flexShrink: 0
+        flexShrink: 0,
+        background: issue.status ? statusColor : C.border
       }
     }), /*#__PURE__*/React.createElement("div", {
       style: {
@@ -31695,7 +31923,7 @@ function DashboardView({
       style: {
         fontSize: 13,
         color: C.text,
-        marginBottom: 3
+        marginBottom: 2
       }
     }, issue.item), howTo && /*#__PURE__*/React.createElement("div", {
       style: {
@@ -31713,21 +31941,23 @@ function DashboardView({
       }
     }, /*#__PURE__*/React.createElement("div", {
       style: {
-        fontSize: 11,
+        fontSize: 10,
         color: C.muted,
-        background: C.border,
+        background: `${issue.catColor}22`,
         borderRadius: 6,
-        padding: '3px 10px',
-        whiteSpace: 'nowrap'
+        padding: '3px 8px',
+        whiteSpace: 'nowrap',
+        color: issue.catColor
       }
     }, issue.category), /*#__PURE__*/React.createElement("div", {
       style: {
-        fontSize: 11,
-        fontWeight: 600,
+        fontSize: 10,
+        fontWeight: 700,
         color: SEV[issue.priority] ?? C.muted,
         textTransform: 'uppercase',
-        width: 60,
-        textAlign: 'right'
+        background: `${SEV[issue.priority]}22`,
+        borderRadius: 6,
+        padding: '3px 8px'
       }
     }, issue.priority)));
   })));
@@ -32878,7 +33108,6 @@ function App() {
     }
   }, page === 'dashboard' && /*#__PURE__*/React.createElement(DashboardView, {
     score: score,
-    issues: issues,
     auditUrl: auditUrl,
     results: results,
     setPage: handleNewAudit,

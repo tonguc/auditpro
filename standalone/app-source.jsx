@@ -319,20 +319,35 @@ function calculateScore(results) {
       const s = results[item.id];
       if (s === 'Pass') pass++;
       else if (s === 'Partial') partial++;
-      else if (s === 'N/A') { /* excluded */ }
-      else fail++; // Fail OR blank → counts as Fail
+      else if (s === 'Fail') fail++;
+      // blank and N/A → excluded from denominator
     });
-    const total = pass + partial + fail;
-    const score = total > 0 ? Math.round((pass * 2 + partial * 1) / (total * 2) * 100) : 0;
+    const evaluated = pass + partial + fail;
+    const score = evaluated > 0 ? Math.round((pass + partial * 0.5) / evaluated * 100) : 0;
     return {
       id: cat.id, label: cat.label, icon: cat.icon, color: cat.color,
-      score, grade: getGrade(score), weight: WEIGHTS[cat.id] ?? 0.25,
-      passed: pass, failed: fail, partial, total,
+      score, grade: getGrade(score), weight: WEIGHTS[cat.id] ?? 0.2,
+      passed: pass, failed: fail, partial, total: allItems.length, evaluated,
     };
   });
-  const weighted = Math.round(categories.reduce((sum, c) => sum + c.score * c.weight, 0));
-  const overall = Math.round(categories.reduce((sum, c) => sum + c.score, 0) / categories.length);
-  return { overall, weighted, grade: getGrade(weighted), rating: getRating(weighted), categories };
+
+  const totalEvaluated = categories.reduce((s, c) => s + c.evaluated, 0);
+  const totalAll       = categories.reduce((s, c) => s + c.total,     0);
+  const activeCats     = categories.filter(c => c.evaluated > 0);
+  const totalWeight    = activeCats.reduce((s, c) => s + c.weight, 0);
+  const weighted       = totalWeight > 0
+    ? Math.round(activeCats.reduce((sum, c) => sum + c.score * c.weight, 0) / totalWeight)
+    : 0;
+
+  const completionPct = Math.round(totalEvaluated / totalAll * 100);
+  const confidence    = completionPct < 20 ? 'Low' : completionPct < 80 ? 'Medium' : 'High';
+
+  return {
+    overall: weighted, weighted,
+    grade:  totalEvaluated > 0 ? getGrade(weighted)  : '—',
+    rating: totalEvaluated > 0 ? getRating(weighted) : '—',
+    categories, completionPct, confidence, totalEvaluated, totalAll,
+  };
 }
 
 function getTopIssues(results, limit = 10) {
@@ -789,15 +804,46 @@ function CategoryDetail({ catId, results, onClose }) {
   );
 }
 
-function DashboardView({ score, issues, auditUrl, results, setPage, onEdit, audits, onSelectAudit }) {
+function DashboardView({ score, auditUrl, results, setPage, onEdit, audits, onSelectAudit }) {
   const [detailCat, setDetailCat] = useState(null);
+  const [issueFilter, setIssueFilter] = useState('Fail');
 
-  const totalItems = AUDIT_CATEGORIES.flatMap(c => c.sections.flatMap(s => s.items)).length;
-  const filledItems = Object.keys(results).filter(k => results[k] !== null && results[k] !== undefined).length;
-  const missingCount = totalItems - filledItems;
-  const activeId = audits?.find(a => a.url === auditUrl)?.id;
+  const totalAll      = AUDIT_CATEGORIES.flatMap(c => c.sections.flatMap(s => s.items)).length;
+  const totalEval     = score?.totalEvaluated ?? 0;
+  const completionPct = score?.completionPct  ?? 0;
+  const confidence    = score?.confidence     ?? 'Low';
+  const naCount       = Object.values(results).filter(v => v === 'N/A').length;
+  const onlyNA        = totalEval === 0 && naCount > 0;
+  const nothingDone   = totalEval === 0 && naCount === 0;
+  const justStarted   = totalEval > 0 && totalEval <= 2;
+  const firstIsFail   = totalEval === 1 && Object.values(results).find(v => v !== 'N/A') === 'Fail';
+  const activeId      = audits?.find(a => a.url === auditUrl)?.id;
+  const confidenceColor = confidence === 'High' ? C.green : confidence === 'Medium' ? C.accent : C.amber;
 
-  if (!score) return (
+  // Smart message
+  const smartMsg = nothingDone  ? { text: "Start your audit to unlock your site's performance score.", icon: '🚀' }
+    : onlyNA     ? { text: 'No applicable checkpoints reviewed yet. Try marking some items.', icon: '💡' }
+    : firstIsFail? { text: "Good start — you've found your first issue. Keep going!", icon: '💪' }
+    : justStarted? { text: 'Keep going to get a clearer picture of your site.', icon: '📈' }
+    : null;
+
+  // All items with status for filter
+  const PSCORE = { Critical: 4, High: 3, Medium: 2, Low: 1 };
+  const allItems = AUDIT_CATEGORIES.flatMap(cat => cat.sections.flatMap(sec =>
+    sec.items.map(it => ({ ...it, category: cat.label, catColor: cat.color, status: results[it.id] || null }))
+  ));
+  const failItems    = allItems.filter(it => it.status === 'Fail').sort((a,b) => (PSCORE[b.priority]??0)-(PSCORE[a.priority]??0));
+  const partialItems = allItems.filter(it => it.status === 'Partial').sort((a,b) => (PSCORE[b.priority]??0)-(PSCORE[a.priority]??0));
+  const blankItems   = allItems.filter(it => !it.status);
+  const filteredIssues = issueFilter === 'Fail' ? failItems : issueFilter === 'Partial' ? partialItems : blankItems;
+
+  const FILTER_TABS = [
+    { key:'Fail',    label:`Fail`,    count: failItems.length,    color: C.red    },
+    { key:'Partial', label:`Partial`, count: partialItems.length, color: C.amber  },
+    { key:'Blank',   label:`Blank`,   count: blankItems.length,   color: C.muted  },
+  ];
+
+  if (!score && Object.keys(results).length === 0) return (
     <div style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', flexDirection:'column', gap:16 }}>
       <div style={{ fontSize:48 }}>📊</div>
       <div style={{ fontSize:16, fontWeight:600, color:C.text }}>No audit yet</div>
@@ -808,118 +854,164 @@ function DashboardView({ score, issues, auditUrl, results, setPage, onEdit, audi
       </button>
     </div>
   );
+
   return (
-    <div style={{ padding:'32px 36px', flex:1, overflowY:'auto' }}>
+    <div style={{ padding:'28px 36px', flex:1, overflowY:'auto' }}>
       {detailCat && <CategoryDetail catId={detailCat} results={results} onClose={() => setDetailCat(null)} />}
-      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:28 }}>
+
+      {/* Header row */}
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:20 }}>
         <div>
-          <h1 style={{ fontSize:26, fontWeight:800, color:C.text, marginBottom:10 }}>Audit Dashboard</h1>
-          {audits && audits.length > 1 && (
-            <select
-              value={activeId || ''}
-              onChange={e => { const a = audits.find(x => x.id === e.target.value); if (a) onSelectAudit(a); }}
+          <h1 style={{ fontSize:24, fontWeight:800, color:C.text, marginBottom:6 }}>Audit Dashboard</h1>
+          {audits && audits.length > 1 ? (
+            <select value={activeId || ''} onChange={e => { const a = audits.find(x => x.id === e.target.value); if (a) onSelectAudit(a); }}
               style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:8,
-                padding:'8px 12px', color:C.text, fontSize:13, cursor:'pointer', marginBottom:8,
-                maxWidth:340, outline:'none' }}>
+                padding:'7px 12px', color:C.text, fontSize:13, cursor:'pointer', maxWidth:340, outline:'none' }}>
               {audits.map(a => (
-                <option key={a.id} value={a.id}>
-                  {a.clientName ? `${a.clientName} — ` : ''}{a.url}  (Grade {a.score.grade})
-                </option>
+                <option key={a.id} value={a.id}>{a.clientName ? `${a.clientName} — ` : ''}{a.url} (Grade {a.score.grade})</option>
               ))}
             </select>
-          )}
-          {audits && audits.length <= 1 && (
-            <div style={{ fontSize:11, color:C.muted, fontWeight:600, textTransform:'uppercase',
-              letterSpacing:'0.08em', marginBottom:6 }}>{auditUrl}</div>
-          )}
-          {missingCount > 0 && (
-            <div style={{ fontSize:12, color:C.amber }}>
-              ⚠ {missingCount} of {totalItems} items not yet reviewed —{' '}
-              <span onClick={onEdit} style={{ cursor:'pointer', textDecoration:'underline' }}>
-                continue audit
-              </span>
-            </div>
+          ) : (
+            <div style={{ fontSize:11, color:C.muted, fontWeight:600, textTransform:'uppercase', letterSpacing:'0.08em' }}>{auditUrl}</div>
           )}
         </div>
         <div style={{ display:'flex', gap:8 }}>
           <button onClick={onEdit} style={{ background:'transparent', border:`1px solid ${C.border}`,
-            borderRadius:8, padding:'9px 18px', color:C.muted, fontSize:13, fontWeight:600, cursor:'pointer' }}>
-            ✎ Edit Audit
-          </button>
+            borderRadius:8, padding:'8px 16px', color:C.muted, fontSize:13, fontWeight:600, cursor:'pointer' }}>✎ Edit</button>
           <button onClick={() => setPage('audit')} style={{ background:C.accent, border:'none',
-            borderRadius:8, padding:'9px 18px', color:'#fff', fontSize:13, fontWeight:600, cursor:'pointer' }}>
-            + New Audit
-          </button>
+            borderRadius:8, padding:'8px 16px', color:'#fff', fontSize:13, fontWeight:600, cursor:'pointer' }}>+ New Audit</button>
         </div>
       </div>
-      <div style={{ display:'grid', gridTemplateColumns:'200px 1fr', gap:20, marginBottom:20 }}>
-        <div style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:12,
-          padding:24, display:'flex', flexDirection:'column', alignItems:'center', gap:12 }}>
-          <ScoreRing score={score.weighted} size={130} />
-          <div style={{ textAlign:'center' }}>
-            <div style={{ fontSize:11, color:C.muted, fontWeight:600, textTransform:'uppercase' }}>Weighted Score</div>
-            <div style={{ fontSize:12, color:C.amber, marginTop:4 }}>{score.rating}</div>
+
+      {/* Smart message banner */}
+      {smartMsg && (
+        <div style={{ background:`${C.accent}15`, border:`1px solid ${C.accent}44`, borderRadius:10,
+          padding:'12px 18px', marginBottom:18, display:'flex', alignItems:'center', gap:10 }}>
+          <span style={{ fontSize:18 }}>{smartMsg.icon}</span>
+          <span style={{ fontSize:13, color:C.text }}>{smartMsg.text}</span>
+          {nothingDone && <button onClick={onEdit} style={{ marginLeft:'auto', background:C.accent,
+            border:'none', borderRadius:7, padding:'6px 14px', color:'#fff', fontSize:12, fontWeight:600, cursor:'pointer' }}>
+            Start Audit →
+          </button>}
+        </div>
+      )}
+
+      {/* Top metrics row */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(4, 1fr)', gap:12, marginBottom:20 }}>
+        {/* Score */}
+        <div style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 20px' }}>
+          <div style={{ fontSize:10, color:C.muted, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:8 }}>Audit Score</div>
+          <div style={{ fontSize:36, fontWeight:800, color: totalEval > 0 ? C.accent : C.muted, lineHeight:1 }}>
+            {totalEval > 0 ? `${score.weighted}%` : '—'}
+          </div>
+          <div style={{ fontSize:12, color:C.muted, marginTop:6 }}>
+            {totalEval > 0 ? `Grade ${score.grade} · ${score.rating}` : 'No items reviewed yet'}
           </div>
         </div>
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
+        {/* Completion */}
+        <div style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 20px' }}>
+          <div style={{ fontSize:10, color:C.muted, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:8 }}>Completion</div>
+          <div style={{ fontSize:36, fontWeight:800, color:C.text, lineHeight:1 }}>{completionPct}<span style={{ fontSize:18 }}>%</span></div>
+          <div style={{ marginTop:10, background:C.border, borderRadius:4, height:5 }}>
+            <div style={{ height:5, borderRadius:4, background:C.accent, width:`${completionPct}%`, transition:'width 0.4s ease' }} />
+          </div>
+          <div style={{ fontSize:11, color:C.muted, marginTop:5 }}>{totalEval} / {totalAll} items</div>
+        </div>
+        {/* Issues Found — clickable */}
+        <div onClick={() => setIssueFilter('Fail')}
+          style={{ background:C.surface, border:`1px solid ${failItems.length > 0 ? C.red+'44' : C.border}`,
+            borderRadius:12, padding:'18px 20px', cursor:'pointer', transition:'border-color 0.15s' }}>
+          <div style={{ fontSize:10, color:C.muted, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:8 }}>Issues Found</div>
+          <div style={{ fontSize:36, fontWeight:800, color: failItems.length > 0 ? C.red : C.muted, lineHeight:1 }}>{failItems.length}</div>
+          <div style={{ fontSize:11, color:C.muted, marginTop:6 }}>
+            {partialItems.length > 0 && <span style={{ color:C.amber }}>{partialItems.length} partial · </span>}
+            <span style={{ color:C.accent }}>view details ↓</span>
+          </div>
+        </div>
+        {/* Confidence */}
+        <div style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:12, padding:'18px 20px' }}>
+          <div style={{ fontSize:10, color:C.muted, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.08em', marginBottom:8 }}>Confidence</div>
+          <div style={{ fontSize:36, fontWeight:800, color:confidenceColor, lineHeight:1 }}>{confidence}</div>
+          <div style={{ fontSize:11, color:C.muted, marginTop:6 }}>
+            {confidence === 'Low' && 'Review more items for reliable results'}
+            {confidence === 'Medium' && 'Good coverage — keep going'}
+            {confidence === 'High' && 'Strong coverage — results are reliable'}
+          </div>
+        </div>
+      </div>
+
+      {/* Category cards */}
+      {score && (
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(5, 1fr)', gap:12, marginBottom:20 }}>
           {score.categories.map(cat => (
             <div key={cat.id} onClick={() => setDetailCat(cat.id)}
               onMouseEnter={e => e.currentTarget.style.borderColor = cat.color}
               onMouseLeave={e => e.currentTarget.style.borderColor = C.border}
               style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:12,
-                padding:'16px 20px', cursor:'pointer', transition:'border-color 0.15s' }}>
-              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
-                <div>
-                  <div style={{ fontSize:11, color:C.muted, fontWeight:600,
-                    textTransform:'uppercase', marginBottom:4 }}>{cat.icon} {cat.label}</div>
-                  <div style={{ fontSize:26, fontWeight:800, color:C.text, lineHeight:1 }}>
-                    {cat.score}<span style={{ fontSize:12, color:C.muted }}>/100</span>
-                  </div>
-                  <div style={{ fontSize:11, color:C.muted, marginTop:4 }}>
-                    {cat.passed} pass · {cat.failed} fail · <span style={{ color:C.accent }}>details →</span>
-                  </div>
-                </div>
-                <div style={{ background:`${cat.color}22`, border:`1px solid ${cat.color}44`,
-                  borderRadius:8, padding:'4px 12px', fontSize:20, fontWeight:800, color:cat.color }}>
-                  {cat.grade}
-                </div>
+                padding:'14px 16px', cursor:'pointer', transition:'border-color 0.15s' }}>
+              <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:8 }}>
+                <div style={{ fontSize:10, color:C.muted, fontWeight:700, textTransform:'uppercase', flex:1, lineHeight:1.3 }}>{cat.icon} {cat.label.replace('Technical SEO','Tech SEO').replace('On-Page & Content','On-Page').replace('UX Heuristics','UX').replace('Conversion & CTA','CRO').replace('AI & SERP Visibility','AI/SERP')}</div>
+                <div style={{ background:`${cat.color}22`, borderRadius:6, padding:'2px 8px',
+                  fontSize:14, fontWeight:800, color:cat.color, flexShrink:0 }}>{cat.grade}</div>
               </div>
-              <div style={{ marginTop:12, background:C.border, borderRadius:4, height:4 }}>
-                <div style={{ height:4, borderRadius:4, background:cat.color, width:`${cat.score}%` }} />
+              <div style={{ fontSize:24, fontWeight:800, color:C.text, lineHeight:1, marginBottom:4 }}>
+                {cat.evaluated > 0 ? cat.score : '—'}<span style={{ fontSize:11, color:C.muted }}>{cat.evaluated > 0 ? '/100' : ''}</span>
+              </div>
+              <div style={{ background:C.border, borderRadius:3, height:3, marginBottom:6 }}>
+                <div style={{ height:3, borderRadius:3, background:cat.color, width:`${cat.score}%` }} />
+              </div>
+              <div style={{ fontSize:10, color:C.muted }}>
+                {cat.evaluated > 0 ? `${cat.passed}✓ ${cat.failed}✗ ${cat.evaluated} reviewed` : 'Not started'}
               </div>
             </div>
           ))}
         </div>
-      </div>
+      )}
+
+      {/* Issues section */}
       <div style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:12, overflow:'hidden' }}>
-        <div style={{ padding:'16px 24px', borderBottom:`1px solid ${C.border}`,
-          display:'flex', justifyContent:'space-between' }}>
-          <div style={{ fontSize:13, fontWeight:700, color:C.text }}>🎯 Top Priority Issues</div>
-          <div style={{ fontSize:11, color:C.muted, textAlign:'right' }}>
-            {issues.length} found
-            {filledItems < totalItems && (
-              <span style={{ color:C.amber }}> · based on {filledItems}/{totalItems} reviewed</span>
-            )}
+        <div style={{ padding:'14px 20px', borderBottom:`1px solid ${C.border}`, display:'flex', alignItems:'center', gap:12 }}>
+          <div style={{ fontSize:13, fontWeight:700, color:C.text }}>🎯 Issues &amp; Gaps</div>
+          <div style={{ display:'flex', gap:6, marginLeft:'auto' }}>
+            {FILTER_TABS.map(tab => (
+              <button key={tab.key} onClick={() => setIssueFilter(tab.key)}
+                style={{ background: issueFilter === tab.key ? tab.color : 'transparent',
+                  border:`1px solid ${issueFilter === tab.key ? tab.color : C.border}`,
+                  borderRadius:20, padding:'4px 12px', fontSize:11, fontWeight:600,
+                  color: issueFilter === tab.key ? '#fff' : C.muted, cursor:'pointer' }}>
+                {tab.label} <span style={{ opacity:0.75 }}>({tab.count})</span>
+              </button>
+            ))}
+          </div>
+          <div style={{ fontSize:11, color:C.muted }}>
+            based on {totalEval}/{totalAll} reviewed
           </div>
         </div>
-        {issues.slice(0, 10).map((issue, i) => {
-          const howTo = AUDIT_CATEGORIES.flatMap(c => c.sections.flatMap(s => s.items)).find(it => it.id === issue.id)?.howTo;
+        {filteredIssues.length === 0 ? (
+          <div style={{ padding:'32px 24px', textAlign:'center', color:C.muted, fontSize:13 }}>
+            {issueFilter === 'Fail'    && (totalEval === 0 ? 'Complete some audit items to see issues.' : '🎉 No failures found in reviewed items.')}
+            {issueFilter === 'Partial' && '✅ No partial items found.'}
+            {issueFilter === 'Blank'   && '✅ All items have been reviewed.'}
+          </div>
+        ) : filteredIssues.map((issue, i) => {
+          const statusColor = issue.status === 'Fail' ? C.red : issue.status === 'Partial' ? C.amber : C.muted;
+          const howTo = issue.howTo;
           return (
-            <div key={issue.id} style={{ padding:'13px 24px',
-              borderBottom: i < 9 ? `1px solid ${C.border}` : 'none',
-              display:'flex', alignItems:'flex-start', gap:14,
-              background: i % 2 === 0 ? 'transparent' : `${C.bg}66` }}>
-              <div style={{ width:8, height:8, borderRadius:'50%', marginTop:5,
-                background: SEV[issue.priority] ?? C.muted, flexShrink:0 }} />
+            <div key={issue.id} style={{ padding:'12px 20px',
+              borderBottom: i < filteredIssues.length - 1 ? `1px solid ${C.border}` : 'none',
+              display:'flex', alignItems:'flex-start', gap:12,
+              background: i % 2 === 0 ? 'transparent' : `${C.bg}55` }}>
+              <div style={{ width:8, height:8, borderRadius:'50%', marginTop:5, flexShrink:0,
+                background: issue.status ? statusColor : C.border }} />
               <div style={{ flex:1, minWidth:0 }}>
-                <div style={{ fontSize:13, color:C.text, marginBottom:3 }}>{issue.item}</div>
+                <div style={{ fontSize:13, color:C.text, marginBottom:2 }}>{issue.item}</div>
                 {howTo && <div style={{ fontSize:11, color:C.muted, fontStyle:'italic', lineHeight:1.5 }}>💡 {howTo}</div>}
               </div>
               <div style={{ display:'flex', gap:8, alignItems:'center', flexShrink:0 }}>
-                <div style={{ fontSize:11, color:C.muted, background:C.border,
-                  borderRadius:6, padding:'3px 10px', whiteSpace:'nowrap' }}>{issue.category}</div>
-                <div style={{ fontSize:11, fontWeight:600, color:SEV[issue.priority] ?? C.muted,
-                  textTransform:'uppercase', width:60, textAlign:'right' }}>{issue.priority}</div>
+                <div style={{ fontSize:10, color:C.muted, background:`${issue.catColor}22`,
+                  borderRadius:6, padding:'3px 8px', whiteSpace:'nowrap', color:issue.catColor }}>{issue.category}</div>
+                <div style={{ fontSize:10, fontWeight:700, color:SEV[issue.priority] ?? C.muted,
+                  textTransform:'uppercase', background:`${SEV[issue.priority]}22`, borderRadius:6, padding:'3px 8px' }}>{issue.priority}</div>
               </div>
             </div>
           );
@@ -1501,7 +1593,7 @@ function App() {
       fontFamily:'-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }}>
       <Sidebar page={page} setPage={p => { if (p === 'audit') { setEditMode(false); } setPage(p); }} />
       <div style={{ flex:1, display:'flex', overflow:'hidden' }}>
-        {page === 'dashboard'  && <DashboardView score={score} issues={issues} auditUrl={auditUrl} results={results}
+        {page === 'dashboard'  && <DashboardView score={score} auditUrl={auditUrl} results={results}
           setPage={handleNewAudit} onEdit={handleEdit} audits={audits} onSelectAudit={handleSelectAudit} />}
         {page === 'audit'      && <AuditView onComplete={handleComplete}
             initialUrl={editMode ? auditUrl : ''}
