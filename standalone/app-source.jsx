@@ -736,6 +736,88 @@ function Sidebar({ page, setPage, isDark, onToggleTheme }) {
   );
 }
 
+// ─── HOLD BUTTON (hold 2s to confirm) ────────────────────────────────────────
+function HoldButton({ onConfirm, label, holdLabel, duration = 2000, style: extStyle = {} }) {
+  const [progress, setProgress] = useState(0);
+  const intervalRef = useRef(null);
+  const startRef    = useRef(null);
+
+  const start = (e) => {
+    e.stopPropagation();
+    startRef.current = Date.now();
+    intervalRef.current = setInterval(() => {
+      const pct = Math.min((Date.now() - startRef.current) / duration * 100, 100);
+      setProgress(pct);
+      if (pct >= 100) { clearInterval(intervalRef.current); setProgress(0); onConfirm(); }
+    }, 16);
+  };
+  const cancel = (e) => {
+    e && e.stopPropagation();
+    clearInterval(intervalRef.current);
+    setProgress(0);
+  };
+
+  return (
+    <button
+      onMouseDown={start} onMouseUp={cancel} onMouseLeave={cancel}
+      onTouchStart={start} onTouchEnd={cancel}
+      style={{ position:'relative', overflow:'hidden', userSelect:'none', ...extStyle }}>
+      {progress > 0 && (
+        <div style={{ position:'absolute', left:0, top:0, height:'100%',
+          width:`${progress}%`, background:'rgba(255,255,255,0.25)', transition:'none', pointerEvents:'none' }} />
+      )}
+      <span style={{ position:'relative', pointerEvents:'none' }}>
+        {progress > 0 ? (holdLabel || '…') : label}
+      </span>
+    </button>
+  );
+}
+
+// ─── CLEAR ALL MODAL (type DELETE to confirm) ─────────────────────────────────
+function ClearAllModal({ count, onConfirm, onCancel }) {
+  const [input, setInput] = useState('');
+  const valid = input.trim() === 'DELETE';
+  return (
+    <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.7)', zIndex:1000,
+      display:'flex', alignItems:'center', justifyContent:'center' }}
+      onClick={onCancel}>
+      <div onClick={e => e.stopPropagation()} style={{
+        background:C.surface, border:`1px solid ${C.border}`, borderRadius:14,
+        padding:32, width:400, boxShadow:'0 24px 64px rgba(0,0,0,0.5)' }}>
+        <div style={{ fontSize:20, marginBottom:8 }}>🗑️</div>
+        <div style={{ fontSize:16, fontWeight:800, color:C.text, marginBottom:8 }}>Delete all audit data?</div>
+        <div style={{ fontSize:13, color:C.muted, lineHeight:1.6, marginBottom:20 }}>
+          This will permanently remove <strong style={{ color:C.text }}>{count} project{count !== 1 ? 's' : ''}</strong> and
+          all audit results. <span style={{ color:C.red }}>This action cannot be undone.</span>
+        </div>
+        <div style={{ fontSize:11, color:C.muted, marginBottom:6, fontWeight:600 }}>
+          Type <strong style={{ color:C.red, letterSpacing:2 }}>DELETE</strong> to confirm
+        </div>
+        <input
+          autoFocus
+          value={input}
+          onChange={e => setInput(e.target.value)}
+          placeholder="DELETE"
+          style={{ width:'100%', boxSizing:'border-box', background:C.bg,
+            border:`1px solid ${valid ? C.red : C.border}`, borderRadius:8,
+            padding:'10px 14px', color:C.text, fontSize:14, outline:'none',
+            letterSpacing:2, fontWeight:700, marginBottom:16 }} />
+        <div style={{ display:'flex', gap:10 }}>
+          <button onClick={onCancel} style={{ flex:1, background:'transparent',
+            border:`1px solid ${C.border}`, borderRadius:8, padding:'10px',
+            color:C.muted, fontSize:13, cursor:'pointer' }}>Cancel</button>
+          <button onClick={() => valid && onConfirm()} disabled={!valid} style={{
+            flex:1, background: valid ? C.red : C.border, border:'none', borderRadius:8,
+            padding:'10px', color:'#fff', fontSize:13, fontWeight:700,
+            cursor: valid ? 'pointer' : 'not-allowed', opacity: valid ? 1 : 0.5 }}>
+            Delete Everything
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function CategoryDetail({ catId, results, onClose }) {
   const cat = AUDIT_CATEGORIES.find(c => c.id === catId);
   const [filter, setFilter] = useState('all');
@@ -1243,7 +1325,8 @@ function AuditView({ onComplete, initialUrl = '', initialClientName = '', initia
   );
 }
 
-function WhiteLabelView({ audits, currentUrl, currentClientName, score, results, onSelect, onDelete, onUpdateAudit, onEditAudit }) {
+function WhiteLabelView({ audits, currentUrl, currentClientName, score, results, onSelect, onDelete, onUpdateAudit, onEditAudit, onResetAudit, onDuplicateAudit, onClearAll }) {
+  const [showClearModal, setShowClearModal] = useState(false);
   const [name, setName]               = useState('My Agency');
   const [color, setColor]             = useState('#0EA5E9');
   const [agencyLogo, setAgencyLogo]   = useState(null);
@@ -1500,10 +1583,17 @@ function WhiteLabelView({ audits, currentUrl, currentClientName, score, results,
         </div>
       </div>
 
+      {showClearModal && (
+        <ClearAllModal count={audits.length} onConfirm={() => { setShowClearModal(false); onClearAll(); }} onCancel={() => setShowClearModal(false)} />
+      )}
+
       {audits.length > 0 && (
         <div style={{ marginTop:28, maxWidth:720 }}>
-          <div style={{ fontSize:16, fontWeight:700, color:C.text, marginBottom:14 }}>
-            Saved Audits ({audits.length})
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:14 }}>
+            <div style={{ fontSize:16, fontWeight:700, color:C.text }}>Saved Audits ({audits.length})</div>
+            <div style={{ fontSize:11, color:C.muted, display:'flex', gap:6, alignItems:'center' }}>
+              <span style={{ fontSize:10, opacity:0.6 }}>↺ hold 2s to reset &nbsp;·&nbsp; ⧉ duplicate</span>
+            </div>
           </div>
           <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
             {audits.map(a => {
@@ -1531,7 +1621,7 @@ function WhiteLabelView({ audits, currentUrl, currentClientName, score, results,
                       {dateStr} at {timeStr} — Grade {a.score.grade}
                     </div>
                   </div>
-                  <div style={{ display:'flex', gap:8, alignItems:'center', flexShrink:0 }}>
+                  <div style={{ display:'flex', gap:6, alignItems:'center', flexShrink:0 }}>
                     {isSelected && <span style={{ fontSize:10, color:C.accent, fontWeight:700,
                       background:`${C.accent}22`, padding:'3px 10px', borderRadius:12 }}>SELECTED</span>}
                     <button onClick={e => { e.stopPropagation(); triggerPDF(a.score, a.results, a.url, a.clientName || ''); }}
@@ -1541,6 +1631,18 @@ function WhiteLabelView({ audits, currentUrl, currentClientName, score, results,
                     <button onClick={e => { e.stopPropagation(); onEditAudit(a); }}
                       style={{ background:'transparent', border:`1px solid ${C.accent}`, borderRadius:6,
                         padding:'4px 10px', color:C.accent, fontSize:12, cursor:'pointer' }}>✎ Edit</button>
+                    <button onClick={e => { e.stopPropagation(); onDuplicateAudit(a); }}
+                      title="Duplicate — copies project with blank results"
+                      style={{ background:'transparent', border:`1px solid ${C.border}`, borderRadius:6,
+                        padding:'4px 10px', color:C.muted, fontSize:12, cursor:'pointer' }}>⧉</button>
+                    <HoldButton
+                      onConfirm={() => onResetAudit(a.id)}
+                      label="↺"
+                      holdLabel="↺"
+                      duration={2000}
+                      style={{ background:'transparent', border:`1px solid ${C.amber}55`, borderRadius:6,
+                        padding:'4px 10px', color:C.amber, fontSize:12, cursor:'pointer',
+                        title:'Hold 2s to reset results' }} />
                     <button onClick={e => { e.stopPropagation(); onDelete(a.id); }}
                       style={{ background:'transparent', border:`1px solid ${C.border}`, borderRadius:6,
                         padding:'4px 10px', color:C.muted, fontSize:12, cursor:'pointer' }}>✕</button>
@@ -1548,6 +1650,26 @@ function WhiteLabelView({ audits, currentUrl, currentClientName, score, results,
                 </div>
               );
             })}
+          </div>
+
+          {/* Danger Zone */}
+          <div style={{ marginTop:28, border:`1px solid ${C.red}44`, borderRadius:10, padding:'16px 20px' }}>
+            <div style={{ fontSize:11, fontWeight:700, color:C.red, textTransform:'uppercase',
+              letterSpacing:'0.08em', marginBottom:10 }}>⚠ Danger Zone</div>
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+              <div>
+                <div style={{ fontSize:13, fontWeight:600, color:C.text }}>Clear All Data</div>
+                <div style={{ fontSize:11, color:C.muted, marginTop:2 }}>
+                  Permanently deletes all {audits.length} project{audits.length !== 1 ? 's' : ''} and audit results.
+                </div>
+              </div>
+              <button onClick={() => setShowClearModal(true)} style={{
+                background:'transparent', border:`1px solid ${C.red}`, borderRadius:8,
+                padding:'8px 16px', color:C.red, fontSize:12, fontWeight:600, cursor:'pointer',
+                flexShrink:0, marginLeft:20 }}>
+                🗑️ Clear All
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -1651,6 +1773,27 @@ function App() {
     setPage('audit');
   };
 
+  const handleResetAudit = (id) => {
+    const blank = calculateScore({});
+    const updated = audits.map(a => a.id === id ? { ...a, results: {}, score: blank } : a);
+    setAudits(updated); saveAudits(updated);
+    if (auditUrl === audits.find(a => a.id === id)?.url) {
+      setResults({}); setScore(blank);
+    }
+  };
+
+  const handleDuplicateAudit = (audit) => {
+    const copy = { ...audit, id: `${Date.now()}`, results: {}, score: calculateScore({}),
+      date: new Date().toISOString(), clientName: `${audit.clientName || audit.url} (copy)` };
+    const updated = [copy, ...audits];
+    setAudits(updated); saveAudits(updated);
+  };
+
+  const handleClearAll = () => {
+    try { localStorage.removeItem('auditpro_audits'); } catch {}
+    setAudits([]); setUrl(''); setClientName(''); setResults({}); setScore(null); setIssues([]);
+  };
+
   return (
     <div style={{ display:'flex', height:'100vh', background:C.bg, color:C.text,
       fontFamily:'-apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif' }}>
@@ -1665,7 +1808,9 @@ function App() {
             isEditing={editMode} />}
         {page === 'whitelabel' && <WhiteLabelView audits={audits} currentUrl={auditUrl}
           currentClientName={clientName} score={score} results={results}
-          onSelect={handleSelectAudit} onDelete={handleDeleteAudit} onUpdateAudit={handleUpdateAudit} onEditAudit={handleEditAudit} />}
+          onSelect={handleSelectAudit} onDelete={handleDeleteAudit} onUpdateAudit={handleUpdateAudit}
+          onEditAudit={handleEditAudit} onResetAudit={handleResetAudit}
+          onDuplicateAudit={handleDuplicateAudit} onClearAll={handleClearAll} />}
       </div>
     </div>
   );
