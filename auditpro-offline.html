@@ -33212,7 +33212,7 @@ function DashboardView({
     onClick: () => scrollToIssues('Fail'),
     style: {
       background: C.surface,
-      border: `1px solid ${failItems.length > 0 ? C.red + '44' : C.border}`,
+      border: `1px solid ${failItems.length > 0 ? C.red + '44' : completionPct < 20 && totalEval > 0 ? C.amber + '44' : C.border}`,
       borderRadius: 12,
       padding: '18px 20px',
       cursor: 'pointer',
@@ -33234,21 +33234,20 @@ function DashboardView({
       color: failItems.length > 0 ? C.red : C.muted,
       lineHeight: 1
     }
-  }, failItems.length), /*#__PURE__*/React.createElement("div", {
+  }, totalEval === 0 ? '\u2014' : failItems.length), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 11,
       color: C.muted,
       marginTop: 6
     }
-  }, partialItems.length > 0 && /*#__PURE__*/React.createElement("span", {
-    style: {
-      color: C.amber
-    }
-  }, partialItems.length, " partial \xB7 "), /*#__PURE__*/React.createElement("span", {
-    style: {
-      color: C.accent
-    }
-  }, "view details \u2193"))), /*#__PURE__*/React.createElement("div", {
+  },
+    completionPct < 20 && totalEval > 0
+      ? /*#__PURE__*/React.createElement("span", { style: { color: C.amber } }, "In ", totalEval, " reviewed items only")
+      : /*#__PURE__*/React.createElement(React.Fragment, null,
+          partialItems.length > 0 && /*#__PURE__*/React.createElement("span", { style: { color: C.amber } }, partialItems.length, " partial \xB7 "),
+          /*#__PURE__*/React.createElement("span", { style: { color: C.accent } }, "view details \u2193")
+        )
+  )), /*#__PURE__*/React.createElement("div", {
     style: {
       background: C.surface,
       border: `1px solid ${C.border}`,
@@ -33264,20 +33263,27 @@ function DashboardView({
       letterSpacing: '0.08em',
       marginBottom: 8
     }
-  }, "Confidence"), /*#__PURE__*/React.createElement("div", {
+  }, "Score Confidence"), /*#__PURE__*/React.createElement("div", {
     style: {
-      fontSize: 36,
-      fontWeight: 800,
+      fontSize: confidence === 'Low' ? 28 : 36,
+      fontWeight: 900,
       color: confidenceColor,
       lineHeight: 1
     }
-  }, confidence), /*#__PURE__*/React.createElement("div", {
+  }, totalEval === 0 ? '—' : confidence), /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 11,
-      color: C.muted,
-      marginTop: 6
+      color: confidence === 'Low' && totalEval > 0 ? C.amber : C.muted,
+      marginTop: 6,
+      lineHeight: 1.4
     }
-  }, confidence === 'Low' && 'Review more items for reliable results', confidence === 'Medium' && 'Good coverage — keep going', confidence === 'High' && 'Strong coverage — results are reliable'))), score && (() => {
+  }, totalEval === 0
+    ? 'Start the audit to see confidence'
+    : confidence === 'Low'
+      ? 'Score unreliable — too few checks done'
+      : confidence === 'Medium'
+        ? 'Good coverage — keep going'
+        : 'Strong coverage — results are reliable'))), score && (() => {
     const evaluated = score.categories.filter(c => c.evaluated > 0);
     const weakestId = evaluated.length > 0 ? evaluated.reduce((a, b) => b.score < a.score ? b : a).id : null;
     return /*#__PURE__*/React.createElement("div", {
@@ -33378,7 +33384,9 @@ function DashboardView({
           fontSize: 10,
           color: C.muted
         }
-      }, cat.evaluated > 0 ? `${cat.passed}✓ ${cat.failed}✗ ${cat.evaluated} reviewed` : 'Not started'));
+      }, cat.evaluated > 0
+        ? `${cat.passed}✓ ${cat.failed}✗ ${cat.evaluated}/${cat.total} reviewed`
+        : React.createElement("span", { style: { color: C.accent, fontWeight: 600 } }, "→ Start this section")));
     }));
   })(), failItems.length > 0 && /*#__PURE__*/React.createElement("div", {
     style: {
@@ -34601,7 +34609,7 @@ function WhiteLabelView({
       borderRadius: 12,
       padding: 24,
       overflowY: 'auto',
-      maxHeight: 600
+      maxHeight: 380
     }
   }, /*#__PURE__*/React.createElement("div", {
     style: {
