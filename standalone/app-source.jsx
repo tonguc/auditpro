@@ -519,21 +519,61 @@ function downloadPDF(config, auditUrl, score, results) {
     doc.setFontSize(6.5); doc.setFont('helvetica','normal'); doc.setTextColor(120,120,120);
     doc.text(stat.label, x + statW/2, y + 17, {align:'center'});
   });
+
+  // ── Top Priority Issues (fill cover whitespace) ──────────────────────────────
+  y += 28;
+  const failedItems = AUDIT_CATEGORIES.flatMap(cat =>
+    cat.sections.flatMap(sec => sec.items.filter(it => results[it.id] === 'Fail')
+      .map(it => ({ ...it, catLabel: cat.label, catColor: hexToRgb(cat.color) })))
+  ).slice(0, 10);
+
+  if (failedItems.length > 0) {
+    doc.setFontSize(12); doc.setFont('helvetica','bold'); doc.setTextColor(30,30,30);
+    doc.text('Top Priority Issues', M, y);
+    doc.setFontSize(7); doc.setFont('helvetica','normal'); doc.setTextColor(140,140,140);
+    doc.text(`${failedItems.length} of ${totalFail} failed items`, W - M, y, {align:'right'});
+    y += 6;
+    failedItems.forEach((item, i) => {
+      const rowH = 9;
+      if (i % 2 === 0) { doc.setFillColor(247,249,252); doc.rect(M, y, W-2*M, rowH, 'F'); }
+      // Category color dot
+      doc.setFillColor(...item.catColor);
+      doc.circle(M + 3, y + rowH/2, 1.5, 'F');
+      // Priority badge
+      const badgeColor = STATUS_COLORS_PDF[item.priority] || [150,150,150];
+      doc.setFillColor(...badgeColor); doc.setFillColor(...badgeColor);
+      doc.roundedRect(M + 7, y + 1.5, 18, 5, 1, 1, 'F');
+      doc.setFontSize(5.5); doc.setFont('helvetica','bold'); doc.setTextColor(255,255,255);
+      doc.text(item.priority.toUpperCase(), M + 16, y + 5, {align:'center'});
+      // Item text
+      doc.setFontSize(7.5); doc.setFont('helvetica','normal'); doc.setTextColor(40,40,40);
+      doc.text(item.item, M + 28, y + 6, { maxWidth: W - 2*M - 30 });
+      y += rowH;
+    });
+  }
   drawFooter();
 
   AUDIT_CATEGORIES.forEach(cat => {
     addPage();
     const catColor = hexToRgb(cat.color);
+    const catDark  = catColor.map(v => Math.max(0, Math.round(v * 0.72)));
+    // Two-tone header: category colour (top) + darker strip (bottom)
     doc.setFillColor(...catColor);
-    doc.rect(0, 0, W, 22, 'F');
-    doc.setTextColor(255,255,255); doc.setFontSize(16); doc.setFont('helvetica','bold');
-    doc.text(cat.label, M, 15);
+    doc.rect(0, 0, W, 18, 'F');
+    doc.setFillColor(...catDark);
+    doc.rect(0, 18, W, 8, 'F');
+    // Category name
+    doc.setTextColor(255,255,255); doc.setFontSize(14); doc.setFont('helvetica','bold');
+    doc.text(cat.label, M, 13);
+    // Score pill — right side of top zone
     const catScore = score.categories.find(c => c.id === cat.id);
     if (catScore) {
-      doc.setFontSize(14);
-      doc.text(`${catScore.score}/100 — Grade ${catScore.grade}`, W - M, 15, {align:'right'});
+      doc.setFontSize(10); doc.setFont('helvetica','bold');
+      doc.text(`${catScore.score}/100 — Grade ${catScore.grade}`, W - M, 13, {align:'right'});
     }
-    y = 30;
+    // Thin accent line using brand colour
+    doc.setFillColor(...brandRgb); doc.rect(0, 26, W, 1, 'F');
+    y = 33;
     cat.sections.forEach(sec => {
       checkPageBreak(20);
       doc.setFillColor(...lighten(catColor, 0.85));
