@@ -270,24 +270,38 @@ const cro = {
 };
 
 const aiSerp = {
-  id: 'serp', label: 'AI & SERP Visibility', icon: '🤖', color: '#8B5CF6',
+  id: 'serp', label: 'AI & SERP Visibility', icon: '🤖', color: '#06B6D4',
   sections: [
     { id: 'serp_visibility', label: 'SERP Performance', items: [
-      { id:'serp1', num:1,  item:'Site appears in Google top 10 for main keyword',    howTo:'Run target keyword in Google. If not in top 10, focus on content depth, backlinks, and on-page SEO.',   priority:'Critical' },
-      { id:'serp2', num:2,  item:'SERP intent matches content type',                  howTo:'Check top 10 results: informational/commercial/transactional? Your content format must match.',            priority:'Critical' },
-      { id:'serp3', num:3,  item:'Content depth ≥ competitor average (top 3)',        howTo:'If top 3 competitors avg 1500 words and your page has 400, add depth.',                                    priority:'High'     },
-      { id:'serp8', num:4,  item:'Title tag has emotional trigger or power word',     howTo:'Add "best", "ultimate", "proven", year, or number to title.',                                              priority:'Medium'   },
+      { id:'serp1',  num:1,  item:'Site appears in Google top 10 for main keyword',      howTo:'Run target keyword in Google. If not in top 10, focus on content depth, backlinks, and on-page SEO.',    priority:'Critical' },
+      { id:'serp2',  num:2,  item:'SERP intent matches content type',                    howTo:'Check top 10 results: informational/commercial/transactional? Your content format must match.',             priority:'Critical' },
+      { id:'serp3',  num:3,  item:'Content depth ≥ competitor average (top 3)',          howTo:'If top 3 competitors avg 1500 words and your page has 400, add depth.',                                     priority:'High'     },
+      { id:'serp8',  num:4,  item:'Title tag has emotional trigger or power word',       howTo:'Add "best", "ultimate", "proven", year, or number to title.',                                               priority:'Medium'   },
     ]},
     { id: 'aeo', label: 'AEO — Answer Engine Optimization', items: [
-      { id:'serp4', num:5,  item:'Featured snippet / answer box opportunity detected', howTo:'If featured snippet present in SERP, structure content with direct Q&A format, 40–60 word answers.',     priority:'High'     },
-      { id:'serp5', num:6,  item:'People Also Ask (PAA) detected → FAQ schema added', howTo:'PAA in SERP = FAQ opportunity. Add FAQ schema markup and answer PAA questions in content.',               priority:'High'     },
-      { id:'serp6', num:7,  item:'Content answers a clear, specific question',         howTo:'Every page should answer ONE clear question. Use it as the H1.',                                          priority:'High'     },
-      { id:'serp7', num:8,  item:'Content structured in short, scannable chunks',      howTo:'Use H2/H3 headers every 200–300 words. Short paragraphs (2–3 lines).',                                   priority:'Medium'   },
+      { id:'serp4',  num:5,  item:'Featured snippet / answer box opportunity detected',  howTo:'If featured snippet present in SERP, structure content with direct Q&A format, 40–60 word answers.',      priority:'High'     },
+      { id:'serp5',  num:6,  item:'People Also Ask (PAA) detected → FAQ schema added',   howTo:'PAA in SERP = FAQ opportunity. Add FAQ schema markup and answer PAA questions in content.',                priority:'High'     },
+      { id:'serp6',  num:7,  item:'Content answers a clear, specific question',           howTo:'Every page should answer ONE clear question. Use it as the H1.',                                           priority:'High'     },
+      { id:'serp7',  num:8,  item:'Content structured in short, scannable chunks',        howTo:'Use H2/H3 headers every 200–300 words. Short paragraphs (2–3 lines).',                                    priority:'Medium'   },
     ]},
     { id: 'aio', label: 'Google AI Overview (AIO)', items: [
-      { id:'serp9',  num:9,  item:'Google AI Overview detected for this keyword',       howTo:'AIO appears for many informational queries. Optimize for direct concise answers and strong E-E-A-T.',   priority:'High'     },
-      { id:'serp10', num:10, item:'Site cited as source in Google AI Overview',          howTo:'Add author bios, cite sources, use structured data. AIO sources favor authoritative content.',          priority:'Critical' },
-      { id:'serp11', num:11, item:'Content structured for AI answer extraction',         howTo:'Short intro paragraphs that directly answer the query. Lists, tables, and clear H2 questions.',        priority:'High'     },
+      { id:'serp9',  num:9,  item:'Google AI Overview detected for this keyword',         howTo:'AIO appears for many informational queries. Optimize for direct concise answers and strong E-E-A-T.',    priority:'High'     },
+      { id:'serp10', num:10, item:'Site cited as source in Google AI Overview',           howTo:'Add author bios, cite sources, use structured data. AIO sources favor authoritative content.',           priority:'Critical' },
+      { id:'serp11', num:11, item:'Content structured for AI answer extraction',          howTo:'Short intro paragraphs that directly answer the query. Lists, tables, and clear H2 questions.',         priority:'High'     },
+    ]},
+    { id: 'geo', label: 'GEO — Generative Engine Optimization', items: [
+      { id:'serp12', num:12, item:'Brand cited in ChatGPT / Perplexity / Gemini answers', howTo:'Search "[brand] + [topic]" in ChatGPT, Perplexity, Gemini. If absent, increase authoritative backlinks and brand co-mentions.', priority:'High' },
+      { id:'serp13', num:13, item:'AI crawlers not blocked in robots.txt',                howTo:'Check robots.txt — ensure GPTBot, ClaudeBot, PerplexityBot, anthropic-ai are not disallowed unless intentional.',  priority:'High'     },
+      { id:'serp14', num:14, item:'llms.txt file present and configured',                 howTo:'Add /llms.txt to guide AI crawlers to preferred content. Emerging standard — include key pages and descriptions.', priority:'Medium' },
+      { id:'serp15', num:15, item:'Content includes original data, statistics or research', howTo:'AI tools preferentially cite original research, surveys, unique data. Add proprietary statistics with source attribution.', priority:'High' },
+      { id:'serp16', num:16, item:'Brand entity in Google Knowledge Graph',               howTo:'Search brand in Google — Knowledge Panel present? If not, create Google Business Profile, add Wikidata entry, use Organization schema.', priority:'Medium' },
+    ]},
+    { id: 'eeat', label: 'E-E-A-T & Authorship Signals', items: [
+      { id:'serp17', num:17, item:'Author byline and bio on all content pages',           howTo:'Add author name, photo, credentials, and link to author page on every article. AI citation algorithms weight author signals heavily.', priority:'High' },
+      { id:'serp18', num:18, item:'Person schema markup on author pages',                 howTo:'Add Person schema with sameAs links to LinkedIn, Google Scholar, published works.',                       priority:'High'     },
+      { id:'serp19', num:19, item:'About / team page establishes domain expertise',       howTo:'About page should mention credentials, experience, certifications. AIO and GEO use this for trust scoring.', priority:'Medium' },
+      { id:'serp20', num:20, item:'External authoritative sources cited in content',      howTo:'Link out to .gov, .edu, peer-reviewed studies. AI tools value well-sourced content for citation eligibility.', priority:'Medium' },
+      { id:'serp21', num:21, item:'No unattributed AI-generated thin content',            howTo:'AI-spun content without editorial oversight triggers quality filters. Add human expertise, first-person experience, original commentary.', priority:'High' },
     ]},
   ]
 };
