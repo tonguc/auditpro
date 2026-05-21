@@ -31191,44 +31191,13 @@ function Sidebar({
     }
   }, n.label)))), /*#__PURE__*/React.createElement("div", {
     style: {
-      padding: '16px 16px',
+      padding: '12px 16px',
       borderTop: `1px solid ${C.border}`
     }
-  }, /*#__PURE__*/React.createElement("button", {
-    onClick: onToggleTheme,
-    style: {
-      width: '100%',
-      background: isDark ? '#1e2d45' : '#E2EAF4',
-      border: `1px solid ${C.border}`,
-      borderRadius: 8,
-      padding: '9px 12px',
-      cursor: 'pointer',
-      display: 'flex',
-      alignItems: 'center',
-      gap: 10
-    }
-  }, /*#__PURE__*/React.createElement("span", {
-    style: {
-      fontSize: 16
-    }
-  }, isDark ? '☀️' : '🌙'), /*#__PURE__*/React.createElement("span", {
-    style: {
-      fontSize: 12,
-      fontWeight: 600,
-      color: C.muted
-    }
-  }, isDark ? 'Light Mode' : 'Dark Mode'), /*#__PURE__*/React.createElement("span", {
-    style: {
-      marginLeft: 'auto',
-      fontSize: 10,
-      color: C.muted,
-      opacity: 0.6
-    }
-  }, isDark ? 'ON' : 'ON')), /*#__PURE__*/React.createElement("div", {
+  }, /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 10,
       color: C.muted,
-      marginTop: 10,
       textAlign: 'center'
     }
   }, "AuditPro v2.5")));
@@ -32566,7 +32535,9 @@ function WhiteLabelView({
   onEditAudit,
   onResetAudit,
   onDuplicateAudit,
-  onClearAll
+  onClearAll,
+  isDark,
+  onToggleTheme
 }) {
   const [showClearModal, setShowClearModal] = useState(false);
   const [name, setName] = useState('My Agency');
@@ -32963,7 +32934,57 @@ function WhiteLabelView({
       width: '100%',
       cursor: 'pointer'
     }
-  }, saved ? '✓ Saved!' : 'Save Settings')), /*#__PURE__*/React.createElement("div", {
+  }, saved ? '✓ Saved!' : 'Save Settings'), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 16,
+      paddingTop: 16,
+      borderTop: `1px solid ${C.border}`
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      fontWeight: 700,
+      color: C.muted,
+      textTransform: 'uppercase',
+      letterSpacing: '0.08em',
+      marginBottom: 10
+    }
+  }, "Appearance"), /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      background: C.bg,
+      border: `1px solid ${C.border}`,
+      borderRadius: 8,
+      padding: 3,
+      gap: 3
+    }
+  }, /*#__PURE__*/React.createElement("button", {
+    onClick: () => !isDark && onToggleTheme(),
+    style: {
+      flex: 1,
+      padding: '7px 0',
+      borderRadius: 6,
+      border: 'none',
+      cursor: 'pointer',
+      background: isDark ? C.accent : 'transparent',
+      color: isDark ? '#fff' : C.muted,
+      fontSize: 12,
+      fontWeight: isDark ? 700 : 400
+    }
+  }, "\uD83C\uDF19 Dark"), /*#__PURE__*/React.createElement("button", {
+    onClick: () => isDark && onToggleTheme(),
+    style: {
+      flex: 1,
+      padding: '7px 0',
+      borderRadius: 6,
+      border: 'none',
+      cursor: 'pointer',
+      background: !isDark ? C.accent : 'transparent',
+      color: !isDark ? '#fff' : C.muted,
+      fontSize: 12,
+      fontWeight: !isDark ? 700 : 400
+    }
+  }, "\u2600\uFE0F Light")))), /*#__PURE__*/React.createElement("div", {
     style: {
       background: C.surface,
       border: `1px solid ${C.border}`,
@@ -33585,7 +33606,9 @@ function App() {
     onEditAudit: handleEditAudit,
     onResetAudit: handleResetAudit,
     onDuplicateAudit: handleDuplicateAudit,
-    onClearAll: handleClearAll
+    onClearAll: handleClearAll,
+    isDark: isDark,
+    onToggleTheme: handleToggleTheme
   })));
 }
 const root = ReactDOM.createRoot(document.getElementById('root'));

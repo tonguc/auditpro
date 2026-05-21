@@ -716,21 +716,8 @@ function Sidebar({ page, setPage, isDark, onToggleTheme }) {
           </div>
         ))}
       </nav>
-      <div style={{ padding:'16px 16px', borderTop:`1px solid ${C.border}` }}>
-        <button onClick={onToggleTheme} style={{
-          width:'100%', background: isDark ? '#1e2d45' : '#E2EAF4',
-          border:`1px solid ${C.border}`, borderRadius:8,
-          padding:'9px 12px', cursor:'pointer',
-          display:'flex', alignItems:'center', gap:10 }}>
-          <span style={{ fontSize:16 }}>{isDark ? '☀️' : '🌙'}</span>
-          <span style={{ fontSize:12, fontWeight:600, color:C.muted }}>
-            {isDark ? 'Light Mode' : 'Dark Mode'}
-          </span>
-          <span style={{ marginLeft:'auto', fontSize:10, color:C.muted, opacity:0.6 }}>
-            {isDark ? 'ON' : 'ON'}
-          </span>
-        </button>
-        <div style={{ fontSize:10, color:C.muted, marginTop:10, textAlign:'center' }}>AuditPro v2.5</div>
+      <div style={{ padding:'12px 16px', borderTop:`1px solid ${C.border}` }}>
+        <div style={{ fontSize:10, color:C.muted, textAlign:'center' }}>AuditPro v2.5</div>
       </div>
     </div>
   );
@@ -1325,7 +1312,7 @@ function AuditView({ onComplete, initialUrl = '', initialClientName = '', initia
   );
 }
 
-function WhiteLabelView({ audits, currentUrl, currentClientName, score, results, onSelect, onDelete, onUpdateAudit, onEditAudit, onResetAudit, onDuplicateAudit, onClearAll }) {
+function WhiteLabelView({ audits, currentUrl, currentClientName, score, results, onSelect, onDelete, onUpdateAudit, onEditAudit, onResetAudit, onDuplicateAudit, onClearAll, isDark, onToggleTheme }) {
   const [showClearModal, setShowClearModal] = useState(false);
   const [name, setName]               = useState('My Agency');
   const [color, setColor]             = useState('#0EA5E9');
@@ -1517,6 +1504,29 @@ function WhiteLabelView({ audits, currentUrl, currentClientName, score, results,
             cursor:'pointer' }}>
             {saved ? '✓ Saved!' : 'Save Settings'}
           </button>
+
+          {/* Theme toggle */}
+          <div style={{ marginTop:16, paddingTop:16, borderTop:`1px solid ${C.border}` }}>
+            <div style={{ fontSize:11, fontWeight:700, color:C.muted, textTransform:'uppercase',
+              letterSpacing:'0.08em', marginBottom:10 }}>Appearance</div>
+            <div style={{ display:'flex', background:C.bg, border:`1px solid ${C.border}`,
+              borderRadius:8, padding:3, gap:3 }}>
+              <button onClick={() => !isDark && onToggleTheme()} style={{
+                flex:1, padding:'7px 0', borderRadius:6, border:'none', cursor:'pointer',
+                background: isDark ? C.accent : 'transparent',
+                color: isDark ? '#fff' : C.muted,
+                fontSize:12, fontWeight: isDark ? 700 : 400 }}>
+                🌙 Dark
+              </button>
+              <button onClick={() => isDark && onToggleTheme()} style={{
+                flex:1, padding:'7px 0', borderRadius:6, border:'none', cursor:'pointer',
+                background: !isDark ? C.accent : 'transparent',
+                color: !isDark ? '#fff' : C.muted,
+                fontSize:12, fontWeight: !isDark ? 700 : 400 }}>
+                ☀️ Light
+              </button>
+            </div>
+          </div>
         </div>
 
         <div style={{ background:C.surface, border:`1px solid ${C.border}`, borderRadius:12, padding:24 }}>
@@ -1810,7 +1820,8 @@ function App() {
           currentClientName={clientName} score={score} results={results}
           onSelect={handleSelectAudit} onDelete={handleDeleteAudit} onUpdateAudit={handleUpdateAudit}
           onEditAudit={handleEditAudit} onResetAudit={handleResetAudit}
-          onDuplicateAudit={handleDuplicateAudit} onClearAll={handleClearAll} />}
+          onDuplicateAudit={handleDuplicateAudit} onClearAll={handleClearAll}
+          isDark={isDark} onToggleTheme={handleToggleTheme} />}
       </div>
     </div>
   );
