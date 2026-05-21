@@ -1,4 +1,4 @@
-const { useState, useEffect, useRef } = React;
+const { useState, useEffect, useRef, useMemo } = React;
 
 // Inject keyframe for auto-advance progress bar
 (function() {
@@ -307,6 +307,7 @@ const aiSerp = {
 };
 
 const AUDIT_CATEGORIES = [technicalSEO, onPage, uxHeuristics, cro, aiSerp];
+const ITEM_W  = { Critical: 2, High: 1.5, Medium: 1, Low: 0.75 };
 const WEIGHTS = { technical: 0.25, ux: 0.25, onpage: 0.20, cro: 0.15, serp: 0.15 };
 
 // ─── SCORING ──────────────────────────────────────────────────────────────────
@@ -328,16 +329,18 @@ function getRating(score) {
 function calculateScore(results) {
   const categories = AUDIT_CATEGORIES.map(cat => {
     const allItems = cat.sections.flatMap(s => s.items);
-    let pass = 0, partial = 0, fail = 0;
+    let pass = 0, partial = 0, fail = 0, wPass = 0, wPartial = 0, wFail = 0;
     allItems.forEach(item => {
       const s = results[item.id];
-      if (s === 'Pass') pass++;
-      else if (s === 'Partial') partial++;
-      else if (s === 'Fail') fail++;
+      const w = ITEM_W[item.priority] ?? 1;
+      if (s === 'Pass')         { pass++;    wPass    += w; }
+      else if (s === 'Partial') { partial++; wPartial += w; }
+      else if (s === 'Fail')    { fail++;    wFail    += w; }
       // blank and N/A → excluded from denominator
     });
     const evaluated = pass + partial + fail;
-    const score = evaluated > 0 ? Math.round((pass + partial * 0.5) / evaluated * 100) : 0;
+    const wTotal = wPass + wPartial + wFail;
+    const score = wTotal > 0 ? Math.round((wPass + wPartial * 0.5) / wTotal * 100) : 0;
     return {
       id: cat.id, label: cat.label, icon: cat.icon, color: cat.color,
       score, grade: getGrade(score), weight: WEIGHTS[cat.id] ?? 0.2,
@@ -1188,6 +1191,7 @@ function AuditView({ onComplete, initialUrl = '', initialClientName = '', initia
   const totalItems = AUDIT_CATEGORIES.flatMap(c => c.sections.flatMap(s => s.items)).length;
   const filledItems = Object.keys(results).filter(k => results[k] !== null && results[k] !== undefined).length;
   const remaining = totalItems - filledItems;
+  const liveScore = useMemo(() => calculateScore(results), [results]);
   const canComplete = filledItems > 0;
   const cat = AUDIT_CATEGORIES.find(c => c.id === activeCat);
   const catIdx = AUDIT_CATEGORIES.findIndex(c => c.id === activeCat);
@@ -1269,6 +1273,11 @@ function AuditView({ onComplete, initialUrl = '', initialClientName = '', initia
                 fontSize:12, fontWeight: active ? 700 : 400, cursor:'pointer',
                 transition:'background 0.15s, color 0.15s', position:'relative' }}>
                 {c.icon} {c.label}
+                {c.id === 'serp' && (
+                  <span style={{ fontSize:8, fontWeight:800, padding:'1px 5px', borderRadius:3,
+                    background: active ? 'rgba(255,255,255,0.3)' : '#06B6D4', color:'#fff',
+                    marginLeft:4, letterSpacing:'0.5px', verticalAlign:'middle' }}>NEW</span>
+                )}
                 {done && !active && (
                   <span style={{ position:'absolute', top:-4, right:-4, width:10, height:10,
                     borderRadius:'50%', background:c.color, border:`2px solid ${C.bg}` }} />
@@ -1277,6 +1286,29 @@ function AuditView({ onComplete, initialUrl = '', initialClientName = '', initia
             );
           })}
         </div>
+        {/* Live Section Score Breakdown */}
+        {liveScore.totalEvaluated > 0 && (
+          <div style={{ display:'flex', gap:10, marginTop:8, flexWrap:'wrap' }}>
+            {liveScore.categories.map(cat => (
+              <div key={cat.id} style={{ display:'flex', alignItems:'center', gap:5, flex:'1 1 100px' }}>
+                <span style={{ fontSize:9, color:C.muted, whiteSpace:'nowrap', minWidth:48 }}>
+                  {cat.label.replace('Technical SEO','Tech SEO').replace('On-Page & Content','On-Page')
+                    .replace('UX Heuristics','UX').replace('Conversion & CTA','CRO').replace('AI & SERP Visibility','AI/SERP')}
+                </span>
+                <div style={{ flex:1, background:C.border, borderRadius:2, height:4 }}>
+                  {cat.evaluated > 0 && (
+                    <div style={{ height:4, borderRadius:2, background:cat.color,
+                      width:`${cat.score}%`, transition:'width 0.3s' }} />
+                  )}
+                </div>
+                <span style={{ fontSize:9, fontWeight:700, minWidth:22, textAlign:'right',
+                  color: cat.evaluated > 0 ? cat.color : C.muted }}>
+                  {cat.evaluated > 0 ? cat.score : '—'}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Category content */}
@@ -1305,6 +1337,22 @@ function AuditView({ onComplete, initialUrl = '', initialClientName = '', initia
                 <span style={{ fontSize:11, opacity:0.7 }}>{isCollapsed ? '▶' : '▼'}</span>
               )}
             </div>
+            {sec.advanced && (
+              <div style={{ padding:'5px 14px', background: cat.color + '0D',
+                borderLeft:`3px solid ${cat.color}55`, fontSize:10, color:C.muted, fontStyle:'italic' }}>
+                Advanced signals for AI-era SEO & authority
+                {isCollapsed && <span style={{ marginLeft:6, color:cat.color }}>— click to expand</span>}
+              </div>
+            )}
+            {sec.advanced && !isCollapsed && (
+              <div style={{ padding:'9px 14px', background: cat.color + '0A',
+                borderLeft:`3px solid ${cat.color}`, display:'flex', alignItems:'center', gap:8 }}>
+                <span style={{ fontSize:13 }}>💡</span>
+                <span style={{ fontSize:11, color:C.muted }}>
+                  These checks are optional but powerful for long-term growth.
+                </span>
+              </div>
+            )}
             {!isCollapsed && sec.items.map((item, i) => {
               const s = results[item.id];
               return (

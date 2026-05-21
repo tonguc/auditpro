@@ -29157,7 +29157,8 @@ function(a,b,c){if(!Vd(b))throw Error(m(200));return Wd(null,a,b,!1,c)};Q.unmoun
 const {
   useState,
   useEffect,
-  useRef
+  useRef,
+  useMemo
 } = React;
 
 // Inject keyframe for auto-advance progress bar
@@ -30585,6 +30586,12 @@ const aiSerp = {
   }]
 };
 const AUDIT_CATEGORIES = [technicalSEO, onPage, uxHeuristics, cro, aiSerp];
+const ITEM_W = {
+  Critical: 2,
+  High: 1.5,
+  Medium: 1,
+  Low: 0.75
+};
 const WEIGHTS = {
   technical: 0.25,
   ux: 0.25,
@@ -30612,14 +30619,28 @@ function calculateScore(results) {
     const allItems = cat.sections.flatMap(s => s.items);
     let pass = 0,
       partial = 0,
-      fail = 0;
+      fail = 0,
+      wPass = 0,
+      wPartial = 0,
+      wFail = 0;
     allItems.forEach(item => {
       const s = results[item.id];
-      if (s === 'Pass') pass++;else if (s === 'Partial') partial++;else if (s === 'Fail') fail++;
+      const w = ITEM_W[item.priority] ?? 1;
+      if (s === 'Pass') {
+        pass++;
+        wPass += w;
+      } else if (s === 'Partial') {
+        partial++;
+        wPartial += w;
+      } else if (s === 'Fail') {
+        fail++;
+        wFail += w;
+      }
       // blank and N/A → excluded from denominator
     });
     const evaluated = pass + partial + fail;
-    const score = evaluated > 0 ? Math.round((pass + partial * 0.5) / evaluated * 100) : 0;
+    const wTotal = wPass + wPartial + wFail;
+    const score = wTotal > 0 ? Math.round((wPass + wPartial * 0.5) / wTotal * 100) : 0;
     return {
       id: cat.id,
       label: cat.label,
@@ -32355,6 +32376,7 @@ function AuditView({
   const totalItems = AUDIT_CATEGORIES.flatMap(c => c.sections.flatMap(s => s.items)).length;
   const filledItems = Object.keys(results).filter(k => results[k] !== null && results[k] !== undefined).length;
   const remaining = totalItems - filledItems;
+  const liveScore = useMemo(() => calculateScore(results), [results]);
   const canComplete = filledItems > 0;
   const cat = AUDIT_CATEGORIES.find(c => c.id === activeCat);
   const catIdx = AUDIT_CATEGORIES.findIndex(c => c.id === activeCat);
@@ -32504,7 +32526,19 @@ function AuditView({
         transition: 'background 0.15s, color 0.15s',
         position: 'relative'
       }
-    }, c.icon, " ", c.label, done && !active && /*#__PURE__*/React.createElement("span", {
+    }, c.icon, " ", c.label, c.id === 'serp' && /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 8,
+        fontWeight: 800,
+        padding: '1px 5px',
+        borderRadius: 3,
+        background: active ? 'rgba(255,255,255,0.3)' : '#06B6D4',
+        color: '#fff',
+        marginLeft: 4,
+        letterSpacing: '0.5px',
+        verticalAlign: 'middle'
+      }
+    }, "NEW"), done && !active && /*#__PURE__*/React.createElement("span", {
       style: {
         position: 'absolute',
         top: -4,
@@ -32516,7 +32550,52 @@ function AuditView({
         border: `2px solid ${C.bg}`
       }
     }));
-  }))), /*#__PURE__*/React.createElement("div", {
+  })), liveScore.totalEvaluated > 0 && /*#__PURE__*/React.createElement("div", {
+    style: {
+      display: 'flex',
+      gap: 10,
+      marginTop: 8,
+      flexWrap: 'wrap'
+    }
+  }, liveScore.categories.map(cat => /*#__PURE__*/React.createElement("div", {
+    key: cat.id,
+    style: {
+      display: 'flex',
+      alignItems: 'center',
+      gap: 5,
+      flex: '1 1 100px'
+    }
+  }, /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 9,
+      color: C.muted,
+      whiteSpace: 'nowrap',
+      minWidth: 48
+    }
+  }, cat.label.replace('Technical SEO', 'Tech SEO').replace('On-Page & Content', 'On-Page').replace('UX Heuristics', 'UX').replace('Conversion & CTA', 'CRO').replace('AI & SERP Visibility', 'AI/SERP')), /*#__PURE__*/React.createElement("div", {
+    style: {
+      flex: 1,
+      background: C.border,
+      borderRadius: 2,
+      height: 4
+    }
+  }, cat.evaluated > 0 && /*#__PURE__*/React.createElement("div", {
+    style: {
+      height: 4,
+      borderRadius: 2,
+      background: cat.color,
+      width: `${cat.score}%`,
+      transition: 'width 0.3s'
+    }
+  })), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 9,
+      fontWeight: 700,
+      minWidth: 22,
+      textAlign: 'right',
+      color: cat.evaluated > 0 ? cat.color : C.muted
+    }
+  }, cat.evaluated > 0 ? cat.score : '—'))))), /*#__PURE__*/React.createElement("div", {
     style: {
       padding: '20px 36px 32px'
     }
@@ -32567,7 +32646,39 @@ function AuditView({
         fontSize: 11,
         opacity: 0.7
       }
-    }, isCollapsed ? '▶' : '▼')), !isCollapsed && sec.items.map((item, i) => {
+    }, isCollapsed ? '▶' : '▼')), sec.advanced && /*#__PURE__*/React.createElement("div", {
+      style: {
+        padding: '5px 14px',
+        background: cat.color + '0D',
+        borderLeft: `3px solid ${cat.color}55`,
+        fontSize: 10,
+        color: C.muted,
+        fontStyle: 'italic'
+      }
+    }, "Advanced signals for AI-era SEO & authority", isCollapsed && /*#__PURE__*/React.createElement("span", {
+      style: {
+        marginLeft: 6,
+        color: cat.color
+      }
+    }, "\u2014 click to expand")), sec.advanced && !isCollapsed && /*#__PURE__*/React.createElement("div", {
+      style: {
+        padding: '9px 14px',
+        background: cat.color + '0A',
+        borderLeft: `3px solid ${cat.color}`,
+        display: 'flex',
+        alignItems: 'center',
+        gap: 8
+      }
+    }, /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 13
+      }
+    }, "\uD83D\uDCA1"), /*#__PURE__*/React.createElement("span", {
+      style: {
+        fontSize: 11,
+        color: C.muted
+      }
+    }, "These checks are optional but powerful for long-term growth.")), !isCollapsed && sec.items.map((item, i) => {
       const s = results[item.id];
       return /*#__PURE__*/React.createElement("div", {
         key: item.id,
