@@ -31405,144 +31405,115 @@ function downloadPDF(config, auditUrl, score, results) {
   }
 
   // ── PAGE 1: COVER ──────────────────────────────────────────────────────────
-  const headerH = 50;
+  // ZONE 1 — Compact brand header bar
+  const hBarH = 22;
   doc.setFillColor(...brandRgb);
-  doc.rect(0, 0, W, 36, 'F');
-  const darkRgb = brandRgb.map(v => Math.max(0, Math.round(v * 0.72)));
-  doc.setFillColor(...darkRgb);
-  doc.rect(0, 36, W, headerH - 36, 'F');
-  // Contrast-safe text — adapts to light or dark brand colours
-  const onBrand = contrastText(brandRgb);
+  doc.rect(0, 0, W, hBarH, 'F');
+
+  const onBrand     = contrastText(brandRgb);
   const onBrandMuted = contrastMuted(brandRgb);
-  const onBrandFaint = contrastFaint(brandRgb);
-  const onDark = contrastText(darkRgb);
-  const onDarkMuted = contrastMuted(darkRgb);
-  if (clientLogo) addLogoToDoc(clientLogo, W - M, 4, 36, 13, true, brandHex);
-  doc.setTextColor(...onBrand);
-  doc.setFontSize(clientName ? 16 : 18);
-  doc.setFont('helvetica', 'bold');
-  doc.text(st(clientName || config.agencyName), M, 14);
-  doc.setFontSize(8.5);
-  doc.setFont('helvetica', 'normal');
-  doc.text('UX + SEO Audit Report', M, 23);
-  doc.setFontSize(7);
-  doc.setTextColor(...onBrandMuted);
-  doc.text(st(urlShortened), M, 31);
-  doc.setFontSize(6);
-  doc.setTextColor(...onBrandFaint);
-  doc.text('Powered by', M, 43);
-  if (agencyLogo) {
-    addLogoToDoc(agencyLogo, M + 22, 38, 30, 9, false, brandHex);
-  } else {
-    doc.setFontSize(7.5);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(...onDarkMuted);
-    doc.text(st(config.agencyName), M + 22, 43);
-    doc.setFont('helvetica', 'normal');
+
+  // Client logo — transparent (composited on brand color)
+  let clientLogoW = 0;
+  if (clientLogo) {
+    const cl = addLogoToDoc(clientLogo, W - M, 4, 32, 10, true, brandHex);
+    clientLogoW = cl.w + 4;
   }
 
-  // ── Prepared by / for ─────────────────────────────────────────────────────
-  y = headerH + 6;
-  const halfW = (W - 2 * M - 4) / 2;
-  doc.setFillColor(245, 247, 251);
-  doc.roundedRect(M, y, W - 2 * M, 22, 2, 2, 'F');
-  doc.setDrawColor(215, 220, 232);
-  doc.setLineWidth(0.2);
-  doc.roundedRect(M, y, W - 2 * M, 22, 2, 2, 'S');
-  // Left: Prepared by
-  doc.setFontSize(6);
+  // Client name (primary)
+  doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
-  doc.setTextColor(155, 160, 178);
-  doc.text('PREPARED BY', M + 5, y + 6);
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(25, 30, 48);
-  doc.text(st(config.agencyName), M + 5, y + 12);
-  if (agencyTitle) {
-    doc.setFontSize(7.5);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(90, 95, 115);
-    doc.text(st(agencyTitle), M + 5, y + 17);
-  }
-  const contactLine = [agencyWebsite, agencyEmail].filter(Boolean).join('  |  ');
-  if (contactLine) {
-    doc.setFontSize(7);
-    doc.setTextColor(125, 130, 150);
-    doc.text(st(contactLine), M + 5, agencyTitle ? y + 21 : y + 17);
-  }
-  // Divider
-  doc.setDrawColor(210, 215, 228);
-  doc.line(M + halfW + 2, y + 4, M + halfW + 2, y + 19);
-  // Right: Prepared for
-  const rx = M + halfW + 6;
-  doc.setFontSize(6);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(155, 160, 178);
-  doc.text('PREPARED FOR', rx, y + 6);
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(25, 30, 48);
-  doc.text(st(clientName || '-'), rx, y + 12);
+  doc.setTextColor(...onBrand);
+  const displayName = st(clientName || auditUrl.replace(/https?:\/\/(www\.)?/, '').split('/')[0]);
+  doc.text(displayName, M, 13);
+
+  // Subtitle
   doc.setFontSize(7.5);
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(90, 95, 115);
-  const urlShort = auditUrl.replace(/https?:\/\/(www\.)?/, '').slice(0, 40);
-  doc.text(urlShort, rx, y + 17);
-  // ── Client Snapshot box ───────────────────────────────────────────────────
-  y += 28;
-  {
-    const snapH = 26;
-    doc.setFillColor(248, 249, 253);
-    doc.roundedRect(M, y, W - 2 * M, snapH, 2, 2, 'F');
-    doc.setDrawColor(215, 220, 232);
-    doc.setLineWidth(0.2);
-    doc.roundedRect(M, y, W - 2 * M, snapH, 2, 2, 'S');
-    doc.setFontSize(6);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(155, 160, 178);
-    doc.text('AUDIT SNAPSHOT', M + 5, y + 5);
-    const evalCatsSnap = score.categories.filter(c => c.evaluated > 0);
-    const weakestSnap = evalCatsSnap.length > 0 ? evalCatsSnap.reduce((a, b) => b.score < a.score ? b : a) : null;
-    const critSnap = AUDIT_CATEGORIES.flatMap(cat => cat.sections.flatMap(sec => sec.items.filter(it => results[it.id] === 'Fail' && it.priority === 'Critical'))).length;
-    const highSnap = AUDIT_CATEGORIES.flatMap(cat => cat.sections.flatMap(sec => sec.items.filter(it => results[it.id] === 'Fail' && it.priority === 'High'))).length;
-    const urgencySnap = critSnap > 0 ? `${critSnap} Critical issue${critSnap > 1 ? 's' : ''}` : highSnap > 0 ? `${highSnap} High issue${highSnap > 1 ? 's' : ''}` : 'No critical blockers';
-    const oppSnap = weakestSnap ? weakestSnap.label.replace('AI & SERP Visibility', 'AI Visibility') + ` (${weakestSnap.score}/100)` : 'N/A';
-    const scopeSnap = `Full UX + SEO Audit - ${score.categories.reduce((s, c) => s + c.total, 0)} checkpoints`;
-    const snapCols = [{
-      label: 'Client',
-      val: st(clientName || '-')
-    }, {
-      label: 'Website',
-      val: auditUrl.replace(/https?:\/\/(www\.)?/, '').slice(0, 38)
-    }, {
-      label: 'Audit Scope',
-      val: scopeSnap
-    }, {
-      label: 'Reviewed',
-      val: dateLong
-    }, {
-      label: 'Main Opportunity',
-      val: st(oppSnap)
-    }, {
-      label: 'Urgency',
-      val: st(urgencySnap)
-    }];
-    const colW = (W - 2 * M - 6) / 3;
-    snapCols.forEach((col, i) => {
-      const cx = M + 5 + i % 3 * (colW + 3);
-      const cy = y + 10 + Math.floor(i / 3) * 9;
-      doc.setFontSize(5.5);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(155, 160, 178);
-      doc.text(col.label.toUpperCase(), cx, cy);
-      doc.setFontSize(7);
-      doc.setFont('helvetica', 'normal');
-      doc.setTextColor(28, 33, 52);
-      const valLine = doc.splitTextToSize(col.val, colW - 2);
-      doc.text(valLine[0], cx, cy + 4.5);
-    });
-    y += snapH + 4;
+  doc.setTextColor(...onBrandMuted);
+  doc.text('UX + SEO Audit Report', M, 19);
+
+  // Date — right, same baseline as client name
+  doc.setFontSize(7);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(...onBrandMuted);
+  doc.text(dateLong, W - M - clientLogoW, 13, { align: 'right' });
+
+  // ZONE 2 — Branding strip (light, below header)
+  const bStripH = 14;
+  doc.setFillColor(245, 247, 251);
+  doc.rect(0, hBarH, W, bStripH, 'F');
+
+  let agLogoEndX = M;
+  if (agencyLogo) {
+    const al = addLogoToDoc(agencyLogo, M, hBarH + 2, 22, 9, false, '#f5f7fb');
+    agLogoEndX = M + al.w + 4;
   }
+
+  // "Prepared by" label
+  doc.setFontSize(5.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(160, 165, 185);
+  doc.text('PREPARED BY', agLogoEndX, hBarH + 6);
+
+  // Agency name
+  doc.setFontSize(8.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(25, 30, 48);
+  doc.text(st(config.agencyName), agLogoEndX, hBarH + 11.5);
+
+  // Agency contact (title / website / email — one compact line)
+  const contactParts = [agencyTitle, agencyWebsite, agencyEmail].filter(Boolean);
+  if (contactParts.length > 0) {
+    doc.setFontSize(6.5);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(120, 125, 145);
+    doc.text(st(contactParts.join('  ·  ').slice(0, 70)), agLogoEndX, hBarH + bStripH - 1.5);
+  }
+
+  // ZONE 3 — Compact audit summary (no box, just text rows)
+  y = hBarH + bStripH + 6;
+
+  const evalCats2  = score.categories.filter(c => c.evaluated > 0);
+  const weakest2   = evalCats2.length > 0 ? evalCats2.reduce((a, b) => b.score < a.score ? b : a) : null;
+  const totalItems2 = score.categories.reduce((s, c) => s + c.total, 0);
+  const critS = AUDIT_CATEGORIES.flatMap(cat => cat.sections.flatMap(sec => sec.items.filter(it => results[it.id] === 'Fail' && it.priority === 'Critical'))).length;
+  const highS = AUDIT_CATEGORIES.flatMap(cat => cat.sections.flatMap(sec => sec.items.filter(it => results[it.id] === 'Fail' && it.priority === 'High'))).length;
+  const urgencyStr = critS > 0 ? `${critS} Critical issue${critS > 1 ? 's' : ''}` : highS > 0 ? `${highS} High-priority issue${highS > 1 ? 's' : ''}` : 'No critical blockers';
+  const oppStr = weakest2 ? weakest2.label.replace('AI & SERP Visibility', 'AI & SERP') : 'N/A';
+
+  // Row 1: Scope + Coverage
+  doc.setFontSize(7.5);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(50, 55, 72);
+  doc.text(`Audit Scope:`, M, y);
+  doc.setFont('helvetica', 'bold');
+  doc.text(`Full UX + SEO Audit  (${totalItems2} checks)`, M + 22, y);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Coverage:`, W / 2, y);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(score.completionPct < 20 ? 180 : 50, score.completionPct < 20 ? 110 : 55, score.completionPct < 20 ? 0 : 72);
+  doc.text(`${score.completionPct}%  (${score.totalEvaluated} / ${score.totalAll} reviewed)`, W / 2 + 18, y);
+
+  y += 6;
+  // Row 2: Opportunity + Urgency
+  doc.setTextColor(50, 55, 72);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Main Opportunity:`, M, y);
+  doc.setFont('helvetica', 'bold');
+  doc.text(st(oppStr), M + 30, y);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Urgency:`, W / 2, y);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(critS > 0 ? 180 : highS > 0 ? 155 : 50, critS > 0 ? 30 : highS > 0 ? 80 : 55, critS > 0 ? 30 : highS > 0 ? 0 : 72);
+  doc.text(st(urgencyStr), W / 2 + 18, y);
+
+  // Thin separator below summary
+  y += 7;
+  doc.setDrawColor(220, 223, 232);
+  doc.setLineWidth(0.2);
+  doc.line(M, y, W - M, y);
+  y += 5;
 
   // ── Low-coverage warning block ────────────────────────────────────────────
   if (score.completionPct < 20) {
