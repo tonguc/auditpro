@@ -35,39 +35,141 @@
   .cover {
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    align-items: flex-start;
+    justify-content: space-between;
     min-height: 88vh;
-    padding: 72px 0 60px;
-    border-bottom: 3px solid #0EA5E9;
+    padding: 64px 0 52px;
+    border-bottom: none;
+    position: relative;
+    overflow: hidden;
   }
-  .brand { font-size: 38px; font-weight: 900; letter-spacing: -1px; }
-  .brand span { color: #0EA5E9; }
-  .tagline { font-size: 14px; color: #64748b; margin-top: 8px; }
-  .doc-title {
-    margin-top: 48px;
-    font-size: 22px;
-    font-weight: 700;
-    color: #1e293b;
+  .cover-bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 55%, #0c4a6e 100%);
+    border-radius: 16px;
+    z-index: 0;
   }
-  .version-badge {
-    display: inline-block;
-    margin-top: 12px;
-    background: #0EA5E9;
+  .cover-accent {
+    position: absolute;
+    top: -60px;
+    right: -60px;
+    width: 340px;
+    height: 340px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(14,165,233,0.25) 0%, transparent 70%);
+    z-index: 0;
+  }
+  .cover-accent2 {
+    position: absolute;
+    bottom: -80px;
+    left: -40px;
+    width: 260px;
+    height: 260px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(56,189,248,0.12) 0%, transparent 70%);
+    z-index: 0;
+  }
+  .cover-inner {
+    position: relative;
+    z-index: 1;
+    padding: 0 44px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 0;
+  }
+  .cover-top { flex: 1; }
+  .brand {
+    font-size: 42px;
+    font-weight: 900;
+    letter-spacing: -1.5px;
     color: #fff;
+  }
+  .brand span { color: #38bdf8; }
+  .cover-pill {
+    display: inline-block;
+    margin-top: 14px;
+    background: rgba(56,189,248,0.18);
+    border: 1px solid rgba(56,189,248,0.35);
+    color: #7dd3fc;
     font-size: 11px;
     font-weight: 700;
-    padding: 4px 12px;
+    padding: 4px 14px;
     border-radius: 20px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .cover-hero {
+    margin-top: 44px;
+  }
+  .cover-hero-title {
+    font-size: 28px;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1.25;
+    letter-spacing: -0.5px;
+    max-width: 480px;
+  }
+  .cover-hero-sub {
+    margin-top: 14px;
+    font-size: 14px;
+    color: #94a3b8;
+    max-width: 420px;
+    line-height: 1.65;
+  }
+  /* icon dashboard mockup */
+  .cover-mockup {
+    display: flex;
+    gap: 10px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+  }
+  .mock-card {
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .mock-icon { font-size: 20px; }
+  .mock-label { font-size: 11px; color: #cbd5e1; font-weight: 600; }
+  .mock-count { font-size: 18px; font-weight: 800; color: #fff; }
+  /* cover footer */
+  .cover-footer {
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .cover-doc-label {
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  .cover-doc-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: #fff;
+    margin-top: 4px;
+  }
+  .cover-version {
+    font-size: 11px;
+    color: #475569;
+    font-weight: 600;
     letter-spacing: 0.06em;
   }
-  .cover-note {
-    margin-top: 40px;
-    font-size: 12px;
-    color: #94a3b8;
-    border-left: 3px solid #e2e8f0;
-    padding-left: 14px;
-    line-height: 1.7;
+  .cover-license {
+    margin-top: 12px;
+    font-size: 10.5px;
+    color: #475569;
   }
 
   /* ── Section pages ── */
@@ -222,14 +324,69 @@
 <!-- COVER                                                      -->
 <!-- ══════════════════════════════════════════════════════════ -->
 <div class="cover">
-  <div class="brand"><span>Audit</span>Pro</div>
-  <div class="tagline">UX + SEO Intelligence Toolkit · 211-Point Audit</div>
-  <div class="doc-title">Quick Start Guide</div>
-  <div class="version-badge">v1.0</div>
-  <div class="cover-note">
-    This is a standalone offline tool — no installation required.<br>
-    Works in Chrome, Edge, Firefox, and Safari.<br>
-    All data stays on your computer. Nothing is sent to any server.
+  <div class="cover-bg"></div>
+  <div class="cover-accent"></div>
+  <div class="cover-accent2"></div>
+  <div class="cover-inner">
+    <div class="cover-top">
+      <div class="brand"><span>Audit</span>Pro</div>
+      <div class="cover-pill">211-Point Audit · v1.0</div>
+
+      <div class="cover-hero">
+        <div class="cover-hero-title">Create professional SEO &amp; UX audit reports for clients in minutes.</div>
+        <div class="cover-hero-sub">
+          A complete offline audit toolkit — no internet, no subscription, no account needed.
+          Works in any modern browser. All data stays on your device.
+        </div>
+      </div>
+
+      <div class="cover-mockup">
+        <div class="mock-card">
+          <div class="mock-icon">⚙️</div>
+          <div>
+            <div class="mock-label">Technical SEO</div>
+            <div class="mock-count">65</div>
+          </div>
+        </div>
+        <div class="mock-card">
+          <div class="mock-icon">📝</div>
+          <div>
+            <div class="mock-label">On-Page &amp; Content</div>
+            <div class="mock-count">50</div>
+          </div>
+        </div>
+        <div class="mock-card">
+          <div class="mock-icon">🎯</div>
+          <div>
+            <div class="mock-label">UX Heuristics</div>
+            <div class="mock-count">40</div>
+          </div>
+        </div>
+        <div class="mock-card">
+          <div class="mock-icon">⚡</div>
+          <div>
+            <div class="mock-label">Conversion &amp; CTA</div>
+            <div class="mock-count">35</div>
+          </div>
+        </div>
+        <div class="mock-card">
+          <div class="mock-icon">🤖</div>
+          <div>
+            <div class="mock-label">AI &amp; SERP Visibility</div>
+            <div class="mock-count">21</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="cover-footer">
+      <div>
+        <div class="cover-doc-label">Included Guide</div>
+        <div class="cover-doc-title">Quick Start</div>
+        <div class="cover-license">For personal or single-agency use only. Redistribution or resale is not allowed.</div>
+      </div>
+      <div class="cover-version">auditpro-offline.html</div>
+    </div>
   </div>
 </div>
 
