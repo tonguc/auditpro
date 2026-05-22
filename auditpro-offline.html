@@ -33073,7 +33073,7 @@ function DashboardView({
   }, audits.map(a => /*#__PURE__*/React.createElement("option", {
     key: a.id,
     value: a.id
-  }, a.clientName ? `${a.clientName} — ` : '', a.url, " (Grade ", a.score.grade, ")"))) : /*#__PURE__*/React.createElement("div", {
+  }, a.clientName ? `${a.clientName} — ` : '', a.url, " (Grade ", a.score?.grade ?? '?', ")"))) : /*#__PURE__*/React.createElement("div", {
     style: {
       fontSize: 11,
       color: C.muted,
@@ -34900,10 +34900,10 @@ function WhiteLabelView({
         justifyContent: 'center',
         fontWeight: 800,
         fontSize: 16,
-        background: `${a.score.weighted >= 70 ? C.green : a.score.weighted >= 50 ? C.amber : C.red}22`,
-        color: a.score.weighted >= 70 ? C.green : a.score.weighted >= 50 ? C.amber : C.red
+        background: `${(a.score?.weighted ?? 0) >= 70 ? C.green : (a.score?.weighted ?? 0) >= 50 ? C.amber : C.red}22`,
+        color: (a.score?.weighted ?? 0) >= 70 ? C.green : (a.score?.weighted ?? 0) >= 50 ? C.amber : C.red
       }
-    }, a.score.weighted), /*#__PURE__*/React.createElement("div", {
+    }, a.score?.weighted ?? '—'), /*#__PURE__*/React.createElement("div", {
       style: {
         flex: 1,
         minWidth: 0
@@ -34927,7 +34927,7 @@ function WhiteLabelView({
       style: {
         color: C.muted
       }
-    }, a.url, " \xB7 "), dateStr, " at ", timeStr, " \u2014 Grade ", a.score.grade)), /*#__PURE__*/React.createElement("div", {
+    }, a.url, " \xB7 "), dateStr, " at ", timeStr, " \u2014 Grade ", a.score?.grade ?? '?')), /*#__PURE__*/React.createElement("div", {
       style: {
         display: 'flex',
         gap: 6,
@@ -34946,6 +34946,7 @@ function WhiteLabelView({
     }, "SELECTED"), /*#__PURE__*/React.createElement("button", {
       onClick: e => {
         e.stopPropagation();
+        if (!a.score) return;
         triggerPDF(a.score, a.results, a.url, a.clientName || '');
       },
       style: {
