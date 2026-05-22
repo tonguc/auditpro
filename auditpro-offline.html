@@ -31439,7 +31439,7 @@ function downloadPDF(config, auditUrl, score, results) {
   doc.text(dateLong, W - M, 13, { align: 'right' });
 
   // ZONE 2 — Branding strip (light, below header)
-  const bStripH = 32;
+  const bStripH = 22;
   doc.setFillColor(245, 247, 251);
   doc.rect(0, hBarH, W, bStripH, 'F');
   // thin separator line at bottom of strip
@@ -31449,38 +31449,38 @@ function downloadPDF(config, auditUrl, score, results) {
 
   let agLogoEndX = M;
   if (agencyLogo) {
-    const al = addLogoToDoc(agencyLogo, M, hBarH + 4, 24, 14, false, '#f5f7fb');
-    agLogoEndX = M + al.w + 6;
+    const al = addLogoToDoc(agencyLogo, M, hBarH + 2, 18, 10, false, '#f5f7fb');
+    agLogoEndX = M + al.w + 5;
   }
 
   // "Prepared by" label
   doc.setFontSize(5.5);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(160, 165, 185);
-  doc.text('PREPARED BY', agLogoEndX, hBarH + 7);
+  doc.text('PREPARED BY', agLogoEndX, hBarH + 5);
 
   // Agency name
-  doc.setFontSize(9);
+  doc.setFontSize(8.5);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(25, 30, 48);
-  doc.text(st(config.agencyName), agLogoEndX, hBarH + 15);
+  doc.text(st(config.agencyName), agLogoEndX, hBarH + 11);
 
   // Agency contact (title / website / email — one compact line)
   const contactParts = [agencyTitle, agencyWebsite, agencyEmail].filter(Boolean);
   if (contactParts.length > 0) {
-    doc.setFontSize(6.5);
+    doc.setFontSize(6);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(120, 125, 145);
-    doc.text(st(contactParts.join('  ·  ').slice(0, 75)), agLogoEndX, hBarH + 23);
+    doc.text(st(contactParts.join('  ·  ').slice(0, 75)), agLogoEndX, hBarH + 17);
   }
 
   // Client logo — right side of the gray branding strip
   if (clientLogo) {
-    addLogoToDoc(clientLogo, W - M, hBarH + 4, 44, 22, true, '#f5f7fb');
+    addLogoToDoc(clientLogo, W - M, hBarH + 2, 40, 18, true, '#f5f7fb');
   }
 
   // ZONE 3 — Compact audit summary (no box, just text rows)
-  y = hBarH + bStripH + 10;
+  y = hBarH + bStripH + 8;
 
   const evalCats2     = score.categories.filter(c => c.evaluated > 0);
   const unevalCats2   = score.categories.filter(c => c.evaluated === 0);
