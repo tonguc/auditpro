@@ -31658,17 +31658,29 @@ function downloadPDF(config, auditUrl, score, results) {
   doc.setLineWidth(0.3);
   doc.line(div2X, y + 5, div2X, y + boxH - 5);
 
-  // Right: Grade (less dominant on low coverage)
+  // Right: Grade (withheld on low coverage, less dominant on medium)
   const gradeAreaCx = div2X + (W - M - div2X) / 2;
-  const gradeFontSize = isLowCovPDF ? 16 : 22;
-  doc.setFontSize(gradeFontSize);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(...brandRgb);
-  doc.text(`Grade ${score.grade}`, gradeAreaCx, y + (isLowCovPDF ? 16 : 18), { align: 'center' });
-  doc.setFontSize(8);
-  doc.setFont('helvetica', 'normal');
-  doc.setTextColor(90, 95, 115);
-  doc.text(st(score.rating), gradeAreaCx, y + (isLowCovPDF ? 24 : 27), { align: 'center' });
+  if (isLowCovPDF) {
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(150, 110, 20);
+    doc.text('Grade withheld', gradeAreaCx, y + 14, { align: 'center' });
+    doc.setFontSize(6.5);
+    doc.setFont('helvetica', 'italic');
+    doc.setTextColor(150, 120, 50);
+    doc.text('Complete more checks', gradeAreaCx, y + 20, { align: 'center' });
+    doc.text('to unlock grade', gradeAreaCx, y + 26, { align: 'center' });
+  } else {
+    const gradeFontSize = isMedCovPDF ? 18 : 22;
+    doc.setFontSize(gradeFontSize);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...brandRgb);
+    doc.text(`Grade ${score.grade}`, gradeAreaCx, y + (isMedCovPDF ? 17 : 18), { align: 'center' });
+    doc.setFontSize(8);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(90, 95, 115);
+    doc.text(st(score.rating), gradeAreaCx, y + (isMedCovPDF ? 25 : 27), { align: 'center' });
+  }
 
   // ── Section Scores ────────────────────────────────────────────────────────
   y += boxH + 10;
@@ -31705,10 +31717,11 @@ function downloadPDF(config, auditUrl, score, results) {
       align: 'center'
     });
     if (!noData) {
+      const catCov = catCovLevel(cat.evaluated, cat.total);
       doc.setFontSize(6.5);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(...catRgb);
-      doc.text(`Grade ${cat.grade}`, x + catBoxW / 2, y + 25, {
+      doc.setFont('helvetica', catCov.isLow ? 'italic' : 'bold');
+      doc.setTextColor(...(catCov.isLow ? [150, 120, 50] : catRgb));
+      doc.text(catCov.isLow ? 'Prelim.' : `Grade ${cat.grade}`, x + catBoxW / 2, y + 25, {
         align: 'center'
       });
     } else {
@@ -32149,7 +32162,7 @@ function downloadPDF(config, auditUrl, score, results) {
     hot: false
   }, weakestCat ? {
     num: '2',
-    title: `Strengthen ${weakestCat.label.replace('AI & SERP Visibility', 'AI Visibility')} - Score: ${weakestCat.score}/100`,
+    title: `Strengthen ${weakestCat.label.replace('AI & SERP Visibility', 'AI Visibility')}${(() => { const cov = catCovLevel(weakestCat.evaluated, weakestCat.total); return cov.isLow ? ` — Preliminary Score: ${weakestCat.score}/100 (${weakestCat.evaluated}/${weakestCat.total} reviewed)` : ` — Score: ${weakestCat.score}/100`; })()}`,
     body: 'This is the weakest area in the audit. A focused effort here will have the highest impact on overall site health and score.',
     hot: false
   } : {
@@ -32174,8 +32187,14 @@ function downloadPDF(config, auditUrl, score, results) {
     hot: false
   }];
   steps.forEach(step => {
-    checkPageBreak(22);
-    const stepH = 19;
+    doc.setFontSize(8.5);
+    doc.setFont('helvetica', 'bold');
+    const titleLines = doc.splitTextToSize(st(step.title), W - 2 * M - 20);
+    doc.setFontSize(7);
+    doc.setFont('helvetica', 'normal');
+    const bodyLines = doc.splitTextToSize(st(step.body), W - 2 * M - 20);
+    const stepH = Math.max(19, titleLines.length * 4.5 + bodyLines.length * 4 + 13);
+    checkPageBreak(stepH + 3);
     const sColor = step.hot ? [214, 45, 60] : brandRgb;
     const sBg = step.hot ? [255, 247, 247] : brandLight;
     doc.setFillColor(...sBg);
@@ -32194,12 +32213,11 @@ function downloadPDF(config, auditUrl, score, results) {
     doc.setFontSize(8.5);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(25, 30, 48);
-    doc.text(st(step.title), M + 17, y + 8.5);
+    doc.text(titleLines, M + 17, y + 8.5);
     doc.setFontSize(7);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(75, 80, 100);
-    const bodyLines = doc.splitTextToSize(st(step.body), W - 2 * M - 20);
-    doc.text(bodyLines, M + 17, y + 14);
+    doc.text(bodyLines, M + 17, y + 8.5 + titleLines.length * 4.5 + 2);
     y += stepH + 3;
   });
 
