@@ -31232,22 +31232,22 @@ function generateReportCopy(score, results) {
   const critCount = AUDIT_CATEGORIES.flatMap(cat => cat.sections.flatMap(sec => sec.items.filter(it => results[it.id] === 'Fail' && it.priority === 'Critical'))).length;
   const highCount = AUDIT_CATEGORIES.flatMap(cat => cat.sections.flatMap(sec => sec.items.filter(it => results[it.id] === 'Fail' && it.priority === 'High'))).length;
   const urgencyText = critCount > 3 ? `${critCount} critical issues that require urgent attention` : critCount > 0 ? `${critCount} critical issue${critCount > 1 ? 's' : ''} that need immediate resolution` : highCount > 0 ? `${highCount} high-priority issue${highCount > 1 ? 's' : ''} that should be addressed soon` : 'no critical blockers — improvements are available but not urgent';
-  const isLowCov = compRate < 20;
-  const isMedCov = compRate >= 20 && compRate < 60;
-  const scoreLabel = isLowCov ? 'Preliminary Score' : isMedCov ? 'Indicative Score' : 'Overall Score';
+  const isLowCov = compRate < 30;
+  const isMedCov = compRate >= 30 && compRate < 80;
+  const scoreLabel = isLowCov ? 'Preliminary Reviewed Score' : isMedCov ? 'Indicative Score' : 'Overall Score';
   const confLevel = isLowCov ? 'low' : isMedCov ? 'medium' : 'high';
   const executiveSummary = isLowCov
-    ? `This is a preliminary result based on limited data. Only ${compRate}% of the audit has been completed (${evalCount} of ${totalCount} checks reviewed). The score of ${overall}/100 (Grade ${score.grade}) reflects only the sections evaluated so far and should not be treated as a final assessment.\n\nOf the items reviewed, the main area needing attention is ${weakestMeaning}. There are ${urgencyText} identified so far — however, more issues may exist in unevaluated sections.\n\nComplete more of the audit to get a reliable and accurate picture of site performance. The result may change significantly as more checks are completed.`
+    ? `This is a preliminary reviewed score based on a partial audit. Only ${evalCount} of ${totalCount} checks have been completed (${compRate}% coverage). The score of ${overall}/100 reflects only the items evaluated so far — it should not be treated as a final result, and the final grade is withheld until sufficient coverage is reached.\n\nAmong the items reviewed, the area requiring most attention is ${weakestMeaning}. There are ${urgencyText} identified in the reviewed sections. Additional issues may exist in checks not yet completed.\n\nThis report is useful as an early diagnostic. Complete the remaining checks to unlock the full assessment, final grade, and a reliable overall picture.`
     : isMedCov
-      ? `This website shows ${PERF_LEVEL(overall)} performance based on ${compRate}% of the audit (${evalCount} of ${totalCount} checks). Score: ${overall}/100, Grade ${score.grade}. The biggest opportunity lies in ${weakestMeaning}. There are ${urgencyText}.\n\nThis is an indicative result — completing the remaining sections may reveal additional issues. Addressing the top priority issues identified so far will deliver meaningful improvements in visibility, user experience, and conversions.`
+      ? `This website shows ${PERF_LEVEL(overall)} performance based on ${compRate}% of the audit (${evalCount} of ${totalCount} checks reviewed). Score: ${overall}/100, Grade ${score.grade}. The biggest opportunity lies in ${weakestMeaning}. There are ${urgencyText}.\n\nThis is an indicative result — completing the remaining sections may reveal additional issues. Addressing the top priority issues identified so far will deliver meaningful improvements in visibility, user experience, and conversions.`
       : `This website shows ${PERF_LEVEL(overall)} performance with an overall score of ${overall}/100 (Grade ${score.grade}). ` + `The biggest opportunity lies in ${weakestMeaning}. ` + `There are ${urgencyText} that are currently limiting performance.\n\n` + `This means the site is underperforming compared to competitors and leaving measurable growth opportunities on the table.\n\n` + `Addressing the top priority issues will deliver the fastest improvements in visibility, user experience, and conversions. ` + `If these issues are resolved, the site has strong potential to significantly improve both traffic and business outcomes.`;
   const performanceInterpretation = isLowCov
-    ? `This is a preliminary result based on limited data (${evalCount}/${totalCount} checks). It may not reflect overall site performance.`
+    ? `Preliminary result — ${evalCount} of ${totalCount} checks reviewed (${compRate}% coverage). This score reflects reviewed items only and may not represent overall site performance.`
     : isMedCov
-      ? `This indicative score covers ${compRate}% of the audit. Completing remaining sections will improve accuracy.`
+      ? `Indicative score based on ${compRate}% of the audit. Completing the remaining sections will improve accuracy.`
       : `This score indicates ${PERF_MEANING(overall)}.`;
   const confidenceText = isLowCov
-    ? `Low-confidence result: only ${compRate}% of checkpoints reviewed (${evalCount} of ${totalCount}). Complete more audit items for an accurate assessment. Continue the audit to uncover additional issues and improve accuracy.`
+    ? `This is a low-confidence, preliminary result. Only ${compRate}% of checkpoints have been reviewed (${evalCount} of ${totalCount}). The score and findings reflect reviewed items only. Continue the audit to complete the remaining checks, surface additional issues, and unlock the final grade.`
     : `Based on ${compRate}% of checkpoints reviewed (${evalCount} of ${totalCount}), this audit provides a ${confLevel}-confidence view of site performance.`;
   const sectionInsights = {};
   score.categories.forEach(cat => {
@@ -31258,7 +31258,7 @@ function generateReportCopy(score, results) {
       const base = fn ? fn(cat.score) : `${cat.label} has areas for improvement that merit further review.`;
       const cov = catCovLevel(cat.evaluated, cat.total);
       if (cov.isLow) {
-        sectionInsights[cat.id] = `Among the ${cat.evaluated} reviewed ${cat.label} items, the score is ${cat.score}/100. This is a preliminary result only — ${cat.evaluated} of ${cat.total} checks were reviewed. Do not treat this as a final ${cat.label.replace('AI & SERP Visibility','AI Visibility')} assessment. Complete the remaining ${cat.total - cat.evaluated} checks for an accurate picture.`;
+        sectionInsights[cat.id] = `Preliminary reviewed score for this section: ${cat.score}/100, based on ${cat.evaluated} of ${cat.total} checks reviewed (${cov.pct}% coverage). This is directional only — grade withheld. Complete the remaining ${cat.total - cat.evaluated} checks for a reliable ${cat.label.replace('AI & SERP Visibility','AI Visibility')} assessment.`;
       } else if (cov.isMed) {
         sectionInsights[cat.id] = `${base} Note: ${cat.evaluated} of ${cat.total} checks reviewed (${cov.pct}% coverage). This is an indicative result — completing the remaining ${cat.total - cat.evaluated} checks may surface additional issues.`;
       } else {
@@ -31369,10 +31369,12 @@ function downloadPDF(config, auditUrl, score, results) {
     doc.setFontSize(6.5);
     doc.setTextColor(170, 172, 180);
     doc.setFont('helvetica', 'normal');
-    doc.text(st(urlShortened), W - M, H - 6, {
-      align: 'right'
-    });
-    doc.text(dateShort, M, H - 6);
+    const footerLeft = dateShort;
+    const footerRight = st(urlShortened);
+    doc.text(footerLeft, M, H - 6);
+    if (footerRight) {
+      doc.text(' · ' + footerRight, M + doc.getTextWidth(footerLeft), H - 6);
+    }
     doc.setDrawColor(220, 222, 228);
     doc.setLineWidth(0.2);
     doc.line(M, H - 10, W - M, H - 10);
@@ -31425,7 +31427,9 @@ function downloadPDF(config, auditUrl, score, results) {
     let urgency = '';
     if (critFails > 0) urgency = `${critFails} critical issue${critFails > 1 ? 's' : ''} require immediate attention.`;else if (highFails > 0) urgency = `${highFails} high-priority issue${highFails > 1 ? 's' : ''} were identified.`;else if (totalFails > 0) urgency = `${totalFails} item${totalFails > 1 ? 's' : ''} failed across the reviewed sections.`;else urgency = 'No failed items found — focus on completing unevaluated sections.';
     const weakestLabel = weakest.label.replace('AI & SERP Visibility', 'AI Visibility');
-    return `This website has a ${healthLabel} overall score of ${overall}/100 (Grade ${score.grade}). The area requiring most attention is ${weakestLabel} (${weakest.score}/100). ${urgency} Prioritise the Top Priority Issues below, then work through each category section.`;
+    const overallCov = score.completionPct || 0;
+    const gradeStr = overallCov < 30 ? `preliminary reviewed score of ${overall}/100 (grade withheld — ${score.totalEvaluated}/${score.totalAll} checks reviewed)` : `overall score of ${overall}/100 (Grade ${score.grade})`;
+    return `This website has a ${healthLabel} ${gradeStr}. The area requiring most attention is ${weakestLabel} (${weakest.score}/100). ${urgency} Prioritise the Top Priority Issues below, then work through each category section.`;
   }
 
   // ── PAGE 1: COVER ──────────────────────────────────────────────────────────
@@ -31592,12 +31596,12 @@ function downloadPDF(config, auditUrl, score, results) {
   doc.roundedRect(M, y, W - 2 * M, boxH, 3, 3, 'S');
 
   // Left: score label + score number + /100
-  const isLowCovPDF = score.completionPct < 20;
-  const isMedCovPDF = score.completionPct >= 20 && score.completionPct < 60;
-  const scoreLabelPDF = copy?.scoreLabel || (isLowCovPDF ? 'Preliminary Score' : isMedCovPDF ? 'Indicative Score' : 'Overall Score');
+  const isLowCovPDF = score.completionPct < 30;
+  const isMedCovPDF = score.completionPct >= 30 && score.completionPct < 80;
+  const scoreLabelPDF = copy?.scoreLabel || (isLowCovPDF ? 'Preliminary Reviewed Score' : isMedCovPDF ? 'Indicative Score' : 'Overall Score');
   const labelColor = isLowCovPDF ? [180, 110, 0] : isMedCovPDF ? [14, 100, 160] : [...brandRgb];
   // Score label (small, above number) — measure width first so divider fits
-  doc.setFontSize(6.5);
+  doc.setFontSize(isLowCovPDF ? 6 : 6.5);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(...labelColor);
   const labelW = doc.getTextWidth(scoreLabelPDF.toUpperCase());
@@ -31718,12 +31722,22 @@ function downloadPDF(config, auditUrl, score, results) {
     });
     if (!noData) {
       const catCov = catCovLevel(cat.evaluated, cat.total);
-      doc.setFontSize(6.5);
-      doc.setFont('helvetica', catCov.isLow ? 'italic' : 'bold');
-      doc.setTextColor(...(catCov.isLow ? [150, 120, 50] : catRgb));
-      doc.text(catCov.isLow ? 'Prelim.' : `Grade ${cat.grade}`, x + catBoxW / 2, y + 25, {
-        align: 'center'
-      });
+      if (catCov.isLow) {
+        // Low coverage: show reviewed count + "Low confidence" — no grade letter
+        doc.setFontSize(5.5);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(140, 110, 40);
+        doc.text(`${cat.evaluated}/${cat.total} reviewed`, x + catBoxW / 2, y + 22, { align: 'center' });
+        doc.setFontSize(5);
+        doc.setFont('helvetica', 'italic');
+        doc.setTextColor(155, 125, 50);
+        doc.text('Low confidence', x + catBoxW / 2, y + 27, { align: 'center' });
+      } else {
+        doc.setFontSize(6.5);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(...catRgb);
+        doc.text(`Grade ${cat.grade}`, x + catBoxW / 2, y + 25, { align: 'center' });
+      }
     } else {
       doc.setFontSize(5);
       doc.setFont('helvetica', 'italic');
@@ -31794,11 +31808,17 @@ function downloadPDF(config, auditUrl, score, results) {
       doc.setFontSize(6);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(6, 120, 90);
-      doc.text('ESTIMATED IMPACT - if priority issues are resolved', M + 6, y + 5.5);
+      const impactTitle = copy.isLowCov
+        ? 'POTENTIAL IMPROVEMENTS - based on reviewed items'
+        : 'ESTIMATED IMPACT - if priority issues are resolved';
+      const impactIntro = copy.isLowCov
+        ? 'Based on the items reviewed so far, addressing these priorities may help with:'
+        : 'If the priority issues are fixed, this can lead to:';
+      doc.text(impactTitle, M + 6, y + 5.5);
       doc.setFontSize(7);
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(22, 60, 50);
-      doc.text('If the priority issues are fixed, this can lead to:', M + 6, y + 10.5);
+      doc.text(impactIntro, M + 6, y + 10.5);
       bullets.forEach((b, bi) => {
         doc.text(`- ${b}`, M + 8, y + 16 + bi * 5);
       });
@@ -31808,6 +31828,13 @@ function downloadPDF(config, auditUrl, score, results) {
       doc.setTextColor(6, 100, 75);
       const closingWrapped = doc.splitTextToSize(closingLine, W - 2 * M - 12);
       doc.text(closingWrapped, M + 6, closingY);
+      if (copy.isLowCov) {
+        const caveatY = closingY + closingWrapped.length * 4.5 + 1;
+        doc.setFontSize(6);
+        doc.setFont('helvetica', 'italic');
+        doc.setTextColor(80, 130, 110);
+        doc.text('Additional opportunities may appear as more checks are completed.', M + 6, caveatY);
+      }
       y += eiH + 12;
     }
   }
@@ -32076,6 +32103,13 @@ function downloadPDF(config, auditUrl, score, results) {
       const reviewedItems = sec.items.filter(it => results[it.id] && results[it.id] !== 'N/A' && results[it.id] !== 'Blank');
       const blankCount = sec.items.filter(it => !results[it.id] || results[it.id] === 'Blank').length;
       const naCount = sec.items.filter(it => results[it.id] === 'N/A').length;
+      if (reviewedItems.length > 0 && blankCount > 0) {
+        doc.setFontSize(5.5);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(140, 145, 165);
+        doc.text('REVIEWED FINDINGS', M + 3, y + 3.5);
+        y += 6;
+      }
       reviewedItems.forEach((item, idx) => {
         checkPageBreak(10);
         const status = results[item.id];
@@ -32117,8 +32151,8 @@ function downloadPDF(config, auditUrl, score, results) {
       if (blankCount > 0) {
         doc.setFontSize(6.5);
         doc.setFont('helvetica', 'italic');
-        doc.setTextColor(175, 180, 198);
-        doc.text(`${blankCount} item${blankCount > 1 ? 's' : ''} not yet reviewed — excluded from this report.`, M + 3, y + 3.5);
+        doc.setTextColor(160, 165, 182);
+        doc.text(`Not yet reviewed: ${blankCount} item${blankCount > 1 ? 's' : ''} — complete these checks to include them in scoring.`, M + 3, y + 3.5);
         y += 6;
       }
       if (naCount > 0) {
