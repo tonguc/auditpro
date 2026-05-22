@@ -32398,7 +32398,8 @@ function Sidebar({
   page,
   setPage,
   isDark,
-  onToggleTheme
+  onToggleTheme,
+  isMobile
 }) {
   const nav = [{
     id: 'dashboard',
@@ -32413,6 +32414,57 @@ function Sidebar({
     icon: '◈',
     label: 'White Label'
   }];
+  if (isMobile) {
+    return /*#__PURE__*/React.createElement("header", {
+      style: {
+        display: 'flex',
+        alignItems: 'center',
+        background: C.surface,
+        borderBottom: `1px solid ${C.border}`,
+        padding: '0 12px',
+        height: 52,
+        flexShrink: 0,
+        gap: 4
+      }
+    }, /*#__PURE__*/React.createElement("div", {
+      style: { fontSize: 14, fontWeight: 800, color: C.text, marginRight: 8, whiteSpace: 'nowrap' }
+    }, /*#__PURE__*/React.createElement("span", { style: { color: C.accent } }, "Audit"), "Pro"),
+    /*#__PURE__*/React.createElement("nav", {
+      style: { display: 'flex', flex: 1, gap: 2 }
+    }, nav.map(n => /*#__PURE__*/React.createElement("button", {
+      key: n.id,
+      onClick: () => setPage(n.id),
+      style: {
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 2,
+        padding: '6px 4px',
+        borderRadius: 8,
+        border: 'none',
+        cursor: 'pointer',
+        background: page === n.id ? `${C.accent}18` : 'transparent',
+        color: page === n.id ? C.accent : C.muted
+      }
+    }, /*#__PURE__*/React.createElement("span", { style: { fontSize: 16 } }, n.icon),
+    /*#__PURE__*/React.createElement("span", { style: { fontSize: 9, fontWeight: page === n.id ? 600 : 400 } }, n.label)))),
+    /*#__PURE__*/React.createElement("button", {
+      onClick: onToggleTheme,
+      style: {
+        marginLeft: 4,
+        padding: '6px 8px',
+        borderRadius: 8,
+        border: `1px solid ${C.border}`,
+        background: 'transparent',
+        color: C.muted,
+        fontSize: 14,
+        cursor: 'pointer',
+        flexShrink: 0
+      }
+    }, isDark ? "🌙" : "☀️"));
+  }
+
   return /*#__PURE__*/React.createElement("div", {
     style: {
       width: 220,
@@ -32449,7 +32501,7 @@ function Sidebar({
       padding: '16px 12px',
       flex: 1
     }
-  }, nav.map(n => /*#__PURE__*/React.createElement("div", {
+  }, nav.map(n => /*#__PURE__*/React.createElement("button", {
     key: n.id,
     onClick: () => setPage(n.id),
     style: {
@@ -32458,8 +32510,10 @@ function Sidebar({
       gap: 10,
       padding: '10px 12px',
       borderRadius: 8,
+      border: 'none',
       cursor: 'pointer',
       marginBottom: 2,
+      width: '100%',
       background: page === n.id ? `${C.accent}18` : 'transparent',
       color: page === n.id ? C.accent : C.muted
     }
@@ -33846,6 +33900,7 @@ function AuditView({
       width: 160
     }
   }), /*#__PURE__*/React.createElement("input", {
+    type: "url",
     value: url,
     onChange: e => setUrl(e.target.value),
     placeholder: "https://yoursite.com",
@@ -34409,6 +34464,7 @@ function WhiteLabelView({
       marginBottom: 8
     }
   }, "Website"), /*#__PURE__*/React.createElement("input", {
+    type: "url",
     value: agencyWebsite,
     onChange: e => setAgencyWebsite(e.target.value),
     placeholder: "e.g. yoursite.com",
@@ -34438,6 +34494,7 @@ function WhiteLabelView({
       marginBottom: 8
     }
   }, "Email"), /*#__PURE__*/React.createElement("input", {
+    type: "email",
     value: agencyEmail,
     onChange: e => setAgencyEmail(e.target.value),
     placeholder: "e.g. hello@yoursite.com",
@@ -34875,7 +34932,7 @@ function WhiteLabelView({
         e.stopPropagation();
         onDuplicateAudit(a);
       },
-      title: "Duplicate with blank results",
+      title: "Create new blank audit with same URL",
       style: {
         background: 'transparent',
         border: `1px solid ${C.border}`,
@@ -34885,7 +34942,7 @@ function WhiteLabelView({
         fontSize: 11,
         cursor: 'pointer'
       }
-    }, "\u29C9 Copy"), /*#__PURE__*/React.createElement(HoldButton, {
+    }, "\u29C9 New Blank"), /*#__PURE__*/React.createElement(HoldButton, {
       onConfirm: () => onResetAudit(a.id),
       label: "\u21BA Clear",
       holdLabel: "\u21BA \u2026",
@@ -34999,6 +35056,12 @@ function App() {
       return true;
     }
   });
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
 
   // Keep C in sync — runs before children render
   Object.assign(C, isDark ? DARK_C : LIGHT_C);
@@ -35123,6 +35186,7 @@ function App() {
   return /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
+      flexDirection: isMobile ? 'column' : 'row',
       height: '100vh',
       background: C.bg,
       color: C.text,
@@ -35137,7 +35201,8 @@ function App() {
       setPage(p);
     },
     isDark: isDark,
-    onToggleTheme: handleToggleTheme
+    onToggleTheme: handleToggleTheme,
+    isMobile: isMobile
   }), /*#__PURE__*/React.createElement("div", {
     style: {
       flex: 1,
