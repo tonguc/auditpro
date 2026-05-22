@@ -100,10 +100,10 @@
     text-transform: uppercase;
   }
   .cover-hero {
-    margin-top: 44px;
+    margin-top: 32px;
   }
   .cover-hero-title {
-    font-size: 28px;
+    font-size: 26px;
     font-weight: 800;
     color: #fff;
     line-height: 1.25;
@@ -120,22 +120,31 @@
   /* icon dashboard mockup */
   .cover-mockup {
     display: flex;
-    gap: 10px;
-    margin-top: 40px;
-    flex-wrap: wrap;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 36px;
   }
   .mock-card {
     background: rgba(255,255,255,0.07);
     border: 1px solid rgba(255,255,255,0.12);
     border-radius: 10px;
-    padding: 14px 18px;
+    padding: 14px 20px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 16px;
   }
-  .mock-icon { font-size: 20px; }
-  .mock-label { font-size: 11px; color: #cbd5e1; font-weight: 600; }
-  .mock-count { font-size: 18px; font-weight: 800; color: #fff; }
+  .mock-icon { font-size: 22px; width: 28px; text-align: center; flex-shrink: 0; }
+  .mock-label { font-size: 13px; color: #cbd5e1; font-weight: 600; flex: 1; }
+  .mock-count {
+    font-size: 15px;
+    font-weight: 800;
+    color: #38bdf8;
+    background: rgba(56,189,248,0.12);
+    border: 1px solid rgba(56,189,248,0.2);
+    border-radius: 6px;
+    padding: 3px 10px;
+    flex-shrink: 0;
+  }
   /* cover footer */
   .cover-footer {
     margin-top: 48px;
@@ -343,38 +352,28 @@
       <div class="cover-mockup">
         <div class="mock-card">
           <div class="mock-icon">⚙️</div>
-          <div>
-            <div class="mock-label">Technical SEO</div>
-            <div class="mock-count">65</div>
-          </div>
+          <div class="mock-label">Technical SEO</div>
+          <div class="mock-count">65 items</div>
         </div>
         <div class="mock-card">
           <div class="mock-icon">📝</div>
-          <div>
-            <div class="mock-label">On-Page &amp; Content</div>
-            <div class="mock-count">50</div>
-          </div>
+          <div class="mock-label">On-Page &amp; Content</div>
+          <div class="mock-count">50 items</div>
         </div>
         <div class="mock-card">
           <div class="mock-icon">🎯</div>
-          <div>
-            <div class="mock-label">UX Heuristics</div>
-            <div class="mock-count">40</div>
-          </div>
+          <div class="mock-label">UX Heuristics</div>
+          <div class="mock-count">40 items</div>
         </div>
         <div class="mock-card">
           <div class="mock-icon">⚡</div>
-          <div>
-            <div class="mock-label">Conversion &amp; CTA</div>
-            <div class="mock-count">35</div>
-          </div>
+          <div class="mock-label">Conversion &amp; CTA</div>
+          <div class="mock-count">35 items</div>
         </div>
         <div class="mock-card">
           <div class="mock-icon">🤖</div>
-          <div>
-            <div class="mock-label">AI &amp; SERP Visibility</div>
-            <div class="mock-count">21</div>
-          </div>
+          <div class="mock-label">AI &amp; SERP Visibility</div>
+          <div class="mock-count">21 items</div>
         </div>
       </div>
     </div>
