@@ -31477,6 +31477,11 @@ function downloadPDF(config, auditUrl, score, results) {
     doc.text(st(contactParts.join('  ·  ').slice(0, 75)), agLogoEndX, hBarH + 16);
   }
 
+  // Client logo — right side of the gray branding strip
+  if (clientLogo) {
+    addLogoToDoc(clientLogo, W - M, hBarH + 2, 36, 14, true, '#f5f7fb');
+  }
+
   // ZONE 3 — Compact audit summary (no box, just text rows)
   y = hBarH + bStripH + 6;
 
