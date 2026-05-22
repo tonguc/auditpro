@@ -31506,14 +31506,16 @@ function downloadPDF(config, auditUrl, score, results) {
   doc.setFontSize(7.5);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(50, 55, 72);
+  const sumValX = M + 34;
+  const sumValX2 = W / 2 + 22;
   doc.text(`Audit Scope:`, M, y);
   doc.setFont('helvetica', 'bold');
-  doc.text(`Full UX + SEO Audit  (${totalItems2} checks)`, M + 22, y);
+  doc.text(`Full UX + SEO Audit  (${totalItems2} checks)`, sumValX, y);
   doc.setFont('helvetica', 'normal');
   doc.text(`Coverage:`, W / 2, y);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(score.completionPct < 20 ? 180 : 50, score.completionPct < 20 ? 110 : 55, score.completionPct < 20 ? 0 : 72);
-  doc.text(`${score.completionPct}%  (${score.totalEvaluated} / ${score.totalAll} reviewed)`, W / 2 + 18, y);
+  doc.text(`${score.completionPct}%  (${score.totalEvaluated} / ${score.totalAll} reviewed)`, sumValX2, y);
 
   y += 6;
   // Row 2: Opportunity + Urgency
@@ -31522,13 +31524,13 @@ function downloadPDF(config, auditUrl, score, results) {
   doc.text(`Main Opportunity:`, M, y);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(...oppColor);
-  doc.text(st(oppStr), M + 30, y);
+  doc.text(st(oppStr), sumValX, y);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(50, 55, 72);
   doc.text(`Urgency:`, W / 2, y);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(critS > 0 ? 180 : highS > 0 ? 155 : 50, critS > 0 ? 30 : highS > 0 ? 80 : 55, critS > 0 ? 30 : highS > 0 ? 0 : 72);
-  doc.text(st(urgencyStr), W / 2 + 18, y);
+  doc.text(st(urgencyStr), sumValX2, y);
 
   // Thin separator below summary
   y += 7;
@@ -31542,11 +31544,11 @@ function downloadPDF(config, auditUrl, score, results) {
     const warnH = 20;
     doc.setFillColor(255, 248, 220);
     doc.roundedRect(M, y, W - 2 * M, warnH, 2, 2, 'F');
+    doc.setFillColor(245, 158, 11);
+    doc.rect(M, y + 2, 3.5, warnH - 4, 'F');
     doc.setDrawColor(245, 158, 11);
     doc.setLineWidth(0.35);
     doc.roundedRect(M, y, W - 2 * M, warnH, 2, 2, 'S');
-    doc.setFillColor(245, 158, 11);
-    doc.roundedRect(M, y, 3, warnH, 1, 0, 'F');
     doc.setFontSize(8);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(120, 75, 0);
