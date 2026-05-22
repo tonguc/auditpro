@@ -30614,6 +30614,13 @@ function getRating(score) {
   if (score >= 50) return 'Needs Improvement';
   return 'Critical';
 }
+function catCovLevel(evaluated, total) {
+  if (!total || evaluated === 0) return { pct: 0, scoreLabel: 'Not Evaluated', confidence: 'None', showGrade: false, isLow: true, isMed: false };
+  const pct = Math.round(evaluated / total * 100);
+  if (pct < 30) return { pct, scoreLabel: 'Preliminary Reviewed Score', confidence: 'Low', showGrade: false, isLow: true, isMed: false };
+  if (pct < 80) return { pct, scoreLabel: 'Indicative Score', confidence: 'Medium', showGrade: true, isLow: false, isMed: true };
+  return { pct, scoreLabel: 'Overall Score', confidence: 'High', showGrade: true, isLow: false, isMed: false };
+}
 function calculateScore(results) {
   const categories = AUDIT_CATEGORIES.map(cat => {
     const allItems = cat.sections.flatMap(s => s.items);
@@ -31245,7 +31252,19 @@ function generateReportCopy(score, results) {
   const sectionInsights = {};
   score.categories.forEach(cat => {
     const fn = SECTION_INSIGHTS[cat.id];
-    sectionInsights[cat.id] = cat.evaluated > 0 ? fn ? fn(cat.score) : `${cat.label} has areas for improvement that merit further review.` : `${cat.label} was not evaluated in this audit and should be assessed in a follow-up.`;
+    if (cat.evaluated === 0) {
+      sectionInsights[cat.id] = `${cat.label} was not evaluated in this audit and should be assessed in a follow-up.`;
+    } else {
+      const base = fn ? fn(cat.score) : `${cat.label} has areas for improvement that merit further review.`;
+      const cov = catCovLevel(cat.evaluated, cat.total);
+      if (cov.isLow) {
+        sectionInsights[cat.id] = `Among the ${cat.evaluated} reviewed ${cat.label} items, the score is ${cat.score}/100. This is a preliminary result only — ${cat.evaluated} of ${cat.total} checks were reviewed. Do not treat this as a final ${cat.label.replace('AI & SERP Visibility','AI Visibility')} assessment. Complete the remaining ${cat.total - cat.evaluated} checks for an accurate picture.`;
+      } else if (cov.isMed) {
+        sectionInsights[cat.id] = `${base} Note: ${cat.evaluated} of ${cat.total} checks reviewed (${cov.pct}% coverage). This is an indicative result — completing the remaining ${cat.total - cat.evaluated} checks may surface additional issues.`;
+      } else {
+        sectionInsights[cat.id] = base;
+      }
+    }
   });
   const PSCORE = {
     Critical: 4,
@@ -31943,24 +31962,39 @@ function downloadPDF(config, auditUrl, score, results) {
     const catScore = score.categories.find(c => c.id === cat.id);
     // Score + evaluation state
     if (catScore) {
-      const scoreStr = catScore.evaluated > 0 ? `${catScore.score}/100  Grade ${catScore.grade}` : 'Not evaluated';
+      const cov = catCovLevel(catScore.evaluated, catScore.total);
       const scoreX = cat.id === 'serp' ? W - M - 20 : W - M;
-      doc.setFontSize(9);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(...onCat);
-      doc.text(scoreStr, scoreX, 13, {
-        align: 'right'
-      });
-      // Low confidence warning
-      if (catScore.evaluated > 0 && catScore.evaluated < catScore.total * 0.3) {
-        doc.setFontSize(6);
+      if (catScore.evaluated === 0) {
+        doc.setFontSize(8);
         doc.setFont('helvetica', 'italic');
-        doc.setTextColor(...onCatDark);
-        doc.text(`Low confidence - only ${catScore.evaluated}/${catScore.total} items reviewed`, M, 22.5);
+        doc.setTextColor(...onCatMuted);
+        doc.text('Not evaluated', scoreX, 13, { align: 'right' });
+      } else if (cov.isLow) {
+        // Low coverage: show preliminary label, numeric score only — no grade letter
+        doc.setFontSize(7.5);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(...onCat);
+        doc.text(`${catScore.score}/100`, scoreX, 11, { align: 'right' });
+        doc.setFontSize(6);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(...onCatMuted);
+        doc.text('Preliminary · Grade withheld', scoreX, 16, { align: 'right' });
+      } else {
+        // Medium / high coverage: show score + grade
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(...onCat);
+        doc.text(`${catScore.score}/100  Grade ${catScore.grade}`, scoreX, 13, { align: 'right' });
       }
+      // Coverage + confidence line in dark sub-bar
+      const covLine = `${cov.scoreLabel}  ·  ${catScore.evaluated}/${catScore.total} checks reviewed  ·  ${cov.confidence} confidence`;
+      doc.setFontSize(6);
+      doc.setFont('helvetica', cov.isLow ? 'bold' : 'normal');
+      doc.setTextColor(...onCatDark);
+      doc.text(covLine, M, 22.5);
     }
-    // AI Visibility subtitle
-    if (cat.id === 'serp') {
+    // AI Visibility subtitle (only if no coverage line needed or append after)
+    if (cat.id === 'serp' && catScore && catScore.evaluated === 0) {
       doc.setFontSize(6.5);
       doc.setFont('helvetica', 'italic');
       doc.setTextColor(...onCatMuted);
@@ -32025,17 +32059,18 @@ function downloadPDF(config, auditUrl, score, results) {
         doc.text('AI brand visibility in ChatGPT, Perplexity, Gemini & Knowledge Graph', M + 3, y + 3.5);
         y += 6;
       }
-      const visibleItems = sec.items.filter(it => results[it.id] !== 'N/A');
-      const naCount = sec.items.length - visibleItems.length;
-      visibleItems.forEach((item, idx) => {
+      // Separate reviewed from blank; exclude N/A entirely
+      const reviewedItems = sec.items.filter(it => results[it.id] && results[it.id] !== 'N/A' && results[it.id] !== 'Blank');
+      const blankCount = sec.items.filter(it => !results[it.id] || results[it.id] === 'Blank').length;
+      const naCount = sec.items.filter(it => results[it.id] === 'N/A').length;
+      reviewedItems.forEach((item, idx) => {
         checkPageBreak(10);
-        const status = results[item.id] || 'Blank';
+        const status = results[item.id];
         const statusColor = STATUS_COLORS_PDF[status] || [160, 165, 180];
         if (idx % 2 === 0) {
           doc.setFillColor(247, 248, 252);
           doc.rect(M, y, W - 2 * M, 8, 'F');
         }
-        // Fail row highlight
         if (status === 'Fail') {
           doc.setFillColor(252, 245, 246);
           doc.rect(M, y, 2, 8, 'F');
@@ -32055,24 +32090,30 @@ function downloadPDF(config, auditUrl, score, results) {
         doc.setFontSize(6);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(255, 255, 255);
-        doc.text(status === 'Blank' ? 'Blank' : status, badgeX + 10, y + 4.9, {
-          align: 'center'
-        });
+        doc.text(status, badgeX + 10, y + 4.9, { align: 'center' });
         y += 8;
       });
-      if (naCount > 0) {
-        doc.setFontSize(6);
-        doc.setFont('helvetica', 'italic');
-        doc.setTextColor(175, 180, 198);
-        doc.text(`${naCount} non-applicable item${naCount > 1 ? 's' : ''} excluded from this report.`, M + 3, y + 3.5);
-        y += 6;
-      }
-      if (visibleItems.length === 0 && naCount > 0) {
+      // Summary lines for not-yet-reviewed and N/A
+      if (reviewedItems.length === 0) {
         doc.setFontSize(7);
         doc.setFont('helvetica', 'italic');
         doc.setTextColor(175, 180, 198);
-        doc.text('All items in this section were marked N/A.', M + 3, y + 3.5);
+        doc.text('No items reviewed in this section yet.', M + 3, y + 4);
+        y += 8;
+      }
+      if (blankCount > 0) {
+        doc.setFontSize(6.5);
+        doc.setFont('helvetica', 'italic');
+        doc.setTextColor(175, 180, 198);
+        doc.text(`${blankCount} item${blankCount > 1 ? 's' : ''} not yet reviewed — excluded from this report.`, M + 3, y + 3.5);
         y += 6;
+      }
+      if (naCount > 0) {
+        doc.setFontSize(6);
+        doc.setFont('helvetica', 'italic');
+        doc.setTextColor(195, 198, 210);
+        doc.text(`${naCount} non-applicable item${naCount > 1 ? 's' : ''} excluded.`, M + 3, y + 3.5);
+        y += 5;
       }
       y += 3;
     });
@@ -33514,7 +33555,11 @@ function DashboardView({
           fontWeight: 800,
           color: cat.color
         }
-      }, cat.grade))), /*#__PURE__*/React.createElement("div", {
+      }, (() => {
+        if (cat.evaluated === 0) return '—';
+        const cov = catCovLevel(cat.evaluated, cat.total);
+        return cov.isLow ? '?' : cat.grade;
+      })()))), /*#__PURE__*/React.createElement("div", {
         style: {
           fontSize: 24,
           fontWeight: 800,
@@ -33546,9 +33591,42 @@ function DashboardView({
           fontSize: 10,
           color: C.muted
         }
-      }, cat.evaluated > 0
-        ? `${cat.passed}✓ ${cat.failed}✗ ${cat.evaluated}/${cat.total} reviewed`
-        : React.createElement("span", { style: { color: C.accent, fontWeight: 600 } }, "→ Start this section")));
+      }, cat.evaluated > 0 ? (() => {
+        const cov = catCovLevel(cat.evaluated, cat.total);
+        return [
+          `${cat.passed}✓ ${cat.failed}✗  ${cat.evaluated}/${cat.total} reviewed`,
+          cov.isLow && /*#__PURE__*/React.createElement("span", {
+            key: 'conf',
+            style: {
+              display: 'inline-block',
+              marginLeft: 6,
+              fontSize: 9,
+              fontWeight: 700,
+              padding: '1px 5px',
+              borderRadius: 3,
+              background: `${C.amber}22`,
+              color: C.amber,
+              letterSpacing: '0.4px',
+              verticalAlign: 'middle'
+            }
+          }, "PRELIMINARY"),
+          cov.isMed && /*#__PURE__*/React.createElement("span", {
+            key: 'conf',
+            style: {
+              display: 'inline-block',
+              marginLeft: 6,
+              fontSize: 9,
+              fontWeight: 700,
+              padding: '1px 5px',
+              borderRadius: 3,
+              background: `${C.accent}22`,
+              color: C.accent,
+              letterSpacing: '0.4px',
+              verticalAlign: 'middle'
+            }
+          }, "INDICATIVE")
+        ];
+      })() : /*#__PURE__*/React.createElement("span", { style: { color: C.accent, fontWeight: 600 } }, "→ Start this section")));
     }));
   })(), failItems.length > 0 && /*#__PURE__*/React.createElement("div", {
     style: {
