@@ -31721,6 +31721,7 @@ function downloadPDF(config, auditUrl, score, results) {
       if (pi < execParas.length - 1) execAllLines.push('');
     });
     const execH = Math.max(22, 12 + execAllLines.length * 4.2);
+    checkPageBreak(execH + 8);
     doc.setFillColor(...brandLight);
     doc.roundedRect(M, y, W - 2 * M, execH, 2, 2, 'F');
     doc.setFillColor(...brandRgb);
