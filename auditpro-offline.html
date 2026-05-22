@@ -31419,13 +31419,6 @@ function downloadPDF(config, auditUrl, score, results) {
   const onBrandMuted = contrastMuted(brandRgb);
   const darkRgb = brandRgb.map(v => Math.max(0, Math.round(v * 0.72)));
 
-  // Client logo — transparent (composited on brand color)
-  let clientLogoW = 0;
-  if (clientLogo) {
-    const cl = addLogoToDoc(clientLogo, W - M, 4, 32, 10, true, brandHex);
-    clientLogoW = cl.w + 4;
-  }
-
   // Client name (primary)
   doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
@@ -31439,11 +31432,11 @@ function downloadPDF(config, auditUrl, score, results) {
   doc.setTextColor(...onBrandMuted);
   doc.text('UX + SEO Audit Report', M, 19);
 
-  // Date — right, same baseline as client name
+  // Date — right aligned
   doc.setFontSize(7);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(...onBrandMuted);
-  doc.text(dateLong, W - M - clientLogoW, 13, { align: 'right' });
+  doc.text(dateLong, W - M, 13, { align: 'right' });
 
   // ZONE 2 — Branding strip (light, below header)
   const bStripH = 32;
