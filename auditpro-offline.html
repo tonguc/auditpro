@@ -32325,99 +32325,138 @@ function downloadPDF(config, auditUrl, score, results) {
   doc.text('About This Report', M, 13);
   y = 30;
 
-  // Prepared by / for cards
-  const cardW = (W - 2 * M - 5) / 2;
-  // Left card
-  doc.setFillColor(244, 246, 252);
-  doc.roundedRect(M, y, cardW, 38, 2, 2, 'F');
-  doc.setFontSize(6.5);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(150, 155, 175);
-  doc.text('PREPARED BY', M + 5, y + 7);
-  if (agencyLogo) {
-    addLogoToDoc(agencyLogo, M + 5, y + 10, 30, 11, false, '#f4f6fc');
-    doc.setFontSize(9.5);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(20, 25, 45);
-    doc.text(config.agencyName, M + 5, y + 26);
-  } else {
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(20, 25, 45);
-    doc.text(config.agencyName, M + 5, y + 16);
+  // ── Prepared By / For cards ────────────────────────────────────────────────
+  const cardW = (W - 2 * M - 6) / 2;
+
+  // Calculate card height dynamically based on which fields are populated
+  function calcCardH(hasLogo, hasTitle, hasContact1, hasContact2) {
+    let h = 10; // label row
+    if (hasLogo) h += 14; // logo area
+    h += 7; // name
+    if (hasTitle) h += 5;
+    if (hasContact1) h += 5;
+    if (hasContact2) h += 5;
+    return Math.max(36, h + 5);
   }
+  const leftCardH  = calcCardH(!!agencyLogo, !!agencyTitle, !!agencyWebsite, !!agencyEmail);
+  const rightCardH = calcCardH(!!clientLogo, false, !!auditUrl, false);
+  const cardH = Math.max(leftCardH, rightCardH);
+
+  // Left card — Prepared By
+  doc.setFillColor(246, 248, 253);
+  doc.roundedRect(M, y, cardW, cardH, 2, 2, 'F');
+  doc.setFillColor(...brandRgb);
+  doc.roundedRect(M, y, cardW, 1.5, 0, 0, 'F');
+  doc.setFontSize(5.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(155, 160, 180);
+  doc.text('PREPARED BY', M + 6, y + 7.5);
+  let lcy = y + 12;
+  if (agencyLogo) {
+    addLogoToDoc(agencyLogo, M + 6, lcy, 30, 11, false, '#f6f8fd');
+    lcy += 14;
+  }
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(20, 25, 45);
+  doc.text(st(config.agencyName), M + 6, lcy);
+  lcy += 6;
   if (agencyTitle) {
-    doc.setFontSize(8);
+    doc.setFontSize(7.5);
     doc.setFont('helvetica', 'normal');
-    doc.setTextColor(85, 90, 112);
-    doc.text(agencyTitle, M + 5, agencyLogo ? y + 31 : y + 22);
+    doc.setTextColor(90, 95, 115);
+    doc.text(st(agencyTitle), M + 6, lcy);
+    lcy += 5;
   }
   if (agencyWebsite) {
     doc.setFontSize(7.5);
+    doc.setFont('helvetica', 'normal');
     doc.setTextColor(14, 155, 230);
-    doc.text(agencyWebsite, M + 5, agencyLogo ? y + 35 : agencyTitle ? y + 27 : y + 22);
+    doc.text(st(agencyWebsite), M + 6, lcy);
+    lcy += 5;
   }
   if (agencyEmail) {
     doc.setFontSize(7.5);
-    doc.setTextColor(85, 90, 112);
-    doc.text(agencyEmail, M + 5, agencyLogo ? y + 35 + (agencyWebsite ? 5 : 0) : agencyTitle && agencyWebsite ? y + 32 : agencyTitle ? y + 27 : agencyWebsite ? y + 27 : y + 22);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(90, 95, 115);
+    doc.text(st(agencyEmail), M + 6, lcy);
   }
 
-  // Right card
-  const rx2 = M + cardW + 5;
-  doc.setFillColor(244, 246, 252);
-  doc.roundedRect(rx2, y, cardW, 38, 2, 2, 'F');
+  // Right card — Prepared For
+  const rx2 = M + cardW + 6;
+  doc.setFillColor(246, 248, 253);
+  doc.roundedRect(rx2, y, cardW, cardH, 2, 2, 'F');
+  doc.setFillColor(...brandRgb);
+  doc.roundedRect(rx2, y, cardW, 1.5, 0, 0, 'F');
+  doc.setFontSize(5.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(155, 160, 180);
+  doc.text('PREPARED FOR', rx2 + 6, y + 7.5);
+  let rcy = y + 12;
+  if (clientLogo) {
+    addLogoToDoc(clientLogo, rx2 + 6, rcy, 30, 11, false, '#f6f8fd');
+    rcy += 14;
+  }
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(20, 25, 45);
+  doc.text(st(clientName || auditUrl.replace(/https?:\/\/(www\.)?/, '').split('/')[0] || '—'), rx2 + 6, rcy);
+  rcy += 6;
+  if (auditUrl) {
+    doc.setFontSize(7.5);
+    doc.setFont('helvetica', 'normal');
+    doc.setTextColor(90, 95, 115);
+    doc.text(auditUrl.replace(/https?:\/\/(www\.)?/, ''), rx2 + 6, rcy);
+    rcy += 5;
+  }
+  doc.setFontSize(7);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(155, 160, 180);
+  doc.text(`Audit conducted: ${dateShort}`, rx2 + 6, rcy);
+
+  y += cardH + 8;
+
+  // ── About This Audit — styled info box ────────────────────────────────────
+  const totalItems2 = score.categories.reduce((s, c) => s + c.total, 0);
+  const aboutText = st(`This UX + SEO audit was conducted for ${auditUrl} on ${dateShort}. It covers ${totalItems2} checkpoints across Technical SEO, On-Page Content, UX Heuristics, Conversion & CTA, and AI Visibility. Some checks require verification with external tools (Google Search Console, PageSpeed Insights, Screaming Frog, etc.). This report is a professional client deliverable — review it in the context of the site's specific goals.`);
+  doc.setFontSize(7.5);
+  doc.setFont('helvetica', 'normal');
+  const aboutLines = doc.splitTextToSize(aboutText, W - 2 * M - 16);
+  const aboutH = 8 + aboutLines.length * 4.4 + 6;
+  doc.setFillColor(246, 248, 253);
+  doc.roundedRect(M, y, W - 2 * M, aboutH, 2, 2, 'F');
+  doc.setFillColor(...brandRgb);
+  doc.roundedRect(M, y, 2.5, aboutH, 0, 0, 'F');
   doc.setFontSize(6.5);
   doc.setFont('helvetica', 'bold');
-  doc.setTextColor(150, 155, 175);
-  doc.text('PREPARED FOR', rx2 + 5, y + 7);
-  if (clientLogo) {
-    addLogoToDoc(clientLogo, rx2 + 5, y + 10, 30, 11, false, '#f4f6fc');
-    doc.setFontSize(9.5);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(20, 25, 45);
-    doc.text(clientName || '—', rx2 + 5, y + 26);
-  } else {
-    doc.setFontSize(11);
-    doc.setFont('helvetica', 'bold');
-    doc.setTextColor(20, 25, 45);
-    doc.text(clientName || '—', rx2 + 5, y + 16);
-  }
-  doc.setFontSize(8);
+  doc.setTextColor(...brandRgb);
+  doc.text('About This Audit', M + 7, y + 6);
+  doc.setFontSize(7.5);
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(85, 90, 112);
-  doc.text(auditUrl.replace(/https?:\/\/(www\.)?/, ''), rx2 + 5, clientLogo ? y + 31 : y + 22);
-  y += 44;
+  doc.setTextColor(55, 60, 80);
+  doc.text(aboutLines, M + 7, y + 12);
+  y += aboutH + 6;
 
-  // Disclaimer
-  doc.setFontSize(9);
-  doc.setFont('helvetica', 'bold');
-  doc.setTextColor(28, 32, 48);
-  doc.text('About This Audit', M, y);
-  y += 6;
-  doc.setFontSize(8);
+  // ── How Scores Are Calculated — styled info box ───────────────────────────
+  const scoringText = st('Scores are based only on reviewed applicable checks. Blank items are excluded entirely — they do not count as passes or failures. N/A items are excluded as they do not apply to this site. Below 30% coverage: preliminary result, grade withheld. 30–59% coverage: directional result, grade shown with qualifier. 60–79%: indicative result. 80%+: full audit score. A high score from a small number of reviewed checks does not imply the full website is strong.');
+  doc.setFontSize(7.5);
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(85, 90, 112);
-  const disclaimer = doc.splitTextToSize(st(`This UX + SEO audit was conducted for ${auditUrl} on ${dateShort}. ` + `It covers ${score.categories.reduce((s, c) => s + c.total, 0)} checkpoints across Technical SEO, On-Page Content, UX Heuristics, Conversion and CTA, and AI Visibility. ` + `Some checks require verification with external tools (Google Search Console, PageSpeed Insights, Screaming Frog, etc.). ` + `This report is intended as a professional client deliverable and should be reviewed in the context of the site's specific goals.`), W - 2 * M);
-  doc.text(disclaimer, M, y);
-  y += disclaimer.length * 4.5 + 8;
-  checkPageBreak(32);
-  doc.setFontSize(9);
+  const scoringLines = doc.splitTextToSize(scoringText, W - 2 * M - 16);
+  const scoringH = 8 + scoringLines.length * 4.4 + 6;
+  checkPageBreak(scoringH + 4);
+  doc.setFillColor(242, 252, 248);
+  doc.roundedRect(M, y, W - 2 * M, scoringH, 2, 2, 'F');
+  doc.setFillColor(16, 185, 129);
+  doc.roundedRect(M, y, 2.5, scoringH, 0, 0, 'F');
+  doc.setFontSize(6.5);
   doc.setFont('helvetica', 'bold');
-  doc.setTextColor(28, 32, 48);
-  doc.text('How Scores Are Calculated', M, y);
-  y += 6;
-  const scoringNote = doc.splitTextToSize(st(
-    'Scores are based only on reviewed applicable checks. Items left blank are treated as not yet reviewed and are excluded from the score entirely — they do not count as passes or failures. ' +
-    'N/A items are also excluded as they do not apply to this site. ' +
-    'For low-coverage audits (below 30% of checks reviewed), results are treated as preliminary and the overall grade is withheld. ' +
-    'For directional audits (30-59% reviewed), grades are shown as directional and not final. ' +
-    'Scores may change significantly as more checks are completed. A high score from a small number of reviewed checks does not imply the full website is strong.'
-  ), W - 2 * M);
-  doc.setFontSize(8);
+  doc.setTextColor(6, 115, 85);
+  doc.text('How Scores Are Calculated', M + 7, y + 6);
+  doc.setFontSize(7.5);
   doc.setFont('helvetica', 'normal');
-  doc.setTextColor(85, 90, 112);
-  doc.text(scoringNote, M, y);
+  doc.setTextColor(55, 60, 80);
+  doc.text(scoringLines, M + 7, y + 12);
+
   drawFooter();
   const safeClient = (clientName || auditUrl).replace(/https?:\/\//, '').replace(/[^a-zA-Z0-9.-]/g, '_');
   doc.save(`${config.agencyName.replace(/\s+/g, '_')}_Audit_${safeClient}.pdf`);
