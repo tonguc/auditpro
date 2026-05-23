@@ -31141,9 +31141,9 @@ const IMPACT_MAP = [
   fix: 'Simplify mobile menus, increase tap targets to at least 44px, and prioritise key actions.'
 }, {
   keys: ['touch target', 'tap target', '48px'],
-  why: 'Small tap targets cause accidental taps and frustration on touch screens.',
-  biz: 'Undersized touch targets increase mobile bounce rates and reduce task completion.',
-  fix: 'Increase tap target size, spacing, and mobile button/link hit areas to meet the 48px recommendation. Use CSS min-height/min-width and verify with Lighthouse Accessibility > Tap targets.'
+  why: 'Small tap targets make mobile navigation harder and increase mis-taps, especially on forms, menus, and CTA buttons.',
+  biz: 'Undersized touch targets increase mobile bounce rates and reduce task completion, directly hurting conversions.',
+  fix: 'Increase tap target size, spacing, and mobile button/link hit areas to meet the 48px recommendation. Use CSS min-height: 48px / min-width: 48px on interactive elements and verify with Lighthouse Accessibility > Tap targets.'
 },
 // ── AI / SERP Visibility ───────────────────────────────────────────────────
 {
@@ -31399,6 +31399,32 @@ function getImpactAndFix(itemText, howTo) {
     fix: howTo || 'Review this item, identify the root cause, and apply the recommended best practice.'
   };
 }
+// ── QA Debug: IMPACT_MAP coverage (call from browser console) ─────────────────
+window.auditProDebugImpactCoverage = function() {
+  const allItems = (typeof AUDIT_CATEGORIES !== 'undefined' ? AUDIT_CATEGORIES : [])
+    .flatMap(cat => cat.sections.flatMap(sec => sec.items));
+  const fallback = [];
+  const mapped = [];
+  allItems.forEach(item => {
+    const combined = (item.item + ' ' + (item.howTo || '')).toLowerCase();
+    const hit = IMPACT_MAP.some(entry => entry.keys.some(k => combined.includes(k)));
+    (hit ? mapped : fallback).push({ id: item.id, text: item.item });
+  });
+  const pct = allItems.length > 0 ? Math.round(fallback.length / allItems.length * 100) : 0;
+  console.group('AuditPro IMPACT_MAP Coverage Report');
+  console.log(`Total items   : ${allItems.length}`);
+  console.log(`Mapped        : ${mapped.length} (${100 - pct}%)`);
+  console.log(`Fallback      : ${fallback.length} (${pct}%)`);
+  console.log(`IMPACT_MAP entries: ${IMPACT_MAP.length}`);
+  if (fallback.length > 0) {
+    console.groupCollapsed(`Fallback items (${fallback.length})`);
+    fallback.forEach(f => console.log(`  [${f.id}] ${f.text}`));
+    console.groupEnd();
+  }
+  console.groupEnd();
+  return { total: allItems.length, mapped: mapped.length, fallback: fallback.length, fallbackPct: pct, fallbackItems: fallback };
+};
+
 const ESTIMATED_IMPACT = {
   technical: 'Primary expected gain: stronger crawlability, faster loading, and improved indexation quality.',
   onpage: 'Primary expected gain: better keyword relevance, higher click-through rates, and stronger content performance.',
@@ -32408,6 +32434,16 @@ function downloadPDF(config, auditUrl, score, results) {
       const reviewedItems = sec.items.filter(it => results[it.id] && results[it.id] !== 'N/A' && results[it.id] !== 'Blank');
       const blankCount = sec.items.filter(it => !results[it.id] || results[it.id] === 'Blank').length;
       const naCount = sec.items.filter(it => results[it.id] === 'N/A').length;
+      const secAllNA = naCount === sec.items.length && sec.items.length > 0;
+      // If every item in this section is N/A, show a clear "not applicable" note and skip item rendering
+      if (secAllNA) {
+        doc.setFontSize(6);
+        doc.setFont('helvetica', 'italic');
+        doc.setTextColor(160, 165, 185);
+        doc.text(`This section was reviewed and excluded from scoring — all ${naCount} item${naCount > 1 ? 's' : ''} marked N/A (not applicable to this site).`, M + 3, y + 3.5);
+        y += 7;
+        return;
+      }
       if (reviewedItems.length > 0 && blankCount > 0) {
         doc.setFontSize(5.5);
         doc.setFont('helvetica', 'bold');
@@ -32465,7 +32501,7 @@ function downloadPDF(config, auditUrl, score, results) {
         doc.setFontSize(6);
         doc.setFont('helvetica', 'italic');
         doc.setTextColor(195, 198, 210);
-        doc.text(`${naCount} non-applicable item${naCount > 1 ? 's' : ''} excluded.`, M + 3, y + 3.5);
+        doc.text(`${naCount} item${naCount > 1 ? 's' : ''} marked N/A — excluded from scoring (not applicable to this site).`, M + 3, y + 3.5);
         y += 5;
       }
       y += 3;
