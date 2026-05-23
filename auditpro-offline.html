@@ -31712,63 +31712,87 @@ function downloadPDF(config, auditUrl, score, results) {
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(30, 35, 45);
   doc.text('Section Scores', M, y);
-  y += 5;
-  const numCats = score.categories.length;
-  const catGap = 3;
-  const catBoxW = (W - 2 * M - catGap * (numCats - 1)) / numCats;
+  y += 6;
+  const catRowH = 12;
   score.categories.forEach((cat, i) => {
-    const x = M + i * (catBoxW + catGap);
     const catRgb = hexToRgb(cat.color);
-    const catLite = lighten(catRgb, 0.92);
     const noData = cat.evaluated === 0;
-    const catBoxH = 30;
-    doc.setFillColor(...(noData ? [244, 245, 250] : catLite));
-    doc.roundedRect(x, y, catBoxW, catBoxH, 2, 2, 'F');
-    doc.setDrawColor(...(noData ? [210, 215, 225] : catRgb));
-    doc.setLineWidth(0.25);
-    doc.roundedRect(x, y, catBoxW, catBoxH, 2, 2, 'S');
-    doc.setFontSize(noData ? 7 : 17);
+    const rowBg = i % 2 === 0 ? [249, 250, 252] : [255, 255, 255];
+    doc.setFillColor(...rowBg);
+    doc.rect(M, y, W - 2 * M, catRowH, 'F');
+    // Left color bar
+    doc.setFillColor(...(noData ? [210, 215, 225] : catRgb));
+    doc.rect(M, y, 3, catRowH, 'F');
+    // Category name
+    const fullLbl = cat.label;
+    doc.setFontSize(7.5);
     doc.setFont('helvetica', 'bold');
-    doc.setTextColor(...(noData ? [185, 190, 205] : catRgb));
-    doc.text(noData ? 'N/E' : `${cat.score}`, x + catBoxW / 2, noData ? y + 11 : y + 13, {
-      align: 'center'
-    });
-    doc.setFontSize(5.5);
+    doc.setTextColor(noData ? 175 : 28, noData ? 180 : 33, noData ? 200 : 52);
+    doc.text(st(fullLbl), M + 7, y + 7.5);
+    // Coverage bar (40mm wide, starting at M+80)
+    const barX = M + 80;
+    const barW = 40;
+    const barH = 2.5;
+    const barY = y + catRowH / 2 - barH / 2;
+    const covPct = cat.total > 0 ? cat.evaluated / cat.total : 0;
+    doc.setFillColor(220, 224, 235);
+    doc.roundedRect(barX, barY, barW, barH, 1, 1, 'F');
+    if (covPct > 0) {
+      doc.setFillColor(...(noData ? [190, 195, 210] : catRgb));
+      doc.roundedRect(barX, barY, barW * covPct, barH, 1, 1, 'F');
+    }
+    // Coverage percentage text
+    doc.setFontSize(6);
     doc.setFont('helvetica', 'normal');
-    doc.setTextColor(noData ? 175 : 75, noData ? 180 : 75, noData ? 198 : 75);
-    const lbl = cat.label.replace('Technical SEO', 'Tech SEO').replace('On-Page & Content', 'On-Page').replace('UX Heuristics', 'UX').replace('Conversion & CTA', 'CRO').replace('AI & SERP Visibility', 'AI/SERP');
-    doc.text(lbl, x + catBoxW / 2, y + 19, {
-      align: 'center'
-    });
-    if (!noData) {
+    doc.setTextColor(130, 135, 155);
+    doc.text(`${Math.round(covPct * 100)}%`, barX + barW + 3, y + 7.5);
+    // Separator line
+    doc.setDrawColor(210, 215, 228);
+    doc.setLineWidth(0.15);
+    doc.line(M + 135, y + 3, M + 135, y + catRowH - 3);
+    // Score
+    const scoreX = M + 148;
+    if (noData) {
+      doc.setFontSize(7);
+      doc.setFont('helvetica', 'italic');
+      doc.setTextColor(180, 185, 200);
+      doc.text('Not evaluated', scoreX, y + 7.5, { align: 'center' });
+    } else {
       const catCov = catCovLevel(cat.evaluated, cat.total);
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(...catRgb);
+      doc.text(`${cat.score}`, scoreX - 8, y + 8, { align: 'center' });
+      doc.setFontSize(6);
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(130, 135, 155);
+      doc.text('/100', scoreX - 2, y + 8);
+      // Grade or coverage label
       if (catCov.isLow) {
-        // Low coverage: show reviewed count + "Low confidence" — no grade letter
         doc.setFontSize(5.5);
-        doc.setFont('helvetica', 'normal');
-        doc.setTextColor(140, 110, 40);
-        doc.text(`${cat.evaluated}/${cat.total} reviewed`, x + catBoxW / 2, y + 22, { align: 'center' });
-        doc.setFontSize(5);
         doc.setFont('helvetica', 'italic');
-        doc.setTextColor(155, 125, 50);
-        doc.text('Low confidence', x + catBoxW / 2, y + 27, { align: 'center' });
+        doc.setTextColor(180, 140, 40);
+        doc.text('grade withheld', W - M - 2, y + 7.5, { align: 'right' });
       } else {
-        doc.setFontSize(6.5);
+        doc.setFontSize(8);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(...catRgb);
-        doc.text(`Grade ${cat.grade}`, x + catBoxW / 2, y + 25, { align: 'center' });
+        doc.text(`${cat.grade}`, W - M - 8, y + 8.5, { align: 'center' });
+        doc.setFontSize(5.5);
+        doc.setFont('helvetica', 'normal');
+        doc.setTextColor(155, 160, 178);
+        doc.text('grade', W - M - 2, y + 5.5, { align: 'right' });
       }
-    } else {
-      doc.setFontSize(5);
-      doc.setFont('helvetica', 'italic');
-      doc.setTextColor(175, 180, 198);
-      doc.text('Not evaluated', x + catBoxW / 2, y + 23, { align: 'center' });
-      doc.text('Complete to unlock', x + catBoxW / 2, y + 27, { align: 'center' });
     }
+    y += catRowH;
   });
+  // Bottom border under last row
+  doc.setDrawColor(210, 215, 228);
+  doc.setLineWidth(0.2);
+  doc.line(M, y, W - M, y);
 
   // ── Executive Summary (rule engine) ──────────────────────────────────────
-  y += 36;
+  y += 10;
   if (copy) {
     // Performance interpretation — italic one-liner above the box
     const interpLines = doc.splitTextToSize(copy.performanceInterpretation, W - 2 * M);
@@ -31829,46 +31853,45 @@ function downloadPDF(config, auditUrl, score, results) {
         ? `The reviewed issues suggest ${issueRef} in ${weakestArea} represent the most accessible near-term opportunity. Additional findings may appear as more checks are completed.`
         : `Prioritising ${issueRef} — especially in ${weakestArea} — will deliver the fastest measurable improvements.`;
       const closingLine = st(rawClosing);
-      // Pre-wrap closing line to compute accurate box height
+      const bulletWrapW = W - 2 * M - 16;
+      // Pre-wrap all bullets and closing line for accurate height
+      doc.setFontSize(7);
+      doc.setFont('helvetica', 'normal');
+      const bulletWrapped = bullets.map(b => doc.splitTextToSize(`– ${b}`, bulletWrapW));
+      const totalBulletLines = bulletWrapped.reduce((s, bl) => s + bl.length, 0);
       doc.setFontSize(6.5);
       doc.setFont('helvetica', 'italic');
-      const closingWrappedCheck = doc.splitTextToSize(closingLine, W - 2 * M - 12);
-      const eiH = 13 + bullets.length * 5 + 2 + closingWrappedCheck.length * 4.5;
+      const closingWrapped = doc.splitTextToSize(closingLine, bulletWrapW);
+      const eiH = 7 + 5 + totalBulletLines * 4.8 + 3 + closingWrapped.length * 4.5 + 5;
       checkPageBreak(eiH + 6);
       doc.setFillColor(232, 250, 244);
       doc.roundedRect(M, y, W - 2 * M, eiH, 2, 2, 'F');
       doc.setFillColor(16, 185, 129);
       doc.roundedRect(M, y, 2.5, eiH, 1, 0, 'F');
-      doc.setFontSize(6);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(6, 120, 90);
       const impactTitle = copy.isLowCov
-        ? 'POTENTIAL IMPROVEMENTS - based on reviewed items'
-        : 'ESTIMATED IMPACT - if priority issues are resolved';
+        ? 'POTENTIAL IMPROVEMENTS  ·  based on reviewed items'
+        : 'ESTIMATED IMPACT  ·  if priority issues are resolved';
       const impactIntro = copy.isLowCov
         ? 'Based on the items reviewed so far, addressing these priorities may help with:'
         : 'If the priority issues are fixed, this can lead to:';
+      doc.setFontSize(6);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(6, 120, 90);
       doc.text(impactTitle, M + 6, y + 5.5);
       doc.setFontSize(7);
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(22, 60, 50);
-      doc.text(impactIntro, M + 6, y + 10.5);
-      bullets.forEach((b, bi) => {
-        doc.text(`- ${b}`, M + 8, y + 16 + bi * 5);
+      doc.text(impactIntro, M + 6, y + 11);
+      let bulletY = y + 16;
+      bulletWrapped.forEach(bl => {
+        doc.text(bl, M + 8, bulletY);
+        bulletY += bl.length * 4.8;
       });
-      const closingY = y + 16 + bullets.length * 5 + 1;
+      const closingY = bulletY + 3;
       doc.setFontSize(6.5);
       doc.setFont('helvetica', 'italic');
       doc.setTextColor(6, 100, 75);
-      const closingWrapped = doc.splitTextToSize(closingLine, W - 2 * M - 12);
       doc.text(closingWrapped, M + 6, closingY);
-      if (copy.isLowCov) {
-        const caveatY = closingY + closingWrapped.length * 4.5 + 1;
-        doc.setFontSize(6);
-        doc.setFont('helvetica', 'italic');
-        doc.setTextColor(80, 130, 110);
-        doc.text('Additional opportunities may appear as more checks are completed.', M + 6, caveatY);
-      }
       y += eiH + 12;
     }
   }
