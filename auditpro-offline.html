@@ -30618,7 +30618,7 @@ function catCovLevel(evaluated, total) {
   if (!total || evaluated === 0) return { pct: 0, scoreLabel: 'Not Reviewed Yet', confidence: 'None', showGrade: false, isLow: true, isDirect: false, isMed: false, isHigh: false };
   const pct = Math.round(evaluated / total * 100);
   if (pct < 30) return { pct, scoreLabel: 'Preliminary Reviewed Score', confidence: 'Low', showGrade: false, isLow: true, isDirect: false, isMed: false, isHigh: false };
-  if (pct < 60) return { pct, scoreLabel: 'Directional Score', confidence: 'Medium-Low', showGrade: true, isLow: false, isDirect: true, isMed: false, isHigh: false };
+  if (pct < 60) return { pct, scoreLabel: 'Directional Score', confidence: 'Medium-Low', showGrade: false, isLow: false, isDirect: true, isMed: false, isHigh: false };
   if (pct < 80) return { pct, scoreLabel: 'Indicative Score', confidence: 'Medium', showGrade: true, isLow: false, isDirect: false, isMed: true, isHigh: false };
   return { pct, scoreLabel: 'Full Audit Score', confidence: 'High', showGrade: true, isLow: false, isDirect: false, isMed: false, isHigh: true };
 }
@@ -31685,15 +31685,15 @@ function downloadPDF(config, auditUrl, score, results) {
     doc.text('Complete more checks', gradeAreaCx, y + 20, { align: 'center' });
     doc.text('to unlock final grade', gradeAreaCx, y + 26, { align: 'center' });
   } else if (isDirectCovPDF) {
-    doc.setFontSize(18);
+    doc.setFontSize(11);
     doc.setFont('helvetica', 'bold');
-    doc.setTextColor(...brandRgb);
-    doc.text(`Grade ${score.grade}`, gradeAreaCx, y + 16, { align: 'center' });
+    doc.setTextColor(150, 110, 20);
+    doc.text('Grade withheld', gradeAreaCx, y + 16, { align: 'center' });
     doc.setFontSize(6.5);
     doc.setFont('helvetica', 'italic');
-    doc.setTextColor(90, 95, 115);
-    doc.text('Directional', gradeAreaCx, y + 23, { align: 'center' });
-    doc.text(st(score.rating), gradeAreaCx, y + 29, { align: 'center' });
+    doc.setTextColor(150, 120, 50);
+    doc.text('30–59% coverage', gradeAreaCx, y + 22, { align: 'center' });
+    doc.text('Directional result — complete more checks', gradeAreaCx, y + 27, { align: 'center' });
   } else {
     const gradeFontSize = isMedCovPDF ? 18 : 22;
     doc.setFontSize(gradeFontSize);
@@ -31758,7 +31758,7 @@ function downloadPDF(config, auditUrl, score, results) {
     } else if (catCov.isLow) {
       confLabel = 'Low confidence'; confRgb = [190, 130, 20];
     } else if (catCov.isDirect) {
-      confLabel = 'Partial confidence'; confRgb = [60, 130, 200];
+      confLabel = 'Medium-low confidence'; confRgb = [60, 130, 200];
     } else if (catCov.isMed) {
       confLabel = 'Good confidence'; confRgb = [30, 165, 115];
     } else {
@@ -31880,8 +31880,7 @@ function downloadPDF(config, auditUrl, score, results) {
     // Estimated Impact box — intro + audit-specific bullets + closing line
     if (copy.weakestId) {
       const weakestArea = st(WEAKEST_MEANING[copy.weakestId] || copy.weakestId);
-      const topHiCrit = copy.priorityIssues.filter(it => it.priority === 'Critical' || it.priority === 'High').length;
-      const issueRef = topHiCrit > 0 ? `the ${topHiCrit} high-priority issue${topHiCrit > 1 ? 's' : ''}` : 'the identified issues';
+      const issueRef = 'the high-priority issues identified in this audit';
       const bullets = copy.isLowCov ? [
         `Improved ${weakestArea} — the clearest near-term lever based on reviewed checks`,
         'Higher search visibility as technical and content gaps are resolved',
@@ -32130,7 +32129,7 @@ function downloadPDF(config, auditUrl, score, results) {
         ? (() => {
             const cov2 = catCovLevel(catScore.evaluated, catScore.total);
             if (cov2.isLow) return `${cov2.scoreLabel}: ${catScore.score}/100  ·  ${catScore.evaluated}/${catScore.total} reviewed  ·  Low confidence  ·  Grade withheld`;
-            if (cov2.isDirect) return `${cov2.scoreLabel}: ${catScore.score}/100  Grade ${catScore.grade}  ·  ${catScore.evaluated}/${catScore.total} reviewed  ·  Medium-Low confidence`;
+            if (cov2.isDirect) return `${cov2.scoreLabel}: ${catScore.score}/100  ·  ${catScore.evaluated}/${catScore.total} reviewed  ·  Medium-Low confidence  ·  Grade withheld`;
             if (cov2.isMed) return `${cov2.scoreLabel}: ${catScore.score}/100  Grade ${catScore.grade}  ·  ${catScore.evaluated}/${catScore.total} reviewed  ·  Medium confidence`;
             return `${cov2.scoreLabel}: ${catScore.score}/100  Grade ${catScore.grade}  ·  ${catScore.evaluated}/${catScore.total} reviewed  ·  High confidence`;
           })()
@@ -32183,7 +32182,8 @@ function downloadPDF(config, auditUrl, score, results) {
       });
       y += 2;
     }
-    cat.sections.forEach(sec => {
+    cat.sections.forEach((sec, secIdx) => {
+      if (secIdx > 0) y += 5;
       checkPageBreak(20);
       doc.setFillColor(...lighten(catColor, 0.88));
       doc.rect(M, y, W - 2 * M, 8, 'F');
@@ -32224,30 +32224,30 @@ function downloadPDF(config, auditUrl, score, results) {
         const statusColor = STATUS_COLORS_PDF[status] || [160, 165, 180];
         if (status === 'Fail') {
           doc.setFillColor(252, 245, 246);
-          doc.rect(M, y, W - 2 * M, 8, 'F');
+          doc.rect(M, y, W - 2 * M, 9, 'F');
           doc.setFillColor(210, 60, 75);
-          doc.rect(M, y, 2, 8, 'F');
+          doc.rect(M, y, 2, 9, 'F');
         } else if (idx % 2 === 0) {
           doc.setFillColor(247, 248, 252);
-          doc.rect(M, y, W - 2 * M, 8, 'F');
+          doc.rect(M, y, W - 2 * M, 9, 'F');
         }
         doc.setFontSize(6.5);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(155, 160, 175);
-        doc.text(`${item.num}`, M + 3, y + 5.5);
+        doc.text(`${item.num}`, M + 3, y + 6);
         doc.setFontSize(7.5);
         doc.setFont('helvetica', status === 'Fail' ? 'bold' : 'normal');
         doc.setTextColor(35, 40, 55);
         const itemText = doc.splitTextToSize(st(item.item), W - 2 * M - 52);
-        doc.text(itemText[0], M + 12, y + 5.5);
+        doc.text(itemText[0], M + 12, y + 6);
         doc.setFillColor(...statusColor);
         const badgeX = W - M - 22;
-        doc.roundedRect(badgeX, y + 1.2, 20, 5.2, 2, 2, 'F');
+        doc.roundedRect(badgeX, y + 1.8, 20, 5.4, 2, 2, 'F');
         doc.setFontSize(6);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(255, 255, 255);
-        doc.text(status, badgeX + 10, y + 4.9, { align: 'center' });
-        y += 8;
+        doc.text(status, badgeX + 10, y + 5.5, { align: 'center' });
+        y += 9;
       });
       // Summary lines for not-yet-reviewed and N/A
       if (reviewedItems.length === 0) {
