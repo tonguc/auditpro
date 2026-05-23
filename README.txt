@@ -6,7 +6,7 @@ WHAT'S IN THIS ZIP
 ------------------
   auditpro-offline.html       — The main audit tool (open in Chrome or Edge)
   QuickStart.html             — Step-by-step guide (open in any browser or print)
-  Sample_Full_Audit.pdf       — Sample PDF: full audit, Grade A result
+  Sample_Full_Audit.pdf       — Sample PDF: full audit, Grade B result
   Sample_Partial_Audit.pdf    — Sample PDF: partial audit, grade withheld (40% coverage)
   README.txt                  — This file
 
@@ -31,7 +31,7 @@ IMPORTANT NOTES
 
 WHITE LABEL PDF EXPORT
 ----------------------
-Go to the "Labouretail White Label PDF" tab to add your agency name, logo,
+Go to the "White Label PDF" tab to add your agency name, logo,
 brand color, and contact info. Every exported PDF will carry your brand.
 
 BACKUP & RESTORE

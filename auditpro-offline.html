@@ -30894,6 +30894,11 @@ const IMPACT_MAP = [
   biz: 'Missing FAQ structure can reduce answer visibility and long-tail search reach.',
   fix: 'Add well-structured FAQ content and valid FAQPage schema where appropriate.'
 }, {
+  keys: ['broken internal link', 'no broken internal', '4xx inlink', 'broken link hurts'],
+  why: 'Broken internal links prevent crawlers and users from reaching destination pages, damaging both SEO and usability.',
+  biz: 'Broken links erode trust, increase bounce rates, and waste crawl budget on larger sites.',
+  fix: 'Crawl the site with Screaming Frog or Sitebulb (Response Codes → 4xx). Fix or redirect each broken URL and update the source pages accordingly.'
+}, {
   keys: ['404', 'error page', 'broken link', 'dead link'],
   why: 'A helpful 404 page helps users recover when they reach a broken URL.',
   biz: 'Poor error recovery increases frustration, abandonment, and lost conversions.',
@@ -31033,6 +31038,11 @@ const IMPACT_MAP = [
   biz: 'Without proof, users may not trust claims and choose a competitor instead.',
   fix: 'Add case studies with a clear problem, solution, and specific measurable outcome.'
 }, {
+  keys: ['ga4', 'analytics', 'tracking', 'conversion tracking', 'event tracking'],
+  why: 'Conversion tracking is needed to understand what is working and what is not.',
+  biz: 'Without measurement, optimisation decisions are based on assumptions rather than data.',
+  fix: 'Configure GA4 events and conversions for all key user actions across the site.'
+}, {
   keys: ['form', 'contact form', 'lead form', 'form field'],
   why: 'Forms should be simple and easy to complete to reduce abandonment.',
   biz: 'Long or confusing forms directly reduce submission rates and lead volume.',
@@ -31062,11 +31072,6 @@ const IMPACT_MAP = [
   why: 'Mobile users often want immediate contact via phone.',
   biz: 'Non-clickable phone numbers add unnecessary friction and reduce inbound calls.',
   fix: 'Use tel: links for all phone numbers and test them on actual mobile devices.'
-}, {
-  keys: ['ga4', 'analytics', 'tracking', 'conversion tracking', 'event tracking'],
-  why: 'Conversion tracking is needed to understand what is working and what is not.',
-  biz: 'Without measurement, optimisation decisions are based on assumptions rather than data.',
-  fix: 'Configure GA4 events and conversions for all key user actions across the site.'
 },
 // ── UX ────────────────────────────────────────────────────────────────────
 {
@@ -32109,7 +32114,7 @@ function downloadPDF(config, auditUrl, score, results) {
         'Higher search visibility as technical and content gaps are resolved',
         'Better user engagement and trust signals across key pages'
       ] : [
-        `Stronger ${weakestArea} — the highest-impact area in this audit`,
+        `A stronger ${weakestArea} — the highest-impact area in this audit`,
         'Higher search rankings and qualified organic traffic',
         'Better user engagement, lower drop-off, and improved conversion signals'
       ];
