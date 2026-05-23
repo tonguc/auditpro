@@ -35473,179 +35473,278 @@ function WhiteLabelView({
     style: { position:'relative', borderRadius:8, overflow:'hidden', background:C.bg, border:`1px solid ${C.border}`, height:300, minHeight:260 }
   }, (() => {
     const acc = color || C.accent;
+    // PDF-style slide helper colours (light paper look)
+    const P = {
+      bg: '#ffffff', surface: '#f4f5f8', border: '#e2e5ec',
+      text: '#1a1d2e', muted: '#6b7280', head: '#0f1120',
+      pass: '#10a070', fail: '#e53e3e', partial: '#d97706',
+      crit: '#e53e3e', high: '#d97706', med: '#6b7280'
+    };
+    const Row = ({cells, header, cols}) =>
+      /*#__PURE__*/React.createElement('div',{style:{display:'grid',gridTemplateColumns:cols||'2fr 1fr 1.2fr 1.6fr',background:header?P.surface:P.bg,borderBottom:`1px solid ${P.border}`,padding:'2.5px 6px'}},
+        cells.map((c,i)=>/*#__PURE__*/React.createElement('div',{key:i,style:{fontSize:header?5.5:6.5,fontWeight:header||i===0?700:400,color:header?P.muted:c.color||P.text,letterSpacing:header?'0.06em':0,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}},c.v||c)));
+    const Badge = ({label,color,bg}) => /*#__PURE__*/React.createElement('span',{style:{fontSize:6,fontWeight:700,background:bg||color+'22',color:color||acc,borderRadius:3,padding:'1px 5px',flexShrink:0}},label);
+    const Divider = () => /*#__PURE__*/React.createElement('div',{style:{borderTop:`1px solid ${P.border}`,margin:'4px 0'}});
+    const Label = ({children,style}) => /*#__PURE__*/React.createElement('div',{style:{fontSize:6,textTransform:'uppercase',letterSpacing:'0.08em',color:P.muted,fontWeight:700,...(style||{})}},children);
+
     const slides = [
+      // ── 1. COVER PAGE ────────────────────────────────────────────────────────
       { label: 'Cover & Score', content: /*#__PURE__*/React.createElement('div', {
-          style: { padding:'14px 16px', fontFamily:'helvetica,sans-serif', minHeight:'100%', display:'flex', flexDirection:'column', gap:8, background: C.bg, boxSizing:'border-box' }
+          style:{padding:'12px 14px',background:P.bg,height:'100%',boxSizing:'border-box',display:'flex',flexDirection:'column',gap:0}
         },
-        /*#__PURE__*/React.createElement('div', { style:{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:2 } },
-          /*#__PURE__*/React.createElement('div', { style:{ fontSize:9, fontWeight:800, color:'#fff', background:acc, borderRadius:4, padding:'2px 7px', letterSpacing:'0.04em' } }, 'FULL AUDIT SCORE'),
-          /*#__PURE__*/React.createElement('div', { style:{ fontSize:8, color:C.muted } }, 'example-ecommerce.com')
-        ),
-        /*#__PURE__*/React.createElement('div', { style:{ display:'flex', alignItems:'baseline', gap:6 } },
-          /*#__PURE__*/React.createElement('div', { style:{ fontSize:34, fontWeight:900, color:C.text, lineHeight:1 } }, '84'),
-          /*#__PURE__*/React.createElement('div', { style:{ fontSize:11, color:C.muted } }, '/ 100'),
-          /*#__PURE__*/React.createElement('div', { style:{ fontSize:18, fontWeight:800, background:acc+'22', color:acc, borderRadius:6, padding:'1px 10px', marginLeft:6 } }, 'B')
-        ),
-        /*#__PURE__*/React.createElement('div', { style:{ fontSize:7.5, color:C.muted } }, '190 / 211 checks reviewed · 90% coverage · High confidence'),
-        /*#__PURE__*/React.createElement('div', { style:{ marginTop:4, borderRadius:6, overflow:'hidden', border:`1px solid ${C.border}` } },
-          [['CATEGORY','COVERAGE','REVIEWED SCORE','CONFIDENCE'],
-           ['Technical SEO','92%','81 / 100','High confidence'],
-           ['On-Page & Content','90%','88 / 100','High confidence'],
-           ['UX Heuristics','88%','79 / 100','High confidence'],
-           ['Conversion & CTA','91%','82 / 100','High confidence'],
-           ['AI & SERP Visibility','82%','91 / 100','High confidence']
-          ].map((row,i) => /*#__PURE__*/React.createElement('div', {
-            key:i,
-            style:{ display:'grid', gridTemplateColumns:'2fr 1fr 1.4fr 1.8fr', background: i===0 ? C.surface : i%2===0 ? C.bg : C.surface, borderBottom: i<5 ? `1px solid ${C.border}` : 'none', padding:'3px 6px' }
-          }, row.map((cell,j) => /*#__PURE__*/React.createElement('div', {
-            key:j,
-            style:{ fontSize: i===0 ? 6 : 7, fontWeight: (i===0||j===0) ? 700 : 400, color: i===0 ? C.muted : j===3 ? '#10a070' : C.text, letterSpacing: i===0 ? '0.06em' : 0, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }
-          }, cell))))
-        )
-      ) },
-      { label: 'Section Scores', content: /*#__PURE__*/React.createElement('div', {
-          style:{ padding:'14px 16px', fontFamily:'helvetica,sans-serif', display:'flex', flexDirection:'column', gap:8, background:C.bg, minHeight:'100%', boxSizing:'border-box' }
-        },
-        /*#__PURE__*/React.createElement('div', { style:{ fontSize:9, fontWeight:700, color:C.text, marginBottom:2 } }, 'SECTION SCORES'),
-        /*#__PURE__*/React.createElement('div', { style:{ fontSize:7.5, color:C.muted, marginBottom:6 } }, 'Coverage-aware — grade shown at 60%+ coverage only'),
-        /*#__PURE__*/React.createElement('div', { style:{ borderRadius:6, overflow:'hidden', border:`1px solid ${C.border}` } },
-          [['CATEGORY','COVERAGE','REVIEWED SCORE','CONFIDENCE'],
-           ['Technical SEO','31%','52 / 100','Medium-low confidence'],
-           ['On-Page & Content','16%','50 / 100','Low confidence'],
-           ['UX Heuristics','10%','88 / 100','Low confidence'],
-           ['Conversion & CTA','0%','—','Not evaluated'],
-           ['AI & SERP Visibility','0%','—','Not evaluated']
-          ].map((row,i) => /*#__PURE__*/React.createElement('div', {
-            key:i,
-            style:{ display:'grid', gridTemplateColumns:'2fr 0.8fr 1.4fr 1.8fr', background: i===0 ? C.surface : i%2===0 ? C.bg : C.surface, borderBottom: i<5 ? `1px solid ${C.border}` : 'none', padding:'3px 6px' }
-          }, row.map((cell,j) => {
-            const confColor = i===0 ? C.muted : j===3 ? (cell==='Not evaluated' ? '#9aa' : cell.includes('Medium-low') ? '#3c82c8' : cell==='Low confidence' ? '#be8214' : '#10a070') : C.text;
-            return /*#__PURE__*/React.createElement('div', {
-              key:j,
-              style:{ fontSize: i===0 ? 6 : 7, fontWeight: (i===0||j===0) ? 700 : 400, color: confColor, letterSpacing: i===0 ? '0.06em' : 0, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }
-            }, cell);
-          })))
-        ),
-        /*#__PURE__*/React.createElement('div', { style:{ fontSize:7, color:C.muted, marginTop:4, fontStyle:'italic' } }, '↑ No Grade column — grade withheld until 60%+ coverage reached')
-      ) },
-      { label: 'Top Priority Issues', content: /*#__PURE__*/React.createElement('div', {
-          style:{ padding:'14px 16px', fontFamily:'helvetica,sans-serif', display:'flex', flexDirection:'column', gap:7, background:C.bg, minHeight:'100%', boxSizing:'border-box' }
-        },
-        /*#__PURE__*/React.createElement('div', { style:{ fontSize:9, fontWeight:700, color:C.text, marginBottom:2 } }, 'TOP PRIORITY ISSUES'),
-        ...[
-          { pri:'Critical', color:'#e53e3e', issue:'Touch targets too small (< 48px)', why:'Small tap targets make mobile navigation harder and increase mis-taps on CTAs and forms.', action:'Increase tap target size to 48px min using CSS min-height/min-width on all interactive elements.' },
-          { pri:'Critical', color:'#e53e3e', issue:'No broken internal links', why:'Broken links interrupt user journeys, waste crawl budget, and reduce trust.', action:'Crawl with Screaming Frog → Response Codes → 4xx. Fix or redirect each broken URL.' },
-          { pri:'High', color:'#d97706', issue:'Title tags missing / duplicate', why:'Missing titles reduce click-through in search results and weaken keyword relevance.', action:'Write unique, benefit-driven titles (50–60 chars) for every key page.' },
-        ].map((item,i) => /*#__PURE__*/React.createElement('div', {
-            key:i,
-            style:{ display:'flex', gap:6, paddingBottom:6, borderBottom: i<2 ? `1px solid ${C.border}` : 'none' }
-          },
-          /*#__PURE__*/React.createElement('div', { style:{ width:2, minHeight:40, background:item.color, borderRadius:2, flexShrink:0 } }),
-          /*#__PURE__*/React.createElement('div', { style:{ flex:1, minWidth:0 } },
-            /*#__PURE__*/React.createElement('div', { style:{ display:'flex', alignItems:'center', gap:5, marginBottom:2 } },
-              /*#__PURE__*/React.createElement('span', { style:{ fontSize:6, fontWeight:700, background:item.color+'22', color:item.color, borderRadius:3, padding:'1px 5px' } }, item.pri),
-              /*#__PURE__*/React.createElement('span', { style:{ fontSize:7.5, fontWeight:700, color:C.text } }, item.issue)
-            ),
-            /*#__PURE__*/React.createElement('div', { style:{ fontSize:6.5, color:C.muted, lineHeight:1.4, marginBottom:2 } }, item.why),
-            /*#__PURE__*/React.createElement('div', { style:{ fontSize:6.5, color:acc, lineHeight:1.4 } }, '→ ', item.action)
-          )
-        ))
-      ) },
-      { label: 'Category Detail', content: /*#__PURE__*/React.createElement('div', {
-          style:{ padding:'14px 16px', fontFamily:'helvetica,sans-serif', display:'flex', flexDirection:'column', gap:7, background:C.bg, minHeight:'100%', boxSizing:'border-box' }
-        },
-        /*#__PURE__*/React.createElement('div', { style:{ display:'flex', alignItems:'baseline', justifyContent:'space-between', marginBottom:2 } },
-          /*#__PURE__*/React.createElement('div', { style:{ fontSize:9, fontWeight:800, color:C.text } }, '⚙️ Technical SEO'),
-          /*#__PURE__*/React.createElement('div', { style:{ fontSize:7, color:'#3c82c8', fontWeight:600 } }, 'DIRECTIONAL REVIEWED SCORE')
-        ),
-        /*#__PURE__*/React.createElement('div', { style:{ display:'flex', gap:8, fontSize:7, color:C.muted, marginBottom:4 } },
-          /*#__PURE__*/React.createElement('span', null, '20 / 65 reviewed · 31% coverage'),
-          /*#__PURE__*/React.createElement('span', { style:{ color:'#3c82c8' } }, 'Medium-low confidence'),
-          /*#__PURE__*/React.createElement('span', { style:{ color:C.muted, fontStyle:'italic' } }, 'Grade withheld')
-        ),
-        ...[
-          { status:'Pass', label:'XML sitemap submitted to Search Console', p:'High' },
-          { status:'Fail', label:'No broken internal links (404s)', p:'Critical' },
-          { status:'Pass', label:'HTTPS on all pages', p:'Critical' },
-          { status:'Partial', label:'Core Web Vitals pass (LCP/CLS/INP)', p:'Critical' },
-          { status:null, label:'Pagination handled correctly', p:'High' },
-          { status:null, label:'Hreflang tags correct', p:'High' },
-        ].map((item,i) => {
-          const sc = item.status==='Pass' ? '#10a070' : item.status==='Fail' ? '#e53e3e' : item.status==='Partial' ? '#d97706' : C.muted;
-          const sl = item.status==='Pass' ? '✓' : item.status==='Fail' ? '✗' : item.status==='Partial' ? '~' : '·';
-          return /*#__PURE__*/React.createElement('div', { key:i, style:{ display:'flex', gap:5, alignItems:'center', padding:'2px 0', borderBottom:`1px solid ${C.border}` } },
-            /*#__PURE__*/React.createElement('span', { style:{ fontSize:8, fontWeight:700, color:sc, width:10, textAlign:'center', flexShrink:0 } }, sl),
-            /*#__PURE__*/React.createElement('span', { style:{ fontSize:7, color: item.status ? C.text : C.muted, fontStyle: item.status ? 'normal' : 'italic', flex:1 } }, item.label),
-            /*#__PURE__*/React.createElement('span', { style:{ fontSize:6, color:item.p==='Critical'?'#e53e3e':item.p==='High'?'#d97706':'#888', fontWeight:600 } }, item.p)
-          );
-        }),
-        /*#__PURE__*/React.createElement('div', { style:{ fontSize:6.5, color:C.muted, fontStyle:'italic', marginTop:3 } }, '45 not yet reviewed — complete for full category score')
-      ) },
-      { label: 'White Label PDF', content: /*#__PURE__*/React.createElement('div', {
-          style:{ padding:'14px 16px', fontFamily:'helvetica,sans-serif', display:'flex', flexDirection:'column', gap:8, background:C.bg, minHeight:'100%', boxSizing:'border-box' }
-        },
-        /*#__PURE__*/React.createElement('div', { style:{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:4 } },
-          /*#__PURE__*/React.createElement('div', null,
-            /*#__PURE__*/React.createElement('div', { style:{ fontSize:7, color:C.muted, textTransform:'uppercase', letterSpacing:'0.08em' } }, 'Prepared by'),
-            /*#__PURE__*/React.createElement('div', { style:{ fontSize:8, fontWeight:700, color:acc } }, name || 'Your Agency'),
-            /*#__PURE__*/React.createElement('div', { style:{ fontSize:6.5, color:C.muted } }, agencyWebsite || 'yoursite.com'),
-            /*#__PURE__*/React.createElement('div', { style:{ fontSize:6.5, color:C.muted } }, agencyEmail || 'hello@yoursite.com')
+        // Header bar
+        /*#__PURE__*/React.createElement('div',{style:{display:'flex',alignItems:'center',justifyContent:'space-between',paddingBottom:7,borderBottom:`2px solid ${acc}`,marginBottom:8}},
+          /*#__PURE__*/React.createElement('div',null,
+            /*#__PURE__*/React.createElement('div',{style:{fontSize:8,fontWeight:900,color:P.head,letterSpacing:'0.04em'}},'UX + SEO + CRO + AI VISIBILITY AUDIT'),
+            /*#__PURE__*/React.createElement('div',{style:{fontSize:6.5,color:P.muted,marginTop:1}},'example-ecommerce.com  ·  Prepared by Digital Growth Agency')
           ),
-          /*#__PURE__*/React.createElement('div', { style:{ textAlign:'right' } },
-            /*#__PURE__*/React.createElement('div', { style:{ fontSize:7, color:C.muted, textTransform:'uppercase', letterSpacing:'0.08em' } }, 'Prepared for'),
-            /*#__PURE__*/React.createElement('div', { style:{ fontSize:8, fontWeight:700, color:C.text } }, 'Your Client'),
-            /*#__PURE__*/React.createElement('div', { style:{ fontSize:6.5, color:C.muted } }, 'client-website.com')
+          /*#__PURE__*/React.createElement('div',{style:{textAlign:'right'}},
+            /*#__PURE__*/React.createElement('div',{style:{fontSize:6,color:P.muted}},'Prepared for'),
+            /*#__PURE__*/React.createElement('div',{style:{fontSize:7,fontWeight:700,color:P.head}},'Example E-Commerce Ltd')
           )
         ),
-        /*#__PURE__*/React.createElement('div', { style:{ borderRadius:6, background:acc+'15', border:`1px solid ${acc}44`, padding:'7px 10px', display:'flex', alignItems:'center', gap:8 } },
-          /*#__PURE__*/React.createElement('div', { style:{ width:28, height:28, borderRadius:6, background:acc+'33', display:'flex', alignItems:'center', justifyContent:'center', fontSize:14 } }, '🏷️'),
-          /*#__PURE__*/React.createElement('div', null,
-            /*#__PURE__*/React.createElement('div', { style:{ fontSize:8, fontWeight:700, color:C.text } }, 'White Label PDF Export'),
-            /*#__PURE__*/React.createElement('div', { style:{ fontSize:7, color:C.muted } }, 'Add your agency name, logo, brand color — every PDF carries your brand')
-          )
-        ),
-        /*#__PURE__*/React.createElement('div', { style:{ display:'flex', gap:6 } },
-          [['Brand Color', acc], ['Agency Logo', '+ Upload PNG'], ['Client Logo', '+ Upload PNG']].map(([lbl,val],i) =>
-            /*#__PURE__*/React.createElement('div', { key:i, style:{ flex:1, background:C.surface, borderRadius:5, padding:'5px 7px', border:`1px solid ${C.border}` } },
-              /*#__PURE__*/React.createElement('div', { style:{ fontSize:6, color:C.muted, marginBottom:2 } }, lbl),
-              i===0
-                ? /*#__PURE__*/React.createElement('div', { style:{ width:'100%', height:10, borderRadius:3, background:acc } })
-                : /*#__PURE__*/React.createElement('div', { style:{ fontSize:7, color:C.muted, fontStyle:'italic' } }, val)
+        // Score row
+        /*#__PURE__*/React.createElement('div',{style:{display:'flex',alignItems:'flex-end',gap:10,marginBottom:8}},
+          /*#__PURE__*/React.createElement('div',null,
+            /*#__PURE__*/React.createElement('div',{style:{fontSize:6.5,color:P.muted,marginBottom:2}},'FULL AUDIT SCORE'),
+            /*#__PURE__*/React.createElement('div',{style:{display:'flex',alignItems:'baseline',gap:4}},
+              /*#__PURE__*/React.createElement('div',{style:{fontSize:38,fontWeight:900,color:P.head,lineHeight:1}},'86'),
+              /*#__PURE__*/React.createElement('div',{style:{fontSize:11,color:P.muted}},'/ 100'),
+              /*#__PURE__*/React.createElement('div',{style:{fontSize:22,fontWeight:900,color:'#fff',background:acc,borderRadius:6,padding:'1px 9px',marginLeft:6}},'B')
+            ),
+            /*#__PURE__*/React.createElement('div',{style:{fontSize:6,color:P.muted,marginTop:3}},'211 / 211 checks reviewed  ·  100% coverage  ·  High confidence')
+          ),
+          /*#__PURE__*/React.createElement('div',{style:{flex:1,display:'flex',gap:8,justifyContent:'flex-end'}},
+            [{val:'73%',lbl:'Passed'},{val:'12%',lbl:'Partial'},{val:'15%',lbl:'Failed'}].map(({val,lbl},i)=>
+              /*#__PURE__*/React.createElement('div',{key:i,style:{textAlign:'center'}},
+                /*#__PURE__*/React.createElement('div',{style:{fontSize:13,fontWeight:800,color:[P.pass,P.partial,P.fail][i]}}),
+                /*#__PURE__*/React.createElement('div',{style:{fontSize:9,fontWeight:800,color:[P.pass,P.partial,P.fail][i]}},val),
+                /*#__PURE__*/React.createElement('div',{style:{fontSize:5.5,color:P.muted}},lbl)
+              )
             )
           )
-        )
-      ) },
-      { label: 'Scoring Methodology', content: /*#__PURE__*/React.createElement('div', {
-          style:{ padding:'14px 16px', fontFamily:'helvetica,sans-serif', display:'flex', flexDirection:'column', gap:7, background:C.bg, minHeight:'100%', boxSizing:'border-box' }
-        },
-        /*#__PURE__*/React.createElement('div', { style:{ fontSize:9, fontWeight:700, color:C.text, marginBottom:4 } }, 'HOW THIS REPORT IS SCORED'),
-        ...[
-          { icon:'☐', label:'Blank items', desc:'Not reviewed — excluded from score entirely' },
-          { icon:'N/A', label:'N/A items', desc:'Not applicable to this site — excluded from scoring' },
-          { icon:'✓', label:'Reviewed items', desc:'Pass / Partial / Fail — these drive the score' },
-        ].map((r,i) => /*#__PURE__*/React.createElement('div', { key:i, style:{ display:'flex', gap:7, alignItems:'flex-start', paddingBottom:5, borderBottom:`1px solid ${C.border}` } },
-          /*#__PURE__*/React.createElement('div', { style:{ fontSize:7, fontWeight:700, color:acc, width:18, textAlign:'center', flexShrink:0 } }, r.icon),
-          /*#__PURE__*/React.createElement('div', null,
-            /*#__PURE__*/React.createElement('div', { style:{ fontSize:7.5, fontWeight:700, color:C.text } }, r.label),
-            /*#__PURE__*/React.createElement('div', { style:{ fontSize:6.5, color:C.muted } }, r.desc)
+        ),
+        // Section scores table
+        /*#__PURE__*/React.createElement('div',{style:{flex:1,display:'flex',flexDirection:'column'}},
+          /*#__PURE__*/React.createElement(Label,{style:{marginBottom:4}},'Section Scores'),
+          /*#__PURE__*/React.createElement('div',{style:{borderRadius:5,overflow:'hidden',border:`1px solid ${P.border}`,flex:1}},
+            [
+              {cells:['CATEGORY','COVERAGE','REVIEWED SCORE','CONFIDENCE'],header:true},
+              {cells:['Technical SEO','100%',{v:'84 / 100',color:P.pass},{v:'High confidence',color:'#10a070'}]},
+              {cells:['On-Page & Content','100%',{v:'88 / 100',color:P.pass},{v:'High confidence',color:'#10a070'}]},
+              {cells:['UX Heuristics','100%',{v:'82 / 100',color:P.pass},{v:'High confidence',color:'#10a070'}]},
+              {cells:['Conversion & CTA','100%',{v:'85 / 100',color:P.pass},{v:'High confidence',color:'#10a070'}]},
+              {cells:['AI & SERP Visibility','100%',{v:'91 / 100',color:P.pass},{v:'High confidence',color:'#10a070'}]},
+            ].map((r,i)=>/*#__PURE__*/React.createElement(Row,{key:i,...r}))
           )
-        )),
-        /*#__PURE__*/React.createElement('div', { style:{ marginTop:4, borderRadius:6, overflow:'hidden', border:`1px solid ${C.border}` } },
-          [['COVERAGE','LABEL','CONFIDENCE','GRADE'],
-           ['0%','Not Reviewed Yet','None','Withheld'],
-           ['1–29%','Preliminary Reviewed Score','Low','Withheld'],
-           ['30–59%','Directional Reviewed Score','Medium-Low','Withheld'],
-           ['60–79%','Indicative Score','Medium','Shown'],
-           ['80%+','Full Audit Score','High','Shown']
-          ].map((row,i) => /*#__PURE__*/React.createElement('div', {
-            key:i,
-            style:{ display:'grid', gridTemplateColumns:'0.7fr 2fr 1.2fr 0.8fr', background: i===0 ? C.surface : i%2===0 ? C.bg : C.surface, borderBottom: i<5 ? `1px solid ${C.border}` : 'none', padding:'3px 6px' }
-          }, row.map((cell,j) => /*#__PURE__*/React.createElement('div', {
-            key:j,
-            style:{ fontSize: i===0 ? 5.5 : 6.5, fontWeight: (i===0||j===0) ? 700 : 400, color: i===0 ? C.muted : j===3 ? (cell==='Shown' ? '#10a070' : '#be8214') : C.text, letterSpacing: i===0 ? '0.06em' : 0 }
-          }, cell))))
+        ),
+        /*#__PURE__*/React.createElement('div',{style:{marginTop:6,fontSize:6,color:P.muted,fontStyle:'italic'}},'No Grade column in Section Scores — grade shown individually at 60%+ coverage per category')
+      )},
+
+      // ── 2. EXECUTIVE SUMMARY ────────────────────────────────────────────────
+      { label: 'Executive Summary', content: /*#__PURE__*/React.createElement('div', {
+          style:{padding:'12px 14px',background:P.bg,height:'100%',boxSizing:'border-box',display:'flex',flexDirection:'column',gap:0}
+        },
+        /*#__PURE__*/React.createElement(Label,{style:{marginBottom:5}},'Executive Summary'),
+        /*#__PURE__*/React.createElement('div',{style:{fontSize:7,color:P.text,lineHeight:1.6,marginBottom:7}},
+          'This website shows ',/*#__PURE__*/React.createElement('strong',null,'good'),
+          ' performance with a full audit score of ',/*#__PURE__*/React.createElement('strong',null,'86/100 (Grade B)'),
+          '. The biggest opportunity lies in the technical foundation. There are ',
+          /*#__PURE__*/React.createElement('strong',null,'8 critical issues'),
+          ' currently limiting performance and requiring urgent attention.'
+        ),
+        // Audit stats bar
+        /*#__PURE__*/React.createElement('div',{style:{display:'flex',gap:5,marginBottom:8}},
+          [{n:'211',l:'Total Checks',c:'#4a6cf7'},{n:'211',l:'Reviewed',c:acc},{n:'155',l:'Passed',c:P.pass},{n:'25',l:'Partial',c:P.partial},{n:'31',l:'Failed',c:P.fail}]
+          .map(({n,l,c},i)=>/*#__PURE__*/React.createElement('div',{key:i,style:{flex:1,borderRadius:5,border:`1px solid ${P.border}`,padding:'5px 4px',textAlign:'center',borderTop:`2px solid ${c}`}},
+            /*#__PURE__*/React.createElement('div',{style:{fontSize:13,fontWeight:800,color:c}}),
+            /*#__PURE__*/React.createElement('div',{style:{fontSize:10,fontWeight:800,color:P.head}}),
+            /*#__PURE__*/React.createElement('div',{style:{fontSize:9,fontWeight:800,color:c}},n),
+            /*#__PURE__*/React.createElement('div',{style:{fontSize:5.5,color:P.muted}},l)
+          ))
+        ),
+        /*#__PURE__*/React.createElement(Label,{style:{marginBottom:4}},'Top Priority Issues'),
+        /*#__PURE__*/React.createElement('div',{style:{flex:1,display:'flex',flexDirection:'column',gap:4}},
+          [
+            {p:'Critical',c:P.crit,issue:'No broken internal links (404s)',why:'Broken links hurt crawlability and user trust.',action:'Crawl with Screaming Frog → fix or redirect each 4xx URL.'},
+            {p:'Critical',c:P.crit,issue:'Touch targets too small (< 48px)',why:'Small tap targets increase mis-taps on mobile CTAs.',action:'Add min-height: 48px to all interactive elements.'},
+            {p:'Critical',c:P.crit,issue:'Mobile page load > 3s on 4G',why:'53% of mobile users abandon after 3 seconds.',action:'Reduce JS/CSS weight, optimise images, improve CDN and caching.'},
+            {p:'High',c:P.high,issue:'Title tags missing or duplicate',why:'Missing titles reduce CTR and keyword relevance.',action:'Write unique 50–60 char titles for all key pages.'},
+          ].map(({p,c,issue,why,action},i)=>/*#__PURE__*/React.createElement('div',{key:i,style:{display:'flex',gap:5,paddingBottom:4,borderBottom:`1px solid ${P.border}`}},
+            /*#__PURE__*/React.createElement('div',{style:{width:2,minHeight:32,background:c,borderRadius:2,flexShrink:0}}),
+            /*#__PURE__*/React.createElement('div',{style:{flex:1,minWidth:0}},
+              /*#__PURE__*/React.createElement('div',{style:{display:'flex',alignItems:'center',gap:4,marginBottom:1}},
+                /*#__PURE__*/React.createElement(Badge,{label:p,color:c}),
+                /*#__PURE__*/React.createElement('span',{style:{fontSize:7,fontWeight:700,color:P.head}},issue)
+              ),
+              /*#__PURE__*/React.createElement('div',{style:{fontSize:6,color:P.muted,lineHeight:1.4}},why),
+              /*#__PURE__*/React.createElement('div',{style:{fontSize:6,color:acc,lineHeight:1.4}},'→ ',action)
+            )
+          ))
         )
-      ) },
+      )},
+
+      // ── 3. CATEGORY DETAIL ───────────────────────────────────────────────────
+      { label: 'Category Detail', content: /*#__PURE__*/React.createElement('div', {
+          style:{padding:'12px 14px',background:P.bg,height:'100%',boxSizing:'border-box',display:'flex',flexDirection:'column',gap:0}
+        },
+        // Category header
+        /*#__PURE__*/React.createElement('div',{style:{display:'flex',alignItems:'flex-start',justifyContent:'space-between',marginBottom:5,paddingBottom:5,borderBottom:`1px solid ${P.border}`}},
+          /*#__PURE__*/React.createElement('div',null,
+            /*#__PURE__*/React.createElement('div',{style:{fontSize:10,fontWeight:900,color:P.head}},'⚙️ Technical SEO'),
+            /*#__PURE__*/React.createElement('div',{style:{fontSize:6.5,color:P.muted,marginTop:1}},'65 items  ·  Crawlability, indexation, speed, schema, security')
+          ),
+          /*#__PURE__*/React.createElement('div',{style:{textAlign:'right'}},
+            /*#__PURE__*/React.createElement('div',{style:{fontSize:7.5,fontWeight:700,color:'#3c82c8'}}, 'DIRECTIONAL REVIEWED SCORE'),
+            /*#__PURE__*/React.createElement('div',{style:{fontSize:6,color:'#3c82c8'}}, '20/65 reviewed  ·  31% coverage  ·  Medium-low confidence'),
+            /*#__PURE__*/React.createElement('div',{style:{fontSize:5.5,color:P.partial,fontStyle:'italic',marginTop:1}},'Grade withheld until 60% coverage')
+          )
+        ),
+        // Insight box
+        /*#__PURE__*/React.createElement('div',{style:{background:P.surface,borderRadius:5,padding:'5px 8px',marginBottom:6,borderLeft:`3px solid ${acc}`}},
+          /*#__PURE__*/React.createElement('div',{style:{fontSize:6.5,color:P.text,lineHeight:1.5}},'Technical SEO issues are actively suppressing search visibility. Fixing crawlability and indexation gaps will directly improve how search engines discover and rank the site.')
+        ),
+        // Checklist items
+        /*#__PURE__*/React.createElement(Label,{style:{marginBottom:4}},'Reviewed Findings'),
+        /*#__PURE__*/React.createElement('div',{style:{flex:1,display:'flex',flexDirection:'column',gap:0}},
+          [
+            {s:'Pass',  item:'XML sitemap submitted to Search Console', p:'High'},
+            {s:'Fail',  item:'No broken internal links (404s)', p:'Critical'},
+            {s:'Pass',  item:'HTTPS enforced on all pages', p:'Critical'},
+            {s:'Partial',item:'Core Web Vitals pass (LCP/CLS/INP)', p:'Critical'},
+            {s:'Pass',  item:'robots.txt accessible and correct', p:'High'},
+            {s:'Fail',  item:'Mobile page load < 3s on 4G connection', p:'Critical'},
+            {s:'Pass',  item:'No redirect chains (max 1 hop)', p:'High'},
+            {s:null,    item:'Pagination handled correctly', p:'High'},
+            {s:null,    item:'Hreflang / international tags correct', p:'Med'},
+            {s:null,    item:'Structured data / schema markup valid', p:'High'},
+          ].map(({s,item,p},i)=>{
+            const sc = s==='Pass'?P.pass:s==='Fail'?P.fail:s==='Partial'?P.partial:P.muted;
+            const sl = s==='Pass'?'✓':s==='Fail'?'✗':s==='Partial'?'~':'·';
+            return /*#__PURE__*/React.createElement('div',{key:i,style:{display:'flex',gap:5,alignItems:'center',padding:'2.5px 0',borderBottom:`1px solid ${P.border}`}},
+              /*#__PURE__*/React.createElement('span',{style:{fontSize:7.5,fontWeight:700,color:sc,width:10,textAlign:'center',flexShrink:0}},sl),
+              /*#__PURE__*/React.createElement('span',{style:{fontSize:6.5,color:s?P.text:P.muted,fontStyle:s?'normal':'italic',flex:1}},item),
+              /*#__PURE__*/React.createElement('span',{style:{fontSize:5.5,color:p==='Critical'?P.crit:p==='High'?P.high:P.muted,fontWeight:600,flexShrink:0}},p)
+            );
+          })
+        ),
+        /*#__PURE__*/React.createElement('div',{style:{marginTop:5,fontSize:6,color:P.muted,fontStyle:'italic'}},'45 items not yet reviewed — complete for full category score and grade')
+      )},
+
+      // ── 4. SECTION SCORES (Partial audit example) ────────────────────────────
+      { label: 'Partial Audit Preview', content: /*#__PURE__*/React.createElement('div', {
+          style:{padding:'12px 14px',background:P.bg,height:'100%',boxSizing:'border-box',display:'flex',flexDirection:'column',gap:0}
+        },
+        /*#__PURE__*/React.createElement('div',{style:{display:'flex',alignItems:'baseline',justifyContent:'space-between',marginBottom:2}},
+          /*#__PURE__*/React.createElement('div',{style:{fontSize:9,fontWeight:900,color:P.head}},'DIRECTIONAL REVIEWED SCORE'),
+          /*#__PURE__*/React.createElement('div',{style:{fontSize:6.5,color:P.muted}},'sample-startup.io')
+        ),
+        /*#__PURE__*/React.createElement('div',{style:{display:'flex',alignItems:'baseline',gap:6,marginBottom:3}},
+          /*#__PURE__*/React.createElement('div',{style:{fontSize:32,fontWeight:900,color:P.head,lineHeight:1}},'81'),
+          /*#__PURE__*/React.createElement('div',{style:{fontSize:10,color:P.muted}},'/ 100'),
+          /*#__PURE__*/React.createElement('div',{style:{fontSize:10,fontWeight:700,color:P.partial,marginLeft:4,fontStyle:'italic'}},'Grade withheld')
+        ),
+        /*#__PURE__*/React.createElement('div',{style:{fontSize:6.5,color:P.muted,marginBottom:6}},'84 / 211 checks reviewed  ·  40% coverage  ·  Medium-low confidence'),
+        /*#__PURE__*/React.createElement('div',{style:{background:'#fff7ed',border:'1px solid #fed7aa',borderRadius:5,padding:'5px 8px',marginBottom:7,borderLeft:'3px solid #d97706'}},
+          /*#__PURE__*/React.createElement('div',{style:{fontSize:6.5,color:'#92400e',lineHeight:1.5}},'⚠ This is a directional score. Grade is withheld until 60% coverage is reached. Complete the remaining 127 checks to unlock the full grade and final score.')
+        ),
+        /*#__PURE__*/React.createElement(Label,{style:{marginBottom:4}},'Section Scores'),
+        /*#__PURE__*/React.createElement('div',{style:{flex:1,display:'flex',flexDirection:'column'}},
+          /*#__PURE__*/React.createElement('div',{style:{borderRadius:5,overflow:'hidden',border:`1px solid ${P.border}`,flex:1}},
+            [
+              {cells:['CATEGORY','COVERAGE','REVIEWED SCORE','CONFIDENCE'],header:true},
+              {cells:['Technical SEO','31%',{v:'52 / 100',color:P.fail},{v:'Medium-low confidence',color:'#3c82c8'}]},
+              {cells:['On-Page & Content','16%',{v:'50 / 100',color:P.fail},{v:'Low confidence',color:'#be8214'}]},
+              {cells:['UX Heuristics','10%',{v:'88 / 100',color:P.pass},{v:'Low confidence',color:'#be8214'}]},
+              {cells:['Conversion & CTA',{v:'0%',color:P.muted},{v:'—',color:P.muted},{v:'Not evaluated',color:P.muted}]},
+              {cells:['AI & SERP Visibility',{v:'0%',color:P.muted},{v:'—',color:P.muted},{v:'Not evaluated',color:P.muted}]},
+            ].map((r,i)=>/*#__PURE__*/React.createElement(Row,{key:i,...r}))
+          )
+        ),
+        /*#__PURE__*/React.createElement('div',{style:{marginTop:5,fontSize:6,color:P.muted,fontStyle:'italic'}},'No Grade column — grade is shown per-category at 60%+ coverage only')
+      )},
+
+      // ── 5. WHITE LABEL ───────────────────────────────────────────────────────
+      { label: 'White Label PDF', content: /*#__PURE__*/React.createElement('div', {
+          style:{padding:'12px 14px',background:P.bg,height:'100%',boxSizing:'border-box',display:'flex',flexDirection:'column',gap:0}
+        },
+        // Cover-style header with agency branding
+        /*#__PURE__*/React.createElement('div',{style:{background:acc,borderRadius:5,padding:'10px 12px',marginBottom:7,display:'flex',justifyContent:'space-between',alignItems:'flex-start'}},
+          /*#__PURE__*/React.createElement('div',null,
+            /*#__PURE__*/React.createElement('div',{style:{fontSize:7,fontWeight:800,color:'#ffffff99',letterSpacing:'0.08em'}},'PREPARED BY'),
+            /*#__PURE__*/React.createElement('div',{style:{fontSize:10,fontWeight:900,color:'#fff',marginTop:1}},(name||'Your Agency')),
+            /*#__PURE__*/React.createElement('div',{style:{fontSize:6.5,color:'#ffffff88',marginTop:1}},(agencyWebsite||'yoursite.com')),
+            /*#__PURE__*/React.createElement('div',{style:{fontSize:6.5,color:'#ffffff88'}},(agencyEmail||'hello@yoursite.com'))
+          ),
+          /*#__PURE__*/React.createElement('div',{style:{textAlign:'right'}},
+            /*#__PURE__*/React.createElement('div',{style:{fontSize:7,color:'#ffffff88',letterSpacing:'0.06em'}},'PREPARED FOR'),
+            /*#__PURE__*/React.createElement('div',{style:{fontSize:9,fontWeight:800,color:'#fff',marginTop:1}},'Your Client'),
+            /*#__PURE__*/React.createElement('div',{style:{fontSize:6.5,color:'#ffffff88'}},'client-website.com')
+          )
+        ),
+        /*#__PURE__*/React.createElement('div',{style:{fontSize:8,fontWeight:800,color:P.head,marginBottom:2}},'🏷️ Fully Branded PDF Reports'),
+        /*#__PURE__*/React.createElement('div',{style:{fontSize:7,color:P.muted,lineHeight:1.6,marginBottom:7}},'Every exported PDF carries your agency name, logo, brand colour, and contact details. Professional reports, ready to send to clients in one click.'),
+        /*#__PURE__*/React.createElement('div',{style:{display:'flex',gap:5,marginBottom:7}},
+          [
+            {icon:'🎨',label:'Brand Color',val:'Custom hex'},
+            {icon:'🖼',label:'Agency Logo',val:'PNG / JPG'},
+            {icon:'🖼',label:'Client Logo',val:'PNG / JPG'},
+            {icon:'✉',label:'Contact Info',val:'Email + URL'},
+          ].map(({icon,label,val},i)=>/*#__PURE__*/React.createElement('div',{key:i,style:{flex:1,background:P.surface,borderRadius:5,padding:'6px 5px',textAlign:'center',border:`1px solid ${P.border}`}},
+            /*#__PURE__*/React.createElement('div',{style:{fontSize:11}}),
+            /*#__PURE__*/React.createElement('div',{style:{fontSize:10}},icon),
+            /*#__PURE__*/React.createElement('div',{style:{fontSize:6,fontWeight:700,color:P.head,marginTop:2}},label),
+            /*#__PURE__*/React.createElement('div',{style:{fontSize:5.5,color:P.muted}},val)
+          ))
+        ),
+        /*#__PURE__*/React.createElement('div',{style:{flex:1,background:P.surface,borderRadius:5,border:`1px solid ${P.border}`,padding:'7px 9px',display:'flex',flexDirection:'column',gap:3}},
+          /*#__PURE__*/React.createElement(Label,{style:{marginBottom:3}},'Report includes'),
+          ...[
+            'Cover page with score, grade, and section scores',
+            'Executive summary + top priority issues',
+            'Full category detail pages (5 categories)',
+            'Scoring methodology + next steps',
+            'About this report / prepared by/for page',
+          ].map((t,i)=>/*#__PURE__*/React.createElement('div',{key:i,style:{display:'flex',gap:5,fontSize:6.5,color:P.text,lineHeight:1.4,alignItems:'flex-start'}},
+            /*#__PURE__*/React.createElement('span',{style:{color:P.pass,fontWeight:700,flexShrink:0}},'✓'),
+            t
+          ))
+        )
+      )},
+
+      // ── 6. SCORING METHODOLOGY ────────────────────────────────────────────────
+      { label: 'Scoring Methodology', content: /*#__PURE__*/React.createElement('div', {
+          style:{padding:'12px 14px',background:P.bg,height:'100%',boxSizing:'border-box',display:'flex',flexDirection:'column',gap:0}
+        },
+        /*#__PURE__*/React.createElement('div',{style:{fontSize:9,fontWeight:900,color:P.head,marginBottom:6}},'HOW THIS REPORT IS SCORED'),
+        /*#__PURE__*/React.createElement('div',{style:{display:'flex',flexDirection:'column',gap:3,marginBottom:7}},
+          [
+            {icon:'☐',label:'Blank items',desc:'Not yet reviewed — excluded from the score entirely. Only checked items count.',c:P.muted},
+            {icon:'N/A',label:'N/A items',desc:'Marked not applicable — excluded from scoring. Does not count as pass or fail.',c:P.muted},
+            {icon:'✓/~/✗',label:'Reviewed items',desc:'Pass (full weight) · Partial (half weight) · Fail (zero). These drive the score.',c:P.pass},
+          ].map(({icon,label,desc,c},i)=>/*#__PURE__*/React.createElement('div',{key:i,style:{display:'flex',gap:7,alignItems:'flex-start',paddingBottom:5,borderBottom:`1px solid ${P.border}`}},
+            /*#__PURE__*/React.createElement('div',{style:{fontSize:7,fontWeight:700,color:c,width:22,textAlign:'center',flexShrink:0,paddingTop:1}},icon),
+            /*#__PURE__*/React.createElement('div',null,
+              /*#__PURE__*/React.createElement('div',{style:{fontSize:7.5,fontWeight:700,color:P.head}},label),
+              /*#__PURE__*/React.createElement('div',{style:{fontSize:6.5,color:P.muted,lineHeight:1.4}},desc)
+            )
+          ))
+        ),
+        /*#__PURE__*/React.createElement(Label,{style:{marginBottom:4}},'Coverage Tiers & Grade Policy'),
+        /*#__PURE__*/React.createElement('div',{style:{flex:1,display:'flex',flexDirection:'column'}},
+          /*#__PURE__*/React.createElement('div',{style:{borderRadius:5,overflow:'hidden',border:`1px solid ${P.border}`,flex:1}},
+            [
+              {cells:['COVERAGE','LABEL','CONFIDENCE','GRADE'],header:true,cols:'0.8fr 1.8fr 1.2fr 0.7fr'},
+              {cells:['0%',{v:'Not Reviewed Yet',color:P.muted},{v:'None',color:P.muted},{v:'Withheld',color:P.partial}],cols:'0.8fr 1.8fr 1.2fr 0.7fr'},
+              {cells:['1–29%',{v:'Preliminary Reviewed Score',color:P.text},{v:'Low',color:'#be8214'},{v:'Withheld',color:P.partial}],cols:'0.8fr 1.8fr 1.2fr 0.7fr'},
+              {cells:['30–59%',{v:'Directional Reviewed Score',color:P.text},{v:'Medium-Low',color:'#3c82c8'},{v:'Withheld',color:P.partial}],cols:'0.8fr 1.8fr 1.2fr 0.7fr'},
+              {cells:['60–79%',{v:'Indicative Score',color:P.text},{v:'Medium',color:'#10a070'},{v:'Shown',color:P.pass}],cols:'0.8fr 1.8fr 1.2fr 0.7fr'},
+              {cells:['80%+',{v:'Full Audit Score',color:P.text},{v:'High',color:P.pass},{v:'Shown',color:P.pass}],cols:'0.8fr 1.8fr 1.2fr 0.7fr'},
+            ].map((r,i)=>/*#__PURE__*/React.createElement(Row,{key:i,...r}))
+          )
+        ),
+        /*#__PURE__*/React.createElement('div',{style:{marginTop:5,fontSize:6,color:P.muted,fontStyle:'italic'}},'Scores reflect only reviewed items. A grade appears when enough coverage has been completed.')
+      )},
     ];
     const cur = previewSlide % slides.length;
     const go = d => setPreviewSlide((previewSlide + d + slides.length) % slides.length);
@@ -35654,20 +35753,20 @@ function WhiteLabelView({
         style:{ position:'absolute', top:0, left:0, right:0, bottom:30, overflowY:'auto', overflowX:'hidden' }
       }, slides[cur].content),
       /*#__PURE__*/React.createElement('div', {
-        style:{ position:'absolute', bottom:0, left:0, right:0, height:30, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 8px', background:C.surface, borderTop:`1px solid ${C.border}` }
+        style:{ position:'absolute', bottom:0, left:0, right:0, height:30, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 8px', background:'#1e2130', borderTop:`1px solid #2e3248` }
       },
-        /*#__PURE__*/React.createElement('button', { onClick:()=>go(-1), style:{ background:'none', border:'none', color:C.muted, fontSize:14, cursor:'pointer', padding:'0 4px', lineHeight:1 } }, '‹'),
+        /*#__PURE__*/React.createElement('button', { onClick:()=>go(-1), style:{ background:'none', border:'none', color:'#6b7280', fontSize:14, cursor:'pointer', padding:'0 4px', lineHeight:1 } }, '‹'),
         /*#__PURE__*/React.createElement('div', { style:{ display:'flex', gap:5, alignItems:'center' } },
           slides.map((_,i) => /*#__PURE__*/React.createElement('div', {
             key:i,
             onClick:()=>setPreviewSlide(i),
-            style:{ width:6, height:6, borderRadius:'50%', background: i===cur ? acc : C.border, cursor:'pointer', transition:'background 0.2s' }
+            style:{ width:6, height:6, borderRadius:'50%', background: i===cur ? acc : '#3a3f5c', cursor:'pointer', transition:'background 0.2s' }
           }))
         ),
-        /*#__PURE__*/React.createElement('button', { onClick:()=>go(1), style:{ background:'none', border:'none', color:C.muted, fontSize:14, cursor:'pointer', padding:'0 4px', lineHeight:1 } }, '›')
+        /*#__PURE__*/React.createElement('button', { onClick:()=>go(1), style:{ background:'none', border:'none', color:'#6b7280', fontSize:14, cursor:'pointer', padding:'0 4px', lineHeight:1 } }, '›')
       ),
       /*#__PURE__*/React.createElement('div', {
-        style:{ position:'absolute', bottom:6, left:0, right:0, textAlign:'center', fontSize:7.5, color:C.muted, pointerEvents:'none' }
+        style:{ position:'absolute', bottom:7, left:0, right:0, textAlign:'center', fontSize:7.5, color:'#6b7280', pointerEvents:'none' }
       }, slides[cur].label)
     );
   })())
