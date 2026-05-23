@@ -13,6 +13,7 @@ const C = {
   text: '#F0F4FF', muted: '#6B7A99',
 }
 const SEV: Record<string, string> = { Critical: '#EF4444', High: '#F59E0B', Medium: '#0EA5E9', Low: '#10B981' }
+const GRADE_COLOR: Record<string, string> = { A: '#10B981', B: '#0EA5E9', C: '#F59E0B', D: '#EF4444' }
 const STATUS_COLOR: Record<string, string> = { Pass: '#10B981', Partial: '#F59E0B', Fail: '#EF4444', 'N/A': '#6B7A99' }
 const STATUS_BG: Record<string, string>    = { Pass: '#10B98122', Partial: '#F59E0B22', Fail: '#EF444422', 'N/A': '#6B7A9922' }
 
@@ -187,12 +188,24 @@ function DashboardView({ score, issues, auditUrl, results, setPage }: {
         </button>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: '200px 1fr', gap: 20, marginBottom: 20 }}>
-        <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 12,
-          padding: 24, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-          <ScoreRing score={score.weighted} size={130} />
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 11, color: C.muted, fontWeight: 600, textTransform: 'uppercase' }}>Weighted Score</div>
-            <div style={{ fontSize: 12, color: C.amber, marginTop: 4 }}>{score.rating}</div>
+        <div style={{ background: C.surface, border: `1px solid ${GRADE_COLOR[score.grade] ?? C.accent}44`, borderRadius: 12,
+          padding: 24, display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <div style={{ display: 'flex', justifyContent: 'center' }}>
+            <ScoreRing score={score.weighted} size={130} color={GRADE_COLOR[score.grade] ?? C.accent} />
+          </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+            <div>
+              <div style={{ fontSize: 10, color: C.muted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em' }}>Audit Score</div>
+              <div style={{ fontSize: 11, color: GRADE_COLOR[score.grade] ?? C.accent, marginTop: 4, fontWeight: 500 }}>{score.rating}</div>
+            </div>
+            <div style={{ textAlign: 'right', lineHeight: 1 }}>
+              <div style={{
+                fontSize: 56, fontWeight: 900, lineHeight: 1,
+                color: GRADE_COLOR[score.grade] ?? C.accent,
+                textShadow: `0 0 24px ${GRADE_COLOR[score.grade] ?? C.accent}88, 0 0 48px ${GRADE_COLOR[score.grade] ?? C.accent}44`,
+              }}>{score.grade}</div>
+              <div style={{ fontSize: 9, color: C.muted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 2 }}>Grade</div>
+            </div>
           </div>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
@@ -266,7 +279,7 @@ function AuditView({ onComplete }: { onComplete: (url: string, results: AuditRes
   const [progress, setProgress]   = useState(0)
   const [scanLabel, setScanLabel] = useState(SCAN_STEPS[0])
   const [error, setError]         = useState('')
-  const [mode, setMode]           = useState<'ai' | 'manual'>('ai')
+  const [mode, setMode]           = useState<'ai' | 'zip' | 'manual'>('ai')
   const [results, setResults]     = useState<AuditResults>({})
   const [activeCat, setActiveCat] = useState('technical')
 
@@ -287,6 +300,26 @@ function AuditView({ onComplete }: { onComplete: (url: string, results: AuditRes
       setProgress(100)
       setTimeout(() => onComplete(url, data.results, data.scores), 400)
     } catch (e) { clearInterval(t); setError(e instanceof Error ? e.message : 'AI audit failed. Try manual mode.'); setStep('url') }
+  }
+
+  const runZip = async (file: File) => {
+    setStep('scanning'); setProgress(0); setError('')
+    let p = 0
+    const t = setInterval(() => {
+      p += Math.random() * 2 + 1
+      setScanLabel(SCAN_STEPS[Math.min(Math.floor((p / 100) * SCAN_STEPS.length), SCAN_STEPS.length - 1)])
+      if (p >= 85) { clearInterval(t); setProgress(85) } else setProgress(Math.round(p))
+    }, 150)
+    try {
+      const form = new FormData()
+      form.append('file', file)
+      const res = await fetch('/api/audit-zip', { method: 'POST', body: form })
+      clearInterval(t)
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Zip audit failed')
+      setProgress(100)
+      setTimeout(() => onComplete(file.name, data.results, data.scores), 400)
+    } catch (e) { clearInterval(t); setError(e instanceof Error ? e.message : 'Zip audit failed.'); setStep('url') }
   }
 
   if (step === 'scanning') return (
@@ -369,26 +402,47 @@ function AuditView({ onComplete }: { onComplete: (url: string, results: AuditRes
           Claude AI analyzes <strong style={{ color: C.text }}>190 UX + SEO signals</strong> and generates a full scored report.
         </p>
         <div style={{ display: 'flex', background: C.surface, borderRadius: 10, padding: 4, marginBottom: 20, border: `1px solid ${C.border}` }}>
-          {(['ai','manual'] as const).map(m => (
-            <button key={m} onClick={() => setMode(m)} style={{ flex: 1, padding: '8px', borderRadius: 7, border: 'none',
-              background: mode === m ? C.accent : 'transparent', color: mode === m ? '#fff' : C.muted,
-              fontSize: 13, fontWeight: mode === m ? 600 : 400, cursor: 'pointer' }}>
-              {m === 'ai' ? '⚡ AI Auto-Audit' : '✍️ Manual Audit'}
+          {([
+            { id: 'ai',     label: '⚡ AI Auto-Audit' },
+            { id: 'zip',    label: '📦 ZIP Upload' },
+            { id: 'manual', label: '✍️ Manual Audit' },
+          ] as const).map(m => (
+            <button key={m.id} onClick={() => setMode(m.id)} style={{ flex: 1, padding: '8px', borderRadius: 7, border: 'none',
+              background: mode === m.id ? C.accent : 'transparent', color: mode === m.id ? '#fff' : C.muted,
+              fontSize: 13, fontWeight: mode === m.id ? 600 : 400, cursor: 'pointer' }}>
+              {m.label}
             </button>
           ))}
         </div>
-        <div style={{ display: 'flex', gap: 10, marginBottom: 12 }}>
-          <input value={url} onChange={e => setUrl(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && (mode === 'ai' ? runAI() : setStep('manual'))}
-            placeholder={mode === 'ai' ? 'https://yoursite.com' : 'https://yoursite.com (optional)'}
-            style={{ flex: 1, background: C.surface, border: `1px solid ${C.border}`, borderRadius: 10,
-              padding: '14px 18px', color: C.text, fontSize: 14, outline: 'none' }} />
-          <button onClick={mode === 'ai' ? runAI : () => setStep('manual')} style={{
-            background: C.accent, border: 'none', borderRadius: 10, padding: '14px 22px',
-            color: '#fff', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>
-            {mode === 'ai' ? 'Run →' : 'Start →'}
-          </button>
-        </div>
+
+        {mode === 'zip' ? (
+          <label style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
+            gap: 10, border: `2px dashed ${C.border}`, borderRadius: 10, padding: '32px 20px',
+            cursor: 'pointer', transition: 'border-color 0.15s', marginBottom: 12,
+            background: C.surface }}
+            onDragOver={e => { e.preventDefault(); e.currentTarget.style.borderColor = C.accent }}
+            onDragLeave={e => { e.currentTarget.style.borderColor = C.border }}
+            onDrop={e => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) runZip(f) }}>
+            <div style={{ fontSize: 32 }}>📦</div>
+            <div style={{ fontSize: 14, fontWeight: 600, color: C.text }}>ZIP dosyası seç veya sürükle</div>
+            <div style={{ fontSize: 12, color: C.muted }}>HTML dosyaları içeren .zip — index.html ana sayfa olarak kullanılır</div>
+            <input type="file" accept=".zip" style={{ display: 'none' }}
+              onChange={e => { const f = e.target.files?.[0]; if (f) runZip(f) }} />
+          </label>
+        ) : (
+          <div style={{ display: 'flex', gap: 10, marginBottom: 12 }}>
+            <input value={url} onChange={e => setUrl(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && (mode === 'ai' ? runAI() : setStep('manual'))}
+              placeholder={mode === 'ai' ? 'https://yoursite.com' : 'https://yoursite.com (optional)'}
+              style={{ flex: 1, background: C.surface, border: `1px solid ${C.border}`, borderRadius: 10,
+                padding: '14px 18px', color: C.text, fontSize: 14, outline: 'none' }} />
+            <button onClick={mode === 'ai' ? runAI : () => setStep('manual')} style={{
+              background: C.accent, border: 'none', borderRadius: 10, padding: '14px 22px',
+              color: '#fff', fontWeight: 700, fontSize: 14, cursor: 'pointer' }}>
+              {mode === 'ai' ? 'Run →' : 'Start →'}
+            </button>
+          </div>
+        )}
         {error && <div style={{ fontSize: 12, color: C.red, marginTop: 8 }}>{error}</div>}
       </div>
     </div>
