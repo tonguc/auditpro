@@ -30615,11 +30615,12 @@ function getRating(score) {
   return 'Critical';
 }
 function catCovLevel(evaluated, total) {
-  if (!total || evaluated === 0) return { pct: 0, scoreLabel: 'Not Evaluated', confidence: 'None', showGrade: false, isLow: true, isMed: false };
+  if (!total || evaluated === 0) return { pct: 0, scoreLabel: 'Not Reviewed Yet', confidence: 'None', showGrade: false, isLow: true, isDirect: false, isMed: false, isHigh: false };
   const pct = Math.round(evaluated / total * 100);
-  if (pct < 30) return { pct, scoreLabel: 'Preliminary Reviewed Score', confidence: 'Low', showGrade: false, isLow: true, isMed: false };
-  if (pct < 80) return { pct, scoreLabel: 'Indicative Score', confidence: 'Medium', showGrade: true, isLow: false, isMed: true };
-  return { pct, scoreLabel: 'Overall Score', confidence: 'High', showGrade: true, isLow: false, isMed: false };
+  if (pct < 30) return { pct, scoreLabel: 'Preliminary Reviewed Score', confidence: 'Low', showGrade: false, isLow: true, isDirect: false, isMed: false, isHigh: false };
+  if (pct < 60) return { pct, scoreLabel: 'Directional Score', confidence: 'Medium-Low', showGrade: true, isLow: false, isDirect: true, isMed: false, isHigh: false };
+  if (pct < 80) return { pct, scoreLabel: 'Indicative Score', confidence: 'Medium', showGrade: true, isLow: false, isDirect: false, isMed: true, isHigh: false };
+  return { pct, scoreLabel: 'Full Audit Score', confidence: 'High', showGrade: true, isLow: false, isDirect: false, isMed: false, isHigh: true };
 }
 function calculateScore(results) {
   const categories = AUDIT_CATEGORIES.map(cat => {
@@ -30669,7 +30670,7 @@ function calculateScore(results) {
   const totalWeight = activeCats.reduce((s, c) => s + c.weight, 0);
   const weighted = totalWeight > 0 ? Math.round(activeCats.reduce((sum, c) => sum + c.score * c.weight, 0) / totalWeight) : 0;
   const completionPct = Math.round(totalEvaluated / totalAll * 100);
-  const confidence = completionPct < 20 ? 'Low' : completionPct < 80 ? 'Medium' : 'High';
+  const confidence = completionPct < 30 ? 'Low' : completionPct < 60 ? 'Medium-Low' : completionPct < 80 ? 'Medium' : 'High';
   return {
     overall: weighted,
     weighted,
@@ -31232,23 +31233,31 @@ function generateReportCopy(score, results) {
   const critCount = AUDIT_CATEGORIES.flatMap(cat => cat.sections.flatMap(sec => sec.items.filter(it => results[it.id] === 'Fail' && it.priority === 'Critical'))).length;
   const highCount = AUDIT_CATEGORIES.flatMap(cat => cat.sections.flatMap(sec => sec.items.filter(it => results[it.id] === 'Fail' && it.priority === 'High'))).length;
   const urgencyText = critCount > 3 ? `${critCount} critical issues that require urgent attention` : critCount > 0 ? `${critCount} critical issue${critCount > 1 ? 's' : ''} that need immediate resolution` : highCount > 0 ? `${highCount} high-priority issue${highCount > 1 ? 's' : ''} that should be addressed soon` : 'no critical blockers — improvements are available but not urgent';
-  const isLowCov = compRate < 30;
-  const isMedCov = compRate >= 30 && compRate < 80;
-  const scoreLabel = isLowCov ? 'Preliminary Reviewed Score' : isMedCov ? 'Indicative Score' : 'Overall Score';
-  const confLevel = isLowCov ? 'low' : isMedCov ? 'medium' : 'high';
+  const isLowCov    = compRate < 30;
+  const isDirectCov = compRate >= 30 && compRate < 60;
+  const isIndCov    = compRate >= 60 && compRate < 80;
+  const isMedCov    = isDirectCov || isIndCov; // backwards compat
+  const scoreLabel  = isLowCov ? 'Preliminary Reviewed Score' : isDirectCov ? 'Directional Score' : isIndCov ? 'Indicative Score' : 'Full Audit Score';
+  const confLevel   = isLowCov ? 'low' : isDirectCov ? 'medium-low' : isIndCov ? 'medium' : 'high';
   const executiveSummary = isLowCov
-    ? `This is a preliminary reviewed score based on a partial audit. Only ${evalCount} of ${totalCount} checks have been completed (${compRate}% coverage). The score of ${overall}/100 reflects only the items evaluated so far — it should not be treated as a final result, and the final grade is withheld until sufficient coverage is reached.\n\nAmong the items reviewed, the area requiring most attention is ${weakestMeaning}. There are ${urgencyText} identified in the reviewed sections. Additional issues may exist in checks not yet completed.\n\nThis report is useful as an early diagnostic. Complete the remaining checks to unlock the full assessment, final grade, and a reliable overall picture.`
-    : isMedCov
-      ? `This website shows ${PERF_LEVEL(overall)} performance based on ${compRate}% of the audit (${evalCount} of ${totalCount} checks reviewed). Score: ${overall}/100, Grade ${score.grade}. The biggest opportunity lies in ${weakestMeaning}. There are ${urgencyText}.\n\nThis is an indicative result — completing the remaining sections may reveal additional issues. Addressing the top priority issues identified so far will deliver meaningful improvements in visibility, user experience, and conversions.`
-      : `This website shows ${PERF_LEVEL(overall)} performance with an overall score of ${overall}/100 (Grade ${score.grade}). ` + `The biggest opportunity lies in ${weakestMeaning}. ` + `There are ${urgencyText} that are currently limiting performance.\n\n` + `This means the site is underperforming compared to competitors and leaving measurable growth opportunities on the table.\n\n` + `Addressing the top priority issues will deliver the fastest improvements in visibility, user experience, and conversions. ` + `If these issues are resolved, the site has strong potential to significantly improve both traffic and business outcomes.`;
+    ? `This is an early diagnostic based on ${evalCount} of ${totalCount} completed checks (${compRate}% coverage). The preliminary reviewed score is ${overall}/100 and reflects only the items evaluated so far. Because coverage is low, the final grade is withheld — the score may change significantly as more checks are completed.\n\nAmong the items reviewed, the area requiring most attention is ${weakestMeaning}. There are ${urgencyText} identified in the reviewed sections. Additional issues may exist in checks not yet completed.\n\nThis report is useful as a starting point. Complete the remaining checks to unlock the full assessment, final grade, and a reliable picture of overall site performance.`
+    : isDirectCov
+      ? `This website shows ${PERF_LEVEL(overall)} performance based on ${compRate}% of the audit (${evalCount} of ${totalCount} checks reviewed). Directional score: ${overall}/100, Grade ${score.grade} — treat this as directional rather than final. The biggest opportunity lies in ${weakestMeaning}. There are ${urgencyText}.\n\nCompleting the remaining sections may reveal additional issues and will sharpen the accuracy of this assessment. Addressing the top priority issues identified so far will deliver meaningful improvements.`
+      : isIndCov
+        ? `This website shows ${PERF_LEVEL(overall)} performance based on ${compRate}% of the audit (${evalCount} of ${totalCount} checks reviewed). Indicative score: ${overall}/100, Grade ${score.grade}. The biggest opportunity lies in ${weakestMeaning}. There are ${urgencyText}.\n\nThis is an indicative result — completing the remaining sections may reveal additional issues. Addressing the top priority issues identified so far will deliver meaningful improvements in visibility, user experience, and conversions.`
+        : `This website shows ${PERF_LEVEL(overall)} performance with a full audit score of ${overall}/100 (Grade ${score.grade}). ` + `The biggest opportunity lies in ${weakestMeaning}. ` + `There are ${urgencyText} that are currently limiting performance.\n\n` + `This means the site is underperforming compared to competitors and leaving measurable growth opportunities on the table.\n\n` + `Addressing the top priority issues will deliver the fastest improvements in visibility, user experience, and conversions. ` + `If these issues are resolved, the site has strong potential to significantly improve both traffic and business outcomes.`;
   const performanceInterpretation = isLowCov
     ? `Preliminary result — ${evalCount} of ${totalCount} checks reviewed (${compRate}% coverage). This score reflects reviewed items only and may not represent overall site performance.`
-    : isMedCov
-      ? `Indicative score based on ${compRate}% of the audit. Completing the remaining sections will improve accuracy.`
-      : `This score indicates ${PERF_MEANING(overall)}.`;
+    : isDirectCov
+      ? `Directional score based on ${compRate}% of the audit. Results are useful for early analysis — completing the remaining ${totalCount - evalCount} checks will improve accuracy.`
+      : isIndCov
+        ? `Indicative score based on ${compRate}% of the audit. Completing the remaining sections will sharpen the accuracy of this assessment.`
+        : `This score indicates ${PERF_MEANING(overall)}.`;
   const confidenceText = isLowCov
-    ? `This is a low-confidence, preliminary result. Only ${compRate}% of checkpoints have been reviewed (${evalCount} of ${totalCount}). The score and findings reflect reviewed items only. Continue the audit to complete the remaining checks, surface additional issues, and unlock the final grade.`
-    : `Based on ${compRate}% of checkpoints reviewed (${evalCount} of ${totalCount}), this audit provides a ${confLevel}-confidence view of site performance.`;
+    ? `This is a low-confidence, preliminary result. Only ${compRate}% of checkpoints have been reviewed (${evalCount} of ${totalCount}). Scores and findings reflect reviewed items only — blank items are not scored. Continue the audit to complete the remaining checks, surface additional issues, and unlock the final grade.`
+    : isDirectCov
+      ? `Based on ${compRate}% of checkpoints reviewed (${evalCount} of ${totalCount}), this is a medium-low-confidence directional result. Results are useful for planning but may shift as more checks are completed.`
+      : `Based on ${compRate}% of checkpoints reviewed (${evalCount} of ${totalCount}), this audit provides a ${confLevel}-confidence view of site performance.`;
   const sectionInsights = {};
   score.categories.forEach(cat => {
     const fn = SECTION_INSIGHTS[cat.id];
@@ -31596,10 +31605,11 @@ function downloadPDF(config, auditUrl, score, results) {
   doc.roundedRect(M, y, W - 2 * M, boxH, 3, 3, 'S');
 
   // Left: score label + score number + /100
-  const isLowCovPDF = score.completionPct < 30;
-  const isMedCovPDF = score.completionPct >= 30 && score.completionPct < 80;
-  const scoreLabelPDF = copy?.scoreLabel || (isLowCovPDF ? 'Preliminary Reviewed Score' : isMedCovPDF ? 'Indicative Score' : 'Overall Score');
-  const labelColor = isLowCovPDF ? [180, 110, 0] : isMedCovPDF ? [14, 100, 160] : [...brandRgb];
+  const isLowCovPDF    = score.completionPct < 30;
+  const isDirectCovPDF = score.completionPct >= 30 && score.completionPct < 60;
+  const isMedCovPDF    = score.completionPct >= 60 && score.completionPct < 80;
+  const scoreLabelPDF  = copy?.scoreLabel || (isLowCovPDF ? 'Preliminary Reviewed Score' : isDirectCovPDF ? 'Directional Score' : isMedCovPDF ? 'Indicative Score' : 'Full Audit Score');
+  const labelColor = isLowCovPDF ? [180, 110, 0] : (isDirectCovPDF || isMedCovPDF) ? [14, 100, 160] : [...brandRgb];
   // Score label (small, above number) — measure width first so divider fits
   doc.setFontSize(isLowCovPDF ? 6 : 6.5);
   doc.setFont('helvetica', 'bold');
@@ -31662,7 +31672,7 @@ function downloadPDF(config, auditUrl, score, results) {
   doc.setLineWidth(0.3);
   doc.line(div2X, y + 5, div2X, y + boxH - 5);
 
-  // Right: Grade (withheld on low coverage, less dominant on medium)
+  // Right: Grade (withheld on low coverage, qualified on directional/medium)
   const gradeAreaCx = div2X + (W - M - div2X) / 2;
   if (isLowCovPDF) {
     doc.setFontSize(8);
@@ -31673,7 +31683,17 @@ function downloadPDF(config, auditUrl, score, results) {
     doc.setFont('helvetica', 'italic');
     doc.setTextColor(150, 120, 50);
     doc.text('Complete more checks', gradeAreaCx, y + 20, { align: 'center' });
-    doc.text('to unlock grade', gradeAreaCx, y + 26, { align: 'center' });
+    doc.text('to unlock final grade', gradeAreaCx, y + 26, { align: 'center' });
+  } else if (isDirectCovPDF) {
+    doc.setFontSize(18);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...brandRgb);
+    doc.text(`Grade ${score.grade}`, gradeAreaCx, y + 16, { align: 'center' });
+    doc.setFontSize(6.5);
+    doc.setFont('helvetica', 'italic');
+    doc.setTextColor(90, 95, 115);
+    doc.text('Directional', gradeAreaCx, y + 23, { align: 'center' });
+    doc.text(st(score.rating), gradeAreaCx, y + 29, { align: 'center' });
   } else {
     const gradeFontSize = isMedCovPDF ? 18 : 22;
     doc.setFontSize(gradeFontSize);
@@ -31766,8 +31786,9 @@ function downloadPDF(config, auditUrl, score, results) {
       pLines.forEach(l => execAllLines.push(l));
       if (pi < execParas.length - 1) execAllLines.push('');
     });
-    const execH = Math.max(22, 12 + execAllLines.length * 4.2);
-    checkPageBreak(execH + 8);
+    const execLineH = 4.8; // generous line height to prevent text/box overflow
+    const execH = Math.max(26, 14 + execAllLines.length * execLineH + 5);
+    checkPageBreak(execH + 10);
     doc.setFillColor(...brandLight);
     doc.roundedRect(M, y, W - 2 * M, execH, 2, 2, 'F');
     doc.setFillColor(...brandRgb);
@@ -32010,7 +32031,7 @@ function downloadPDF(config, auditUrl, score, results) {
         doc.setTextColor(...onCatMuted);
         doc.text('Not evaluated', scoreX, 13, { align: 'right' });
       } else if (cov.isLow) {
-        // Low coverage: show preliminary label, numeric score only — no grade letter
+        // Low coverage: preliminary, no grade
         doc.setFontSize(7.5);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(...onCat);
@@ -32018,9 +32039,19 @@ function downloadPDF(config, auditUrl, score, results) {
         doc.setFontSize(6);
         doc.setFont('helvetica', 'normal');
         doc.setTextColor(...onCatMuted);
-        doc.text('Preliminary · Grade withheld', scoreX, 16, { align: 'right' });
+        doc.text('Preliminary Reviewed Score  ·  Grade withheld', scoreX, 16, { align: 'right' });
+      } else if (cov.isDirect) {
+        // Directional: show grade with qualifier
+        doc.setFontSize(9);
+        doc.setFont('helvetica', 'bold');
+        doc.setTextColor(...onCat);
+        doc.text(`${catScore.score}/100  Grade ${catScore.grade}`, scoreX, 11, { align: 'right' });
+        doc.setFontSize(6);
+        doc.setFont('helvetica', 'italic');
+        doc.setTextColor(...onCatMuted);
+        doc.text('Directional — not final', scoreX, 16, { align: 'right' });
       } else {
-        // Medium / high coverage: show score + grade
+        // Indicative / full coverage: show score + grade normally
         doc.setFontSize(9);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(...onCat);
@@ -32197,7 +32228,7 @@ function downloadPDF(config, auditUrl, score, results) {
   }, weakestCat ? {
     num: '2',
     title: `Strengthen ${weakestCat.label.replace('AI & SERP Visibility', 'AI Visibility')}${(() => { const cov = catCovLevel(weakestCat.evaluated, weakestCat.total); return cov.isLow ? ` — Preliminary Score: ${weakestCat.score}/100 (${weakestCat.evaluated}/${weakestCat.total} reviewed)` : ` — Score: ${weakestCat.score}/100`; })()}`,
-    body: 'This is the weakest area in the audit. A focused effort here will have the highest impact on overall site health and score.',
+    body: (() => { const wCov = catCovLevel(weakestCat.evaluated, weakestCat.total); return wCov.isLow ? 'Among the reviewed areas, this is currently the weakest signal. Complete more checks in this section to confirm whether it represents a real gap or an early-stage finding.' : wCov.isDirect ? 'This is currently the weakest area based on a directional review. A focused effort here is likely to have a meaningful impact — complete the remaining checks to confirm.' : 'This is the weakest area in the audit. A focused effort here will have the highest impact on overall site health and score.'; })(),
     hot: false
   } : {
     num: '2',
@@ -32261,9 +32292,12 @@ function downloadPDF(config, auditUrl, score, results) {
   doc.setFontSize(7.5);
   doc.setFont('helvetica', 'italic');
   doc.setTextColor(75, 80, 100);
-  doc.text('This report provides a clear starting point. Prioritising the critical issues will deliver the fastest measurable results.', M, y, {
-    maxWidth: W - 2 * M
-  });
+  doc.text(isLowCovPDF
+    ? 'This is an early diagnostic based on a partial audit. Results reflect reviewed items only. Complete the remaining checks for a full assessment and final grade.'
+    : isDirectCovPDF
+      ? 'This directional report is based on a partial audit. Addressing the identified issues will deliver meaningful improvements — completing the remaining checks will sharpen the assessment.'
+      : 'This report provides a clear starting point. Prioritising the critical issues will deliver the fastest measurable results.',
+    M, y, { maxWidth: W - 2 * M });
   y += 10;
   checkPageBreak(18);
   doc.setFillColor(...brandLight);
@@ -32365,8 +32399,26 @@ function downloadPDF(config, auditUrl, score, results) {
   doc.setFontSize(8);
   doc.setFont('helvetica', 'normal');
   doc.setTextColor(85, 90, 112);
-  const disclaimer = doc.splitTextToSize(st(`This UX + SEO audit was conducted for ${auditUrl} on ${dateShort}. ` + `It covers ${score.categories.reduce((s, c) => s + c.total, 0)} checkpoints across Technical SEO, On-Page Content, UX Heuristics, Conversion and CTA, and AI Visibility. ` + `Scores are based on evaluated items only - blank and N/A items are excluded from scoring. ` + `Some checks require verification with external tools (Google Search Console, PageSpeed Insights, Screaming Frog, etc.). ` + `This report is intended as a professional client deliverable and should be reviewed in the context of the site's specific goals.`), W - 2 * M);
+  const disclaimer = doc.splitTextToSize(st(`This UX + SEO audit was conducted for ${auditUrl} on ${dateShort}. ` + `It covers ${score.categories.reduce((s, c) => s + c.total, 0)} checkpoints across Technical SEO, On-Page Content, UX Heuristics, Conversion and CTA, and AI Visibility. ` + `Some checks require verification with external tools (Google Search Console, PageSpeed Insights, Screaming Frog, etc.). ` + `This report is intended as a professional client deliverable and should be reviewed in the context of the site's specific goals.`), W - 2 * M);
   doc.text(disclaimer, M, y);
+  y += disclaimer.length * 4.5 + 8;
+  checkPageBreak(32);
+  doc.setFontSize(9);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(28, 32, 48);
+  doc.text('How Scores Are Calculated', M, y);
+  y += 6;
+  const scoringNote = doc.splitTextToSize(st(
+    'Scores are based only on reviewed applicable checks. Items left blank are treated as not yet reviewed and are excluded from the score entirely — they do not count as passes or failures. ' +
+    'N/A items are also excluded as they do not apply to this site. ' +
+    'For low-coverage audits (below 30% of checks reviewed), results are treated as preliminary and the overall grade is withheld. ' +
+    'For directional audits (30-59% reviewed), grades are shown as directional and not final. ' +
+    'Scores may change significantly as more checks are completed. A high score from a small number of reviewed checks does not imply the full website is strong.'
+  ), W - 2 * M);
+  doc.setFontSize(8);
+  doc.setFont('helvetica', 'normal');
+  doc.setTextColor(85, 90, 112);
+  doc.text(scoringNote, M, y);
   drawFooter();
   const safeClient = (clientName || auditUrl).replace(/https?:\/\//, '').replace(/[^a-zA-Z0-9.-]/g, '_');
   doc.save(`${config.agencyName.replace(/\s+/g, '_')}_Audit_${safeClient}.pdf`);
@@ -33335,18 +33387,21 @@ function DashboardView({
       marginBottom: 20
     }
   }, (() => {
-    const isLow    = completionPct < 20;
-    const isMedium = completionPct >= 20 && completionPct < 60;
-    const isHigh   = completionPct >= 60;
-    const scoreLabel = totalEval === 0 ? 'Audit Score' : isLow ? 'Preliminary Score' : isMedium ? 'Indicative Score' : 'Overall Score';
+    const isLow    = completionPct < 30;
+    const isDirect = completionPct >= 30 && completionPct < 60;
+    const isMedium = completionPct >= 60 && completionPct < 80;
+    const isHigh   = completionPct >= 80;
+    const scoreLabel = totalEval === 0 ? 'Audit Score' : isLow ? 'Preliminary Reviewed Score' : isDirect ? 'Directional Score' : isMedium ? 'Indicative Score' : 'Full Audit Score';
     const confMsg = isLow
-      ? 'This score is based on a limited number of checks and may not reflect overall site performance.'
-      : isMedium
-        ? 'This score provides a general direction but may still miss some issues.'
-        : 'This score is based on a broad analysis and is a reliable indicator of performance.';
-    const gradeColor = totalEval > 0 ? (GRADE_COLOR[score.grade] || C.accent) : C.muted;
-    const gradeFontSize = isLow ? 36 : isMedium ? 44 : 52;
-    const scoreFontSize = isLow ? 28 : isMedium ? 32 : 36;
+      ? 'This score reflects reviewed checks only. The final grade is withheld until at least 30% of checks are reviewed. Complete more checks for an accurate assessment.'
+      : isDirect
+        ? 'This directional score is based on a partial audit. Results are useful for early analysis but may shift as more checks are completed.'
+        : isMedium
+          ? 'This indicative score covers a substantial portion of the audit. Completing the remaining checks will sharpen the accuracy of this result.'
+          : 'This full-coverage score is based on a comprehensive audit. Results are reliable.';
+    const gradeColor = totalEval > 0 ? (isLow ? C.amber : GRADE_COLOR[score.grade] || C.accent) : C.muted;
+    const gradeFontSize = isLow ? 16 : isDirect ? 40 : isMedium ? 44 : 52;
+    const scoreFontSize = isLow ? 28 : isDirect ? 30 : isMedium ? 32 : 36;
     return /*#__PURE__*/React.createElement("div", {
       style: {
         background: C.surface,
@@ -33373,11 +33428,11 @@ function DashboardView({
       ),
       /*#__PURE__*/React.createElement("div", { style: { textAlign: 'right', lineHeight: 1 } },
         /*#__PURE__*/React.createElement("div", {
-          style: { fontSize: gradeFontSize, fontWeight: 900, lineHeight: 1, color: gradeColor, textShadow: totalEval > 0 ? `0 0 24px ${gradeColor}88, 0 0 48px ${gradeColor}44` : 'none' }
-        }, totalEval > 0 ? score.grade : '—'),
+          style: { fontSize: gradeFontSize, fontWeight: 900, lineHeight: 1, color: gradeColor, textShadow: totalEval > 0 && !isLow ? `0 0 24px ${gradeColor}88, 0 0 48px ${gradeColor}44` : 'none' }
+        }, totalEval === 0 ? '—' : isLow ? 'Withheld' : score.grade),
         /*#__PURE__*/React.createElement("div", {
-          style: { fontSize: 9, color: C.muted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 2 }
-        }, "Grade")
+          style: { fontSize: 9, color: isLow && totalEval > 0 ? C.amber : C.muted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', marginTop: 2 }
+        }, totalEval > 0 && isLow ? 'Grade' : 'Grade')
       )
     ),
     /* Coverage bar */
@@ -33400,14 +33455,21 @@ function DashboardView({
         })
       )
     ),
-    /* Low-coverage warning */
-    isLow && totalEval > 0 && /*#__PURE__*/React.createElement("div", {
-      style: { marginTop: 10, padding: '8px 10px', background: `${C.amber}18`, border: `1px solid ${C.amber}55`, borderRadius: 7, fontSize: 10, color: C.amber, lineHeight: 1.5 }
-    }, "⚠️ This score is based on limited data. Complete more checks for an accurate evaluation."),
-    /* Microcopy */
-    totalEval > 0 && !isHigh && /*#__PURE__*/React.createElement("div", {
-      style: { marginTop: 8, fontSize: 10, color: C.muted, fontStyle: 'italic' }
-    }, "Continue the audit to uncover additional improvement opportunities.")
+    /* Coverage warning / reliability note */
+    totalEval > 0 && /*#__PURE__*/React.createElement("div", {
+      style: { marginTop: 10, padding: '8px 10px', background: isLow ? `${C.amber}18` : isDirect ? `${C.accent}12` : `${C.green}10`, border: `1px solid ${isLow ? C.amber : isDirect ? C.accent : C.green}44`, borderRadius: 7, fontSize: 10, color: isLow ? C.amber : isDirect ? C.accent : C.green, lineHeight: 1.6 }
+    }, isLow
+      ? `Score Reliability: Low  ·  ${totalEval}/${totalAll} checks reviewed  ·  Grade withheld`
+      : isDirect
+        ? `Score Reliability: Medium-Low  ·  ${totalEval}/${totalAll} checks reviewed  ·  Directional`
+        : isMedium
+          ? `Score Reliability: Medium  ·  ${totalEval}/${totalAll} checks reviewed  ·  Indicative`
+          : `Score Reliability: High  ·  ${totalEval}/${totalAll} checks reviewed`
+    ),
+    /* Microcopy / guidance */
+    totalEval > 0 && /*#__PURE__*/React.createElement("div", {
+      style: { marginTop: 8, fontSize: 10, color: C.muted }
+    }, confMsg)
     );
   })(), /*#__PURE__*/React.createElement("div", {
     onClick: () => scrollToIssues('Blank'),
@@ -33662,7 +33724,7 @@ function DashboardView({
               verticalAlign: 'middle'
             }
           }, "PRELIMINARY"),
-          cov.isMed && /*#__PURE__*/React.createElement("span", {
+          cov.isDirect && /*#__PURE__*/React.createElement("span", {
             key: 'conf',
             style: {
               display: 'inline-block',
@@ -33673,6 +33735,21 @@ function DashboardView({
               borderRadius: 3,
               background: `${C.accent}22`,
               color: C.accent,
+              letterSpacing: '0.4px',
+              verticalAlign: 'middle'
+            }
+          }, "DIRECTIONAL"),
+          cov.isMed && /*#__PURE__*/React.createElement("span", {
+            key: 'conf',
+            style: {
+              display: 'inline-block',
+              marginLeft: 6,
+              fontSize: 9,
+              fontWeight: 700,
+              padding: '1px 5px',
+              borderRadius: 3,
+              background: `${C.green}22`,
+              color: C.green,
               letterSpacing: '0.4px',
               verticalAlign: 'middle'
             }
