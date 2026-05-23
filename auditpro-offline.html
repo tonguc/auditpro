@@ -31134,10 +31134,10 @@ const IMPACT_MAP = [
   biz: 'Poor mobile navigation reduces engagement and conversion rates on small screens.',
   fix: 'Simplify mobile menus, increase tap targets to at least 44px, and prioritise key actions.'
 }, {
-  keys: ['touch target', 'tap target', '48px', 'tap.*size', 'touch.*size'],
-  why: 'Small tap targets cause accidental taps and user frustration on touch screens.',
+  keys: ['touch target', 'tap target', '48px'],
+  why: 'Small tap targets cause accidental taps and frustration on touch screens.',
   biz: 'Undersized touch targets increase mobile bounce rates and reduce task completion.',
-  fix: 'Increase the size and spacing of all buttons, links, and interactive elements to at least 48×48px. Check with Lighthouse (Accessibility > Tap targets) and use min-height/min-width in CSS to enforce minimum hit areas.'
+  fix: 'Increase tap target size, spacing, and mobile button/link hit areas to meet the 48px recommendation. Use CSS min-height/min-width and verify with Lighthouse Accessibility > Tap targets.'
 },
 // ── AI / SERP Visibility ───────────────────────────────────────────────────
 {
@@ -31884,8 +31884,8 @@ function downloadPDF(config, auditUrl, score, results) {
 
     // Estimated Impact box — intro + audit-specific bullets + closing line
     if (copy.weakestId) {
-      const weakestArea = st(WEAKEST_MEANING[copy.weakestId] || copy.weakestId);
-      const issueRef = 'the high-priority issues identified in this audit';
+      const weakestArea  = st(WEAKEST_MEANING[copy.weakestId] || copy.weakestId);
+      const weakestShort = st(score.categories.find(c => c.id === copy.weakestId)?.label || copy.weakestLabel || 'the weakest category');
       const bullets = copy.isLowCov ? [
         `Improved ${weakestArea} — the clearest near-term lever based on reviewed checks`,
         'Higher search visibility as technical and content gaps are resolved',
@@ -31896,8 +31896,8 @@ function downloadPDF(config, auditUrl, score, results) {
         'Better user engagement, lower drop-off, and improved conversion signals'
       ];
       const rawClosing = copy.isLowCov
-        ? `The reviewed issues suggest ${issueRef} in ${weakestArea} represent the most accessible near-term opportunity. Additional findings may appear as more checks are completed.`
-        : `Prioritising ${issueRef} — especially in ${weakestArea} — will deliver the fastest measurable improvements.`;
+        ? `The reviewed findings point to ${weakestShort} as the clearest near-term opportunity. Additional priorities may appear as more checks are completed.`
+        : `Addressing the high-priority issues — especially in ${weakestShort} — will deliver the fastest measurable improvements.`;
       const closingLine = st(rawClosing);
       const bulletWrapW = W - 2 * M - 16;
       // Pre-wrap all bullets and closing line for accurate height
