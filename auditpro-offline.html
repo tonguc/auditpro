@@ -31782,7 +31782,7 @@ function downloadPDF(config, auditUrl, score, results) {
     const execParas = st(copy.executiveSummary).split('\n\n');
     const execAllLines = [];
     execParas.forEach((para, pi) => {
-      const pLines = doc.splitTextToSize(para, W - 2 * M - 10);
+      const pLines = doc.splitTextToSize(para, W - 2 * M - 20);
       pLines.forEach(l => execAllLines.push(l));
       if (pi < execParas.length - 1) execAllLines.push('');
     });
@@ -31918,7 +31918,7 @@ function downloadPDF(config, auditUrl, score, results) {
     doc.setFontSize(6);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(155, 160, 178);
-    doc.text(`${enrichedIssues.length} issue${enrichedIssues.length > 1 ? 's' : ''}  impact-sorted`, W - M, y, {
+    doc.text(`${enrichedIssues.length} issue${enrichedIssues.length > 1 ? 's' : ''}  ·  ranked by impact`, W - M, y, {
       align: 'right'
     });
     y += 5;
@@ -32031,15 +32031,11 @@ function downloadPDF(config, auditUrl, score, results) {
         doc.setTextColor(...onCatMuted);
         doc.text('Not evaluated', scoreX, 13, { align: 'right' });
       } else if (cov.isLow) {
-        // Low coverage: preliminary, no grade
+        // Low coverage: single combined line in dark sub-bar, no grade in header
         doc.setFontSize(7.5);
         doc.setFont('helvetica', 'bold');
         doc.setTextColor(...onCat);
-        doc.text(`${catScore.score}/100`, scoreX, 11, { align: 'right' });
-        doc.setFontSize(6);
-        doc.setFont('helvetica', 'normal');
-        doc.setTextColor(...onCatMuted);
-        doc.text('Preliminary Reviewed Score  ·  Grade withheld', scoreX, 16, { align: 'right' });
+        doc.text(`${catScore.score}/100`, scoreX, 13, { align: 'right' });
       } else if (cov.isDirect) {
         // Directional: show grade with qualifier
         doc.setFontSize(9);
@@ -32057,8 +32053,10 @@ function downloadPDF(config, auditUrl, score, results) {
         doc.setTextColor(...onCat);
         doc.text(`${catScore.score}/100  Grade ${catScore.grade}`, scoreX, 13, { align: 'right' });
       }
-      // Coverage + confidence line in dark sub-bar
-      const covLine = `${cov.scoreLabel}  ·  ${catScore.evaluated}/${catScore.total} checks reviewed  ·  ${cov.confidence} confidence`;
+      // Single combined coverage line in dark sub-bar
+      const covLine = cov.isLow
+        ? `${cov.scoreLabel}  ·  ${catScore.evaluated}/${catScore.total} reviewed  ·  ${cov.confidence} confidence  ·  Grade withheld`
+        : `${cov.scoreLabel}  ·  ${catScore.evaluated}/${catScore.total} checks reviewed  ·  ${cov.confidence} confidence`;
       doc.setFontSize(6);
       doc.setFont('helvetica', cov.isLow ? 'bold' : 'normal');
       doc.setTextColor(...onCatDark);
@@ -32077,7 +32075,7 @@ function downloadPDF(config, auditUrl, score, results) {
     // Section insight from rule engine
     if (copy && copy.sectionInsights[cat.id]) {
       const insightTxt = st(copy.sectionInsights[cat.id]);
-      const iLines = doc.splitTextToSize(insightTxt, W - 2 * M - 6);
+      const iLines = doc.splitTextToSize(insightTxt, W - 2 * M - 16);
       const iH = Math.max(10, 5 + iLines.length * 4);
       doc.setFillColor(...lighten(catColor, 0.92));
       doc.rect(M, y, W - 2 * M, iH, 'F');
@@ -32145,13 +32143,14 @@ function downloadPDF(config, auditUrl, score, results) {
         checkPageBreak(10);
         const status = results[item.id];
         const statusColor = STATUS_COLORS_PDF[status] || [160, 165, 180];
-        if (idx % 2 === 0) {
-          doc.setFillColor(247, 248, 252);
-          doc.rect(M, y, W - 2 * M, 8, 'F');
-        }
         if (status === 'Fail') {
           doc.setFillColor(252, 245, 246);
+          doc.rect(M, y, W - 2 * M, 8, 'F');
+          doc.setFillColor(210, 60, 75);
           doc.rect(M, y, 2, 8, 'F');
+        } else if (idx % 2 === 0) {
+          doc.setFillColor(247, 248, 252);
+          doc.rect(M, y, W - 2 * M, 8, 'F');
         }
         doc.setFontSize(6.5);
         doc.setFont('helvetica', 'bold');
@@ -32160,7 +32159,7 @@ function downloadPDF(config, auditUrl, score, results) {
         doc.setFontSize(7.5);
         doc.setFont('helvetica', status === 'Fail' ? 'bold' : 'normal');
         doc.setTextColor(35, 40, 55);
-        const itemText = doc.splitTextToSize(st(item.item), W - 2 * M - 40);
+        const itemText = doc.splitTextToSize(st(item.item), W - 2 * M - 52);
         doc.text(itemText[0], M + 12, y + 5.5);
         doc.setFillColor(...statusColor);
         const badgeX = W - M - 22;
@@ -32245,7 +32244,12 @@ function downloadPDF(config, auditUrl, score, results) {
     title: 'Strengthen AI Visibility and Trust Signals',
     body: 'AI search engines (ChatGPT, Perplexity, Google AI Overviews) are becoming major traffic sources. Ensure your brand, authors, and content are optimised for this layer.',
     hot: false
-  }, {
+  }, isLowCovPDF || isDirectCovPDF ? {
+    num: '5',
+    title: 'Complete the Remaining Audit Checks',
+    body: 'This audit is partially complete. Finishing the remaining checks will unlock the final grade, surface additional issues, and give a reliable picture of overall site performance.',
+    hot: false
+  } : {
     num: '5',
     title: 'Re-run This Audit in 4 to 8 Weeks',
     body: 'Track your progress by re-running the audit after implementing changes. Use the score difference to demonstrate the value of your work to stakeholders.',
