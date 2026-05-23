@@ -6,8 +6,8 @@ WHAT'S IN THIS ZIP
 ------------------
   auditpro-offline.html       — The main audit tool (open in Chrome or Edge)
   QuickStart.html             — Step-by-step guide (open in any browser or print)
-  Sample_Full_Audit.pdf       — Sample PDF: full audit, Grade B result
-  Sample_Partial_Audit.pdf    — Sample PDF: partial audit, grade withheld (40% coverage)
+  Sample_Full_Audit.pdf       — Sample PDF: full audit, 100% coverage, Grade B (86/100)
+  Sample_Partial_Audit.pdf    — Sample PDF: partial audit, 40% coverage, grade withheld (Directional Reviewed Score)
   README.txt                  — This file
 
 HOW TO START
