@@ -31125,6 +31125,11 @@ const IMPACT_MAP = [
   biz: 'Vague error messages create frustration and increase abandonment.',
   fix: 'Show specific, actionable error messages that explain the problem and resolution path.'
 }, {
+  keys: ['touch target', 'tap target', '48px'],
+  why: 'Small tap targets make mobile navigation harder and increase mis-taps, especially on forms, menus, and CTA buttons.',
+  biz: 'Undersized touch targets increase mobile bounce rates and reduce task completion, directly hurting conversions.',
+  fix: 'Increase tap target size, spacing, and mobile button/link hit areas to meet the 48px recommendation. Use CSS min-height: 48px / min-width: 48px on interactive elements and verify with Lighthouse Accessibility > Tap targets.'
+}, {
   keys: ['accessibility', 'wcag', 'aria', 'screen reader', 'a11y'],
   why: 'Accessible design improves usability for all users, including those with disabilities.',
   biz: 'Poor accessibility can exclude users and create legal compliance risk.',
@@ -31139,11 +31144,6 @@ const IMPACT_MAP = [
   why: 'Mobile users need fast, thumb-friendly navigation with minimal friction.',
   biz: 'Poor mobile navigation reduces engagement and conversion rates on small screens.',
   fix: 'Simplify mobile menus, increase tap targets to at least 44px, and prioritise key actions.'
-}, {
-  keys: ['touch target', 'tap target', '48px'],
-  why: 'Small tap targets make mobile navigation harder and increase mis-taps, especially on forms, menus, and CTA buttons.',
-  biz: 'Undersized touch targets increase mobile bounce rates and reduce task completion, directly hurting conversions.',
-  fix: 'Increase tap target size, spacing, and mobile button/link hit areas to meet the 48px recommendation. Use CSS min-height: 48px / min-width: 48px on interactive elements and verify with Lighthouse Accessibility > Tap targets.'
 },
 // ── AI / SERP Visibility ───────────────────────────────────────────────────
 {
@@ -31459,7 +31459,7 @@ function generateReportCopy(score, results) {
   const executiveSummary = isLowCov
     ? `This audit covers ${evalCount} of ${totalCount} checks (${compRate}% coverage). The preliminary reviewed score is ${overall}/100, reflecting completed items only — the final grade is withheld pending fuller coverage.\n\nAmong the reviewed items, the area most in need of attention is ${weakestMeaning}. There are ${urgencyText} identified so far. Completing the remaining checks will unlock the final grade and may surface additional issues.`
     : isDirectCov
-      ? `This directional assessment covers ${evalCount} of ${totalCount} checks (${compRate}% coverage). Score: ${overall}/100, Grade ${score.grade} — treat this as directional, not final. The biggest opportunity lies in ${weakestMeaning}. There are ${urgencyText}.\n\nCompleting the remaining ${totalCount - evalCount} checks will sharpen the accuracy of this assessment and may reveal additional issues.`
+      ? `This directional assessment covers ${evalCount} of ${totalCount} checks (${compRate}% coverage). Score: ${overall}/100 — treat this as directional, not final. Grade is withheld until 60% coverage is reached. The biggest opportunity lies in ${weakestMeaning}. There are ${urgencyText}.\n\nCompleting the remaining ${totalCount - evalCount} checks will sharpen the accuracy of this assessment and may reveal additional issues.`
       : isIndCov
         ? `This website shows ${PERF_LEVEL(overall)} performance based on ${compRate}% of the audit (${evalCount} of ${totalCount} checks reviewed). Indicative score: ${overall}/100, Grade ${score.grade}. The biggest opportunity lies in ${weakestMeaning}. There are ${urgencyText}.\n\nThis is an indicative result — completing the remaining sections may reveal additional issues. Addressing the top priority issues will deliver meaningful improvements in visibility, user experience, and conversions.`
         : `This website shows ${PERF_LEVEL(overall)} performance with a full audit score of ${overall}/100 (Grade ${score.grade}). ` + `The biggest opportunity lies in ${weakestMeaning}. ` + `There are ${urgencyText} that are currently limiting performance.\n\n` + `Addressing the top priority issues will deliver the fastest improvements in visibility, user experience, and conversions. ` + `If these issues are resolved, the site has strong potential to significantly improve both traffic and business outcomes.`;
@@ -31658,7 +31658,7 @@ function downloadPDF(config, auditUrl, score, results) {
     if (critFails > 0) urgency = `${critFails} critical issue${critFails > 1 ? 's' : ''} require immediate attention.`;else if (highFails > 0) urgency = `${highFails} high-priority issue${highFails > 1 ? 's' : ''} were identified.`;else if (totalFails > 0) urgency = `${totalFails} item${totalFails > 1 ? 's' : ''} failed across the reviewed sections.`;else urgency = 'No failed items found — focus on completing unevaluated sections.';
     const weakestLabel = weakest.label.replace('AI & SERP Visibility', 'AI Visibility');
     const overallCov = score.completionPct || 0;
-    const gradeStr = overallCov < 30 ? `preliminary reviewed score of ${overall}/100 (grade withheld — ${score.totalEvaluated}/${score.totalAll} checks reviewed)` : `overall score of ${overall}/100 (Grade ${score.grade})`;
+    const gradeStr = overallCov < 60 ? `reviewed score of ${overall}/100 (grade withheld — ${score.totalEvaluated}/${score.totalAll} checks reviewed, ${overallCov}% coverage)` : `overall score of ${overall}/100 (Grade ${score.grade})`;
     return `This website has a ${healthLabel} ${gradeStr}. The area requiring most attention is ${weakestLabel} (${weakest.score}/100). ${urgency} Prioritise the Top Priority Issues below, then work through each category section.`;
   }
 
