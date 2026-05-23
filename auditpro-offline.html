@@ -31240,12 +31240,12 @@ function generateReportCopy(score, results) {
   const scoreLabel  = isLowCov ? 'Preliminary Reviewed Score' : isDirectCov ? 'Directional Score' : isIndCov ? 'Indicative Score' : 'Full Audit Score';
   const confLevel   = isLowCov ? 'low' : isDirectCov ? 'medium-low' : isIndCov ? 'medium' : 'high';
   const executiveSummary = isLowCov
-    ? `This is an early diagnostic based on ${evalCount} of ${totalCount} completed checks (${compRate}% coverage). The preliminary reviewed score is ${overall}/100 and reflects only the items evaluated so far. Because coverage is low, the final grade is withheld — the score may change significantly as more checks are completed.\n\nAmong the items reviewed, the area requiring most attention is ${weakestMeaning}. There are ${urgencyText} identified in the reviewed sections. Additional issues may exist in checks not yet completed.\n\nThis report is useful as a starting point. Complete the remaining checks to unlock the full assessment, final grade, and a reliable picture of overall site performance.`
+    ? `This audit covers ${evalCount} of ${totalCount} checks (${compRate}% coverage). The preliminary reviewed score is ${overall}/100, reflecting completed items only — the final grade is withheld pending fuller coverage.\n\nAmong the reviewed items, the area most in need of attention is ${weakestMeaning}. There are ${urgencyText} identified so far. Completing the remaining checks will unlock the final grade and may surface additional issues.`
     : isDirectCov
-      ? `This website shows ${PERF_LEVEL(overall)} performance based on ${compRate}% of the audit (${evalCount} of ${totalCount} checks reviewed). Directional score: ${overall}/100, Grade ${score.grade} — treat this as directional rather than final. The biggest opportunity lies in ${weakestMeaning}. There are ${urgencyText}.\n\nCompleting the remaining sections may reveal additional issues and will sharpen the accuracy of this assessment. Addressing the top priority issues identified so far will deliver meaningful improvements.`
+      ? `This directional assessment covers ${evalCount} of ${totalCount} checks (${compRate}% coverage). Score: ${overall}/100, Grade ${score.grade} — treat this as directional, not final. The biggest opportunity lies in ${weakestMeaning}. There are ${urgencyText}.\n\nCompleting the remaining ${totalCount - evalCount} checks will sharpen the accuracy of this assessment and may reveal additional issues.`
       : isIndCov
-        ? `This website shows ${PERF_LEVEL(overall)} performance based on ${compRate}% of the audit (${evalCount} of ${totalCount} checks reviewed). Indicative score: ${overall}/100, Grade ${score.grade}. The biggest opportunity lies in ${weakestMeaning}. There are ${urgencyText}.\n\nThis is an indicative result — completing the remaining sections may reveal additional issues. Addressing the top priority issues identified so far will deliver meaningful improvements in visibility, user experience, and conversions.`
-        : `This website shows ${PERF_LEVEL(overall)} performance with a full audit score of ${overall}/100 (Grade ${score.grade}). ` + `The biggest opportunity lies in ${weakestMeaning}. ` + `There are ${urgencyText} that are currently limiting performance.\n\n` + `This means the site is underperforming compared to competitors and leaving measurable growth opportunities on the table.\n\n` + `Addressing the top priority issues will deliver the fastest improvements in visibility, user experience, and conversions. ` + `If these issues are resolved, the site has strong potential to significantly improve both traffic and business outcomes.`;
+        ? `This website shows ${PERF_LEVEL(overall)} performance based on ${compRate}% of the audit (${evalCount} of ${totalCount} checks reviewed). Indicative score: ${overall}/100, Grade ${score.grade}. The biggest opportunity lies in ${weakestMeaning}. There are ${urgencyText}.\n\nThis is an indicative result — completing the remaining sections may reveal additional issues. Addressing the top priority issues will deliver meaningful improvements in visibility, user experience, and conversions.`
+        : `This website shows ${PERF_LEVEL(overall)} performance with a full audit score of ${overall}/100 (Grade ${score.grade}). ` + `The biggest opportunity lies in ${weakestMeaning}. ` + `There are ${urgencyText} that are currently limiting performance.\n\n` + `Addressing the top priority issues will deliver the fastest improvements in visibility, user experience, and conversions. ` + `If these issues are resolved, the site has strong potential to significantly improve both traffic and business outcomes.`;
   const performanceInterpretation = isLowCov
     ? `Preliminary result — ${evalCount} of ${totalCount} checks reviewed (${compRate}% coverage). This score reflects reviewed items only and may not represent overall site performance.`
     : isDirectCov
@@ -31811,10 +31811,23 @@ function downloadPDF(config, auditUrl, score, results) {
     doc.text(confLines, M, y);
     y += confLines.length * 3.8 + 3;
 
-    // Estimated Impact box — intro + clean ASCII bullets + closing line
+    // Estimated Impact box — intro + audit-specific bullets + closing line
     if (copy.weakestId) {
-      const bullets = ['Higher search rankings and greater organic visibility', 'Increased qualified traffic from search and AI channels', 'Better user engagement and lower drop-off rates', 'Stronger trust signals and improved brand credibility', 'More conversions, leads, enquiries, or sales'];
-      const rawClosing = `The primary opportunity lies in improving ${WEAKEST_MEANING[copy.weakestId] || copy.weakestId}, which directly affects overall performance.`;
+      const weakestArea = st(WEAKEST_MEANING[copy.weakestId] || copy.weakestId);
+      const topHiCrit = copy.priorityIssues.filter(it => it.priority === 'Critical' || it.priority === 'High').length;
+      const issueRef = topHiCrit > 0 ? `the ${topHiCrit} high-priority issue${topHiCrit > 1 ? 's' : ''}` : 'the identified issues';
+      const bullets = copy.isLowCov ? [
+        `Improved ${weakestArea} — the clearest near-term lever based on reviewed checks`,
+        'Higher search visibility as technical and content gaps are resolved',
+        'Better user engagement and trust signals across key pages'
+      ] : [
+        `Stronger ${weakestArea} — the highest-impact area in this audit`,
+        'Higher search rankings and qualified organic traffic',
+        'Better user engagement, lower drop-off, and improved conversion signals'
+      ];
+      const rawClosing = copy.isLowCov
+        ? `The reviewed issues suggest ${issueRef} in ${weakestArea} represent the most accessible near-term opportunity. Additional findings may appear as more checks are completed.`
+        : `Prioritising ${issueRef} — especially in ${weakestArea} — will deliver the fastest measurable improvements.`;
       const closingLine = st(rawClosing);
       // Pre-wrap closing line to compute accurate box height
       doc.setFontSize(6.5);
@@ -32025,37 +32038,20 @@ function downloadPDF(config, auditUrl, score, results) {
       const cov = catCovLevel(catScore.evaluated, catScore.total);
       const scoreX = cat.id === 'serp' ? W - M - 20 : W - M;
       if (catScore.evaluated === 0) {
-        doc.setFontSize(8);
-        doc.setFont('helvetica', 'italic');
-        doc.setTextColor(...onCatMuted);
-        doc.text('Not evaluated', scoreX, 13, { align: 'right' });
-      } else if (cov.isLow) {
-        // Low coverage: single combined line in dark sub-bar, no grade in header
-        doc.setFontSize(7.5);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(...onCat);
-        doc.text(`${catScore.score}/100`, scoreX, 13, { align: 'right' });
-      } else if (cov.isDirect) {
-        // Directional: show grade with qualifier
-        doc.setFontSize(9);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(...onCat);
-        doc.text(`${catScore.score}/100  Grade ${catScore.grade}`, scoreX, 11, { align: 'right' });
-        doc.setFontSize(6);
-        doc.setFont('helvetica', 'italic');
-        doc.setTextColor(...onCatMuted);
-        doc.text('Directional — not final', scoreX, 16, { align: 'right' });
+        // Sub-bar: not evaluated
       } else {
-        // Indicative / full coverage: show score + grade normally
-        doc.setFontSize(9);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(...onCat);
-        doc.text(`${catScore.score}/100  Grade ${catScore.grade}`, scoreX, 13, { align: 'right' });
+        // Tüm kapsam düzeyleri için skor blue zone'da değil, sub-bar'da gösterilir
       }
-      // Single combined coverage line in dark sub-bar
-      const covLine = cov.isLow
-        ? `${cov.scoreLabel}  ·  ${catScore.evaluated}/${catScore.total} reviewed  ·  ${cov.confidence} confidence  ·  Grade withheld`
-        : `${cov.scoreLabel}  ·  ${catScore.evaluated}/${catScore.total} checks reviewed  ·  ${cov.confidence} confidence`;
+      // Sub-bar: skor + etiket + kapsam bilgisi tek satırda
+      const covLine = catScore && catScore.evaluated > 0
+        ? (() => {
+            const cov2 = catCovLevel(catScore.evaluated, catScore.total);
+            if (cov2.isLow) return `${cov2.scoreLabel}: ${catScore.score}/100  ·  ${catScore.evaluated}/${catScore.total} reviewed  ·  Low confidence  ·  Grade withheld`;
+            if (cov2.isDirect) return `${cov2.scoreLabel}: ${catScore.score}/100  Grade ${catScore.grade}  ·  ${catScore.evaluated}/${catScore.total} reviewed  ·  Medium-Low confidence`;
+            if (cov2.isMed) return `${cov2.scoreLabel}: ${catScore.score}/100  Grade ${catScore.grade}  ·  ${catScore.evaluated}/${catScore.total} reviewed  ·  Medium confidence`;
+            return `${cov2.scoreLabel}: ${catScore.score}/100  Grade ${catScore.grade}  ·  ${catScore.evaluated}/${catScore.total} reviewed  ·  High confidence`;
+          })()
+        : 'Not evaluated — complete this section to unlock the score';
       doc.setFontSize(6);
       doc.setFont('helvetica', cov.isLow ? 'bold' : 'normal');
       doc.setTextColor(...onCatDark);
