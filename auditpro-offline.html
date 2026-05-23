@@ -30743,11 +30743,11 @@ const STATUS_COLORS_PDF = {
 const PERF_LEVEL = s => s >= 85 ? 'strong' : s >= 70 ? 'good' : s >= 50 ? 'below average' : 'poor';
 const PERF_MEANING = s => s >= 85 ? 'strong performance — the site is well-optimised with minor areas still to refine' : s >= 70 ? 'solid performance, with clear opportunities to improve visibility, experience, and conversion' : s >= 50 ? 'below-average performance — the site is missing key opportunities across search visibility, user experience, and conversions' : 'poor performance that is actively limiting search rankings, user engagement, and conversion outcomes';
 const WEAKEST_MEANING = {
-  technical: 'the technical foundation — the underlying issues that limit how search engines can crawl and rank the site',
-  onpage: 'on-page content and search signals — the areas that directly determine keyword relevance and click-through rates',
-  ux: 'user experience — the friction points that are causing visitors to disengage before converting',
-  cro: 'conversion performance — the gaps preventing visitors from becoming customers, leads, or enquiries',
-  serp: 'AI and search visibility — the signals that determine whether the brand appears in modern search and AI-generated results'
+  technical: 'the technical foundation, improving how search engines crawl, index, and rank the site',
+  onpage: 'on-page content and search signals, increasing keyword relevance and organic click-through rates',
+  ux: 'user experience, reducing the friction that causes visitors to disengage before converting',
+  cro: 'conversion performance, closing the gaps that prevent visitors from becoming customers',
+  serp: 'AI and search visibility, strengthening the signals that drive brand presence in modern search results'
 };
 const SECTION_INSIGHTS = {
   technical: s => s >= 80 ? 'Technical SEO is well-structured. Search engines can crawl, index, and process the site effectively. Minor refinements may still yield incremental gains.' : s >= 60 ? 'Technical SEO has gaps that are restricting how search engines discover and rank the site. Fixing these builds the foundation that all other SEO efforts depend on.' : 'Technical SEO issues are actively suppressing search visibility. These problems affect crawlability, page speed, and how search engines process every page on the site.',
@@ -30819,10 +30819,15 @@ const IMPACT_MAP = [
   biz: 'Slow pages can reduce organic traffic quality and lower conversion rates.',
   fix: 'Run PageSpeed Insights and resolve the highest-impact performance issues first.'
 }, {
-  keys: ['webp', 'avif', 'image format', 'next-gen image'],
+  keys: ['mobile page load', 'page load < 3s', '4g connection', '4g throttl', 'mobile users abandon'],
+  why: 'Mobile users on 4G abandon pages that take longer than 3 seconds to load — 53% of visits are lost.',
+  biz: 'Slow mobile load directly reduces conversions, increases bounce rate, and weakens mobile search rankings.',
+  fix: 'Test mobile performance using WebPageTest with 4G throttling. Key levers: reduce JavaScript and CSS payload, optimise images (size, format, lazy-load), improve server response time, add a CDN, and prioritise above-the-fold content loading.'
+}, {
+  keys: ['webp image', 'avif image', 'next-gen image', 'image format', 'convert to webp', '.webp', '.avif'],
   why: 'Modern image formats reduce file size while maintaining quality.',
   biz: 'Heavy images slow loading, increase bounce risk, and waste mobile data.',
-  fix: 'Convert large images to WebP or AVIF and serve responsive sizes.'
+  fix: 'Convert large images to WebP or AVIF and serve responsive sizes using a build pipeline or CDN image optimisation.'
 }, {
   keys: ['width height', 'image dimensions', 'aspect ratio', 'layout instability'],
   why: 'Defined media dimensions prevent layout instability during page load.',
@@ -30925,6 +30930,11 @@ const IMPACT_MAP = [
   why: 'Users need clear recovery paths when they make mistakes or change their mind.',
   biz: 'Missing undo, back, and cancel options increase frustration, abandonment, and support burden.',
   fix: 'Add clear back, cancel, undo, edit, or confirmation flows for all important and irreversible actions. Warn users before destructive operations with explicit confirmation dialogs.'
+}, {
+  keys: ['heading hierarchy correct', 'h1→h2', 'h1->h2', 'h1→h2→h3', 'h1->h2->h3', 'heading hierarchy'],
+  why: 'A correct heading hierarchy makes content scannable for users and interpretable for search engines and accessibility tools.',
+  biz: 'Broken or skipped heading levels reduce SEO clarity, fail accessibility checks, and confuse screen readers.',
+  fix: 'Use one clear H1 per page, then structure sections with logical H2 and H3 headings without skipping levels. Every heading should reflect the content it introduces.'
 }, {
   keys: ['h1', 'missing h1', 'multiple h1', 'no h1'],
   why: 'The H1 clarifies the main topic of a page for users and search engines.',
@@ -35460,12 +35470,12 @@ function WhiteLabelView({
     onClick: () => setShowPreview(v => !v),
     style: { background:'none', border:'none', color:C.muted, fontSize:11, cursor:'pointer', padding:'2px 6px', textDecoration:'underline' }
   }, showPreview ? "Hide" : "Show")), showPreview && /*#__PURE__*/React.createElement("div", {
-    style: { flex:1, position:'relative', borderRadius:8, overflow:'hidden', background:C.bg, border:`1px solid ${C.border}`, minHeight:180 }
+    style: { position:'relative', borderRadius:8, overflow:'hidden', background:C.bg, border:`1px solid ${C.border}`, height:300, minHeight:260 }
   }, (() => {
     const acc = color || C.accent;
     const slides = [
       { label: 'Cover & Score', content: /*#__PURE__*/React.createElement('div', {
-          style: { padding:'14px 16px', fontFamily:'helvetica,sans-serif', height:'100%', display:'flex', flexDirection:'column', gap:8, background: C.bg }
+          style: { padding:'14px 16px', fontFamily:'helvetica,sans-serif', minHeight:'100%', display:'flex', flexDirection:'column', gap:8, background: C.bg, boxSizing:'border-box' }
         },
         /*#__PURE__*/React.createElement('div', { style:{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:2 } },
           /*#__PURE__*/React.createElement('div', { style:{ fontSize:9, fontWeight:800, color:'#fff', background:acc, borderRadius:4, padding:'2px 7px', letterSpacing:'0.04em' } }, 'FULL AUDIT SCORE'),
@@ -35494,7 +35504,7 @@ function WhiteLabelView({
         )
       ) },
       { label: 'Section Scores', content: /*#__PURE__*/React.createElement('div', {
-          style:{ padding:'14px 16px', fontFamily:'helvetica,sans-serif', display:'flex', flexDirection:'column', gap:8, background:C.bg }
+          style:{ padding:'14px 16px', fontFamily:'helvetica,sans-serif', display:'flex', flexDirection:'column', gap:8, background:C.bg, minHeight:'100%', boxSizing:'border-box' }
         },
         /*#__PURE__*/React.createElement('div', { style:{ fontSize:9, fontWeight:700, color:C.text, marginBottom:2 } }, 'SECTION SCORES'),
         /*#__PURE__*/React.createElement('div', { style:{ fontSize:7.5, color:C.muted, marginBottom:6 } }, 'Coverage-aware — grade shown at 60%+ coverage only'),
@@ -35519,7 +35529,7 @@ function WhiteLabelView({
         /*#__PURE__*/React.createElement('div', { style:{ fontSize:7, color:C.muted, marginTop:4, fontStyle:'italic' } }, '↑ No Grade column — grade withheld until 60%+ coverage reached')
       ) },
       { label: 'Top Priority Issues', content: /*#__PURE__*/React.createElement('div', {
-          style:{ padding:'14px 16px', fontFamily:'helvetica,sans-serif', display:'flex', flexDirection:'column', gap:7, background:C.bg }
+          style:{ padding:'14px 16px', fontFamily:'helvetica,sans-serif', display:'flex', flexDirection:'column', gap:7, background:C.bg, minHeight:'100%', boxSizing:'border-box' }
         },
         /*#__PURE__*/React.createElement('div', { style:{ fontSize:9, fontWeight:700, color:C.text, marginBottom:2 } }, 'TOP PRIORITY ISSUES'),
         ...[
@@ -35542,7 +35552,7 @@ function WhiteLabelView({
         ))
       ) },
       { label: 'Category Detail', content: /*#__PURE__*/React.createElement('div', {
-          style:{ padding:'14px 16px', fontFamily:'helvetica,sans-serif', display:'flex', flexDirection:'column', gap:7, background:C.bg }
+          style:{ padding:'14px 16px', fontFamily:'helvetica,sans-serif', display:'flex', flexDirection:'column', gap:7, background:C.bg, minHeight:'100%', boxSizing:'border-box' }
         },
         /*#__PURE__*/React.createElement('div', { style:{ display:'flex', alignItems:'baseline', justifyContent:'space-between', marginBottom:2 } },
           /*#__PURE__*/React.createElement('div', { style:{ fontSize:9, fontWeight:800, color:C.text } }, '⚙️ Technical SEO'),
@@ -35572,7 +35582,7 @@ function WhiteLabelView({
         /*#__PURE__*/React.createElement('div', { style:{ fontSize:6.5, color:C.muted, fontStyle:'italic', marginTop:3 } }, '45 not yet reviewed — complete for full category score')
       ) },
       { label: 'White Label PDF', content: /*#__PURE__*/React.createElement('div', {
-          style:{ padding:'14px 16px', fontFamily:'helvetica,sans-serif', display:'flex', flexDirection:'column', gap:8, background:C.bg }
+          style:{ padding:'14px 16px', fontFamily:'helvetica,sans-serif', display:'flex', flexDirection:'column', gap:8, background:C.bg, minHeight:'100%', boxSizing:'border-box' }
         },
         /*#__PURE__*/React.createElement('div', { style:{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:4 } },
           /*#__PURE__*/React.createElement('div', null,
@@ -35606,7 +35616,7 @@ function WhiteLabelView({
         )
       ) },
       { label: 'Scoring Methodology', content: /*#__PURE__*/React.createElement('div', {
-          style:{ padding:'14px 16px', fontFamily:'helvetica,sans-serif', display:'flex', flexDirection:'column', gap:7, background:C.bg }
+          style:{ padding:'14px 16px', fontFamily:'helvetica,sans-serif', display:'flex', flexDirection:'column', gap:7, background:C.bg, minHeight:'100%', boxSizing:'border-box' }
         },
         /*#__PURE__*/React.createElement('div', { style:{ fontSize:9, fontWeight:700, color:C.text, marginBottom:4 } }, 'HOW THIS REPORT IS SCORED'),
         ...[
@@ -35641,10 +35651,10 @@ function WhiteLabelView({
     const go = d => setPreviewSlide((previewSlide + d + slides.length) % slides.length);
     return /*#__PURE__*/React.createElement(React.Fragment, null,
       /*#__PURE__*/React.createElement('div', {
-        style:{ position:'absolute', top:0, left:0, right:0, bottom:28, overflowY:'auto', overflowX:'hidden' }
+        style:{ position:'absolute', top:0, left:0, right:0, bottom:30, overflowY:'auto', overflowX:'hidden' }
       }, slides[cur].content),
       /*#__PURE__*/React.createElement('div', {
-        style:{ position:'absolute', bottom:0, left:0, right:0, height:28, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 8px', background:C.surface, borderTop:`1px solid ${C.border}` }
+        style:{ position:'absolute', bottom:0, left:0, right:0, height:30, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 8px', background:C.surface, borderTop:`1px solid ${C.border}` }
       },
         /*#__PURE__*/React.createElement('button', { onClick:()=>go(-1), style:{ background:'none', border:'none', color:C.muted, fontSize:14, cursor:'pointer', padding:'0 4px', lineHeight:1 } }, '‹'),
         /*#__PURE__*/React.createElement('div', { style:{ display:'flex', gap:5, alignItems:'center' } },
@@ -35657,7 +35667,7 @@ function WhiteLabelView({
         /*#__PURE__*/React.createElement('button', { onClick:()=>go(1), style:{ background:'none', border:'none', color:C.muted, fontSize:14, cursor:'pointer', padding:'0 4px', lineHeight:1 } }, '›')
       ),
       /*#__PURE__*/React.createElement('div', {
-        style:{ position:'absolute', bottom:4, left:0, right:0, textAlign:'center', fontSize:7.5, color:C.muted, pointerEvents:'none', bottom:8 }
+        style:{ position:'absolute', bottom:6, left:0, right:0, textAlign:'center', fontSize:7.5, color:C.muted, pointerEvents:'none' }
       }, slides[cur].label)
     );
   })())
