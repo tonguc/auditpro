@@ -30618,7 +30618,7 @@ function catCovLevel(evaluated, total) {
   if (!total || evaluated === 0) return { pct: 0, scoreLabel: 'Not Reviewed Yet', confidence: 'None', showGrade: false, isLow: true, isDirect: false, isMed: false, isHigh: false };
   const pct = Math.round(evaluated / total * 100);
   if (pct < 30) return { pct, scoreLabel: 'Preliminary Reviewed Score', confidence: 'Low', showGrade: false, isLow: true, isDirect: false, isMed: false, isHigh: false };
-  if (pct < 60) return { pct, scoreLabel: 'Directional Score', confidence: 'Medium-Low', showGrade: false, isLow: false, isDirect: true, isMed: false, isHigh: false };
+  if (pct < 60) return { pct, scoreLabel: 'Directional Reviewed Score', confidence: 'Medium-Low', showGrade: false, isLow: false, isDirect: true, isMed: false, isHigh: false };
   if (pct < 80) return { pct, scoreLabel: 'Indicative Score', confidence: 'Medium', showGrade: true, isLow: false, isDirect: false, isMed: true, isHigh: false };
   return { pct, scoreLabel: 'Full Audit Score', confidence: 'High', showGrade: true, isLow: false, isDirect: false, isMed: false, isHigh: true };
 }
@@ -31454,7 +31454,7 @@ function generateReportCopy(score, results) {
   const isDirectCov = compRate >= 30 && compRate < 60;
   const isIndCov    = compRate >= 60 && compRate < 80;
   const isMedCov    = isDirectCov || isIndCov; // backwards compat
-  const scoreLabel  = isLowCov ? 'Preliminary Reviewed Score' : isDirectCov ? 'Directional Score' : isIndCov ? 'Indicative Score' : 'Full Audit Score';
+  const scoreLabel  = isLowCov ? 'Preliminary Reviewed Score' : isDirectCov ? 'Directional Reviewed Score' : isIndCov ? 'Indicative Score' : 'Full Audit Score';
   const confLevel   = isLowCov ? 'low' : isDirectCov ? 'medium-low' : isIndCov ? 'medium' : 'high';
   const executiveSummary = isLowCov
     ? `This audit covers ${evalCount} of ${totalCount} checks (${compRate}% coverage). The preliminary reviewed score is ${overall}/100, reflecting completed items only — the final grade is withheld pending fuller coverage.\n\nAmong the reviewed items, the area most in need of attention is ${weakestMeaning}. There are ${urgencyText} identified so far. Completing the remaining checks will unlock the final grade and may surface additional issues.`
@@ -31829,7 +31829,7 @@ function downloadPDF(config, auditUrl, score, results) {
   const isLowCovPDF    = score.completionPct < 30;
   const isDirectCovPDF = score.completionPct >= 30 && score.completionPct < 60;
   const isMedCovPDF    = score.completionPct >= 60 && score.completionPct < 80;
-  const scoreLabelPDF  = copy?.scoreLabel || (isLowCovPDF ? 'Preliminary Reviewed Score' : isDirectCovPDF ? 'Directional Score' : isMedCovPDF ? 'Indicative Score' : 'Full Audit Score');
+  const scoreLabelPDF  = copy?.scoreLabel || (isLowCovPDF ? 'Preliminary Reviewed Score' : isDirectCovPDF ? 'Directional Reviewed Score' : isMedCovPDF ? 'Indicative Score' : 'Full Audit Score');
   const labelColor = isLowCovPDF ? [180, 110, 0] : (isDirectCovPDF || isMedCovPDF) ? [14, 100, 160] : [...brandRgb];
   // Score label (small, above number) — measure width first so divider fits
   doc.setFontSize(isLowCovPDF ? 6 : 6.5);
@@ -31983,7 +31983,7 @@ function downloadPDF(config, auditUrl, score, results) {
     } else if (catCov.isDirect) {
       confLabel = 'Medium-low confidence'; confRgb = [60, 130, 200];
     } else if (catCov.isMed) {
-      confLabel = 'Good confidence'; confRgb = [30, 165, 115];
+      confLabel = 'Medium confidence'; confRgb = [30, 165, 115];
     } else {
       confLabel = 'High confidence'; confRgb = [16, 140, 90];
     }
@@ -33810,7 +33810,7 @@ function DashboardView({
     const isDirect = completionPct >= 30 && completionPct < 60;
     const isMedium = completionPct >= 60 && completionPct < 80;
     const isHigh   = completionPct >= 80;
-    const scoreLabel = totalEval === 0 ? 'Audit Score' : isLow ? 'Preliminary Reviewed Score' : isDirect ? 'Directional Score' : isMedium ? 'Indicative Score' : 'Full Audit Score';
+    const scoreLabel = totalEval === 0 ? 'Audit Score' : isLow ? 'Preliminary Reviewed Score' : isDirect ? 'Directional Reviewed Score' : isMedium ? 'Indicative Score' : 'Full Audit Score';
     const confMsg = isLow
       ? 'This score reflects reviewed checks only. The final grade is withheld until at least 30% of checks are reviewed. Complete more checks for an accurate assessment.'
       : isDirect
