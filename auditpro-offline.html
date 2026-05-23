@@ -35470,7 +35470,7 @@ function WhiteLabelView({
     onClick: () => setShowPreview(v => !v),
     style: { background:'none', border:'none', color:C.muted, fontSize:11, cursor:'pointer', padding:'2px 6px', textDecoration:'underline' }
   }, showPreview ? "Hide" : "Show")), showPreview && /*#__PURE__*/React.createElement("div", {
-    style: { borderRadius:8, background: isDark ? '#0b0d1a' : '#eaecf4', border:`1px solid ${C.border}`, padding:'20px' }
+    style: { marginTop: 8 }
   }, (() => {
     const acc = color || C.accent;
     const P = {
@@ -35578,13 +35578,15 @@ function WhiteLabelView({
         )
       ),
 
-      // ── 4 value items below — 2×2 grid, no borders ──────────────────────────
-      /*#__PURE__*/React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10,paddingTop:2}},
+      // ── 4 value boxes below — 2×2 grid ──────────────────────────────────────
+      /*#__PURE__*/React.createElement('div',{style:{display:'grid',gridTemplateColumns:'1fr 1fr',gap:8,marginTop:14}},
         cards.map(({icon,label},i)=>/*#__PURE__*/React.createElement('div',{key:i,
-          style:{display:'flex',gap:10,alignItems:'center'}
+          style:{display:'flex',gap:10,alignItems:'center',
+                 background:C.bg,border:`1px solid ${C.border}`,
+                 borderRadius:8,padding:'10px 13px'}
         },
-          /*#__PURE__*/React.createElement('span',{style:{fontSize:18,lineHeight:1,flexShrink:0}},icon),
-          /*#__PURE__*/React.createElement('div',{style:{fontSize:12,fontWeight:600,color:C.text,lineHeight:1.4}},label)
+          /*#__PURE__*/React.createElement('span',{style:{fontSize:19,lineHeight:1,flexShrink:0}},icon),
+          /*#__PURE__*/React.createElement('div',{style:{fontSize:11.5,fontWeight:600,color:C.text,lineHeight:1.4}},label)
         ))
       )
     );
