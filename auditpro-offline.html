@@ -30628,6 +30628,7 @@ function calculateScore(results) {
     let pass = 0,
       partial = 0,
       fail = 0,
+      na = 0,
       wPass = 0,
       wPartial = 0,
       wFail = 0;
@@ -30643,12 +30644,15 @@ function calculateScore(results) {
       } else if (s === 'Fail') {
         fail++;
         wFail += w;
+      } else if (s === 'N/A') {
+        na++;
       }
-      // blank and N/A → excluded from denominator
+      // blank → excluded from denominator
     });
     const evaluated = pass + partial + fail;
     const wTotal = wPass + wPartial + wFail;
     const score = wTotal > 0 ? Math.round((wPass + wPartial * 0.5) / wTotal * 100) : 0;
+    const allNA = evaluated === 0 && na === allItems.length;
     return {
       id: cat.id,
       label: cat.label,
@@ -30660,6 +30664,8 @@ function calculateScore(results) {
       passed: pass,
       failed: fail,
       partial,
+      naCount: na,
+      allNA,
       total: allItems.length,
       evaluated
     };
@@ -31195,6 +31201,186 @@ const IMPACT_MAP = [
   why: 'High-quality references support credibility and factual accuracy of content.',
   biz: 'Weak sourcing reduces perceived expertise and trust with both users and AI systems.',
   fix: 'Reference reputable sources such as .gov, .edu, research papers, or established industry bodies.'
+}, {
+  keys: ['crawl depth', 'clicks from homepage', '3 clicks'],
+  why: 'Pages buried more than 3 clicks deep are harder for search engines to discover and rank.',
+  biz: 'Deep pages receive less crawl budget and link equity, reducing their chance of ranking.',
+  fix: 'Flatten site architecture so all important pages are reachable within 3 clicks. Use internal linking and navigation to surface deep content.'
+}, {
+  keys: ['pagination', 'paginated', 'page 2', 'next page'],
+  why: 'Incorrectly handled pagination can cause duplicate content issues and split link equity across pages.',
+  biz: 'Search engines may index the wrong page or dilute rankings across paginated sets.',
+  fix: 'Use rel="next" / rel="prev" or consolidate paginated content. Ensure the canonical points to the main category page, not paginated variants.'
+}, {
+  keys: ['redirect chain', 'redirect loop', 'max 1 hop', 'redirect hop'],
+  why: 'Each redirect in a chain adds latency and causes crawlers to lose link equity at every hop.',
+  biz: 'Redirect chains slow page load and reduce the PageRank passed from backlinks.',
+  fix: 'Update all redirect chains to point directly to the final destination URL. Audit with Screaming Frog: Redirects > Redirect Chains.'
+}, {
+  keys: ['hreflang', 'international', 'multilingual', 'multi-language'],
+  why: 'Incorrect hreflang tags cause search engines to serve the wrong language version to users.',
+  biz: 'Mismatched language targeting reduces organic traffic from international markets.',
+  fix: 'Implement correct hreflang tags for all language/region combinations. Validate with hreflang Testing Tool or Google Search Console.'
+}, {
+  keys: ['javascript blocking', 'js blocking', 'render-blocking', 'javascript not blocking'],
+  why: 'Content rendered only via JavaScript may not be indexed reliably by search engines.',
+  biz: 'Key content hidden behind JavaScript can reduce indexation and rankings for important pages.',
+  fix: 'Use server-side rendering or dynamic rendering for critical content. Test with Google\'s URL Inspection tool > "View Crawled Page".'
+}, {
+  keys: ['sensitive data', 'exposed in source', 'api key', 'password in url', 'credentials'],
+  why: 'Sensitive data exposed in HTML source or URLs poses a security risk and may be indexed by search engines.',
+  biz: 'Leaked credentials or personal data can cause legal, reputational, and security damage.',
+  fix: 'Remove all API keys, passwords, and PII from HTML source, URL parameters, and client-side code. Move secrets server-side.'
+}, {
+  keys: ['schema markup error', 'schema error', 'structured data error', 'rich result error'],
+  why: 'Schema markup errors prevent search engines from generating rich results for your pages.',
+  biz: 'Broken schema reduces eligibility for rich snippets, which lowers click-through rates in search.',
+  fix: 'Fix errors shown in Google Search Console > Enhancements. Validate markup at schema.org/validator or Google Rich Results Test.'
+}, {
+  keys: ['localbusiness schema', 'local business schema', 'localbusiness'],
+  why: 'LocalBusiness schema helps search engines display accurate business information in local search results.',
+  biz: 'Missing local schema reduces visibility in local pack results and Google Business Profile integration.',
+  fix: 'Add LocalBusiness schema with name, address, phone, opening hours, and geo coordinates. Validate at search.google.com/test/rich-results.'
+}, {
+  keys: ['mobile-first', 'mobile first indexing', 'mobile-first indexing'],
+  why: 'Google indexes the mobile version of pages first. If the mobile version is incomplete, rankings suffer.',
+  biz: 'Content or structured data missing from the mobile version may be ignored in Google\'s index.',
+  fix: 'Ensure mobile and desktop versions have identical content and structured data. Test with Google\'s Mobile-Friendly Test and URL Inspection tool.'
+}, {
+  keys: ['viewport meta', 'viewport tag', 'meta viewport'],
+  why: 'Without a correct viewport meta tag, pages render at desktop width on mobile devices.',
+  biz: 'Poor mobile rendering increases bounce rates and triggers Google\'s mobile usability penalties.',
+  fix: 'Add <meta name="viewport" content="width=device-width, initial-scale=1"> to every page\'s <head>.'
+}, {
+  keys: ['horizontal scroll', 'horizontal scrollbar', 'overflow-x'],
+  why: 'Horizontal scrolling on mobile indicates layout overflow that breaks the user experience.',
+  biz: 'Google flags horizontal scroll as a mobile usability issue, affecting both rankings and conversions.',
+  fix: 'Identify elements causing overflow with Chrome DevTools. Add overflow-x: hidden to body and fix the root cause — usually a wide image or fixed-width element.'
+}, {
+  keys: ['amp', 'accelerated mobile page'],
+  why: 'AMP provides near-instant loading for news and article content in Google\'s Top Stories carousel.',
+  biz: 'News and publisher sites without AMP may be excluded from Top Stories rich results.',
+  fix: 'If the site is a news or article publisher, implement AMP pages and submit the AMP sitemap to Google Search Console.'
+}, {
+  keys: ['lang attribute', 'html lang', 'language declared', 'site language'],
+  why: 'The lang attribute tells browsers and search engines the primary language of the page.',
+  biz: 'Missing or incorrect lang attributes reduce accessibility score and may confuse international search engines.',
+  fix: 'Add lang="en" (or appropriate language code) to the <html> tag on every page. Use hreflang for multilingual sites.'
+}, {
+  keys: ['international targeting', 'gsc international', 'search console international', 'country targeting'],
+  why: 'Without international targeting configured, Google may serve the wrong country version of the site.',
+  biz: 'Incorrect geographic targeting reduces organic visibility in target markets.',
+  fix: 'Set country targeting in Google Search Console > Legacy tools > International Targeting. For global sites, leave it unset and rely on hreflang.'
+}, {
+  keys: ['cdn', 'content delivery network', 'static asset'],
+  why: 'A CDN serves static assets from servers geographically close to visitors, reducing load time.',
+  biz: 'Slow static asset delivery increases page load time and worsens Core Web Vitals scores.',
+  fix: 'Implement a CDN (Cloudflare, AWS CloudFront, Fastly) for images, CSS, and JS files. Verify with browser DevTools > Network panel.'
+}, {
+  keys: ['print css', 'print stylesheet', 'print pages indexed', '@media print'],
+  why: 'Print-specific pages or print CSS versions being indexed create duplicate content.',
+  biz: 'Indexed print pages waste crawl budget and may confuse search engine content interpretation.',
+  fix: 'Add noindex to print versions or use canonical tags pointing to the main page. Block print-specific URLs in robots.txt if needed.'
+}, {
+  keys: ['speed consistent', 'consistent across templates', 'page speed template'],
+  why: 'Speed inconsistency across page templates means Core Web Vitals may pass on some pages but fail on others.',
+  biz: 'Google measures CWV at the page group level — poor templates affect the whole site\'s performance rating.',
+  fix: 'Test multiple page templates (home, category, product, blog) with PageSpeed Insights. Identify and fix the slowest templates first.'
+}, {
+  keys: ['ai-generated content', 'ai content penalty', 'ai generated penalty', 'helpful content'],
+  why: 'Google\'s Helpful Content system targets low-quality AI-generated content that provides little value.',
+  biz: 'Sites penalised for unhelpful AI content may see traffic drops that affect all pages sitewide.',
+  fix: 'Monitor GSC for organic traffic drops. Ensure AI-assisted content is reviewed, edited, and adds genuine expertise. Remove or substantially improve thin AI-generated pages.'
+}, {
+  keys: ['open graph', 'og:title', 'og:image', 'twitter card', 'twitter:card', 'social sharing tag'],
+  why: 'Open Graph and Twitter Card tags control how pages appear when shared on social media.',
+  biz: 'Missing social tags result in unformatted, low-click previews that reduce referral traffic from social platforms.',
+  fix: 'Add og:title, og:description, og:image, and og:url to all shareable pages. Use Twitter Card tags. Validate with Facebook Sharing Debugger and Twitter Card Validator.'
+}, {
+  keys: ['important pages linked from homepage', 'homepage link', 'linked from homepage'],
+  why: 'Pages linked from the homepage receive the highest internal PageRank and are prioritised by crawlers.',
+  biz: 'Key conversion or content pages not linked from the homepage receive less link equity and crawl attention.',
+  fix: 'Audit your homepage\'s internal links. Ensure top revenue pages, key landing pages, and main categories are reachable from the homepage.'
+}, {
+  keys: ['internal resource', 'content links', 'links to relevant', 'contextual link'],
+  why: 'Contextual internal links distribute link equity and help search engines understand content relationships.',
+  biz: 'Pages with few internal links rank lower than well-connected pages with similar content quality.',
+  fix: 'Add contextual internal links within body content pointing to related pages. Aim for 3–5 relevant internal links per key page.'
+}, {
+  keys: ['external link', 'opens in new tab', 'opens in new window', 'target blank'],
+  why: 'External links not opening in new tabs cause users to leave the site unexpectedly.',
+  biz: 'Users who navigate away via external links reduce session time and conversion opportunities.',
+  fix: 'Add target="_blank" and rel="noopener noreferrer" to all external links. Keep internal navigation within the same tab.'
+}, {
+  keys: ['privacy policy', 'terms of service', 'terms and conditions', 'legal pages'],
+  why: 'Privacy policies and terms of service are required for legal compliance and user trust.',
+  biz: 'Missing legal pages can disqualify sites from ad platforms, payment processors, and app stores.',
+  fix: 'Add Privacy Policy and Terms of Service pages. Link them in the footer. Ensure the Privacy Policy meets GDPR and CCPA requirements if applicable.'
+}, {
+  keys: ['terminology consistent', 'consistent terminology', 'same words', 'h4:'],
+  why: 'Inconsistent terminology confuses users who encounter different words for the same concept.',
+  biz: 'Terminology inconsistency increases cognitive load and support queries.',
+  fix: 'Audit key terms used across navigation, buttons, headings, and copy. Create a style guide for consistent naming and apply it sitewide.'
+}, {
+  keys: ['password show', 'show hide password', 'password toggle', 'h5:'],
+  why: 'Without a password visibility toggle, users make more errors during sign-up and login.',
+  biz: 'Password frustration increases form abandonment at login and registration.',
+  fix: 'Add a show/hide password toggle to all password fields using a simple eye icon button.'
+}, {
+  keys: ['help tutorial', 'complex task help', 'user guidance', 'h7:'],
+  why: 'Complex features without help or guidance lead to user abandonment and support requests.',
+  biz: 'Users who cannot complete complex tasks without help convert less and churn more.',
+  fix: 'Add inline help text, tooltips, or tutorial modals for complex flows. Consider progressive disclosure to reduce upfront complexity.'
+}, {
+  keys: ['minimal design', 'unnecessary element', 'visual noise', 'h8:'],
+  why: 'Unnecessary visual elements distract users from key actions and increase cognitive load.',
+  biz: 'Cluttered interfaces reduce conversion rates and increase time-to-action.',
+  fix: 'Audit each page for elements that do not serve the user\'s primary task. Remove decorative elements that compete with CTAs or key content.'
+}, {
+  keys: ['breadcrumb', 'breadcrumbs', 'breadcrumb nav'],
+  why: 'Breadcrumbs help users understand their location within the site hierarchy and return to parent sections.',
+  biz: 'Sites with breadcrumbs often get breadcrumb rich results in Google, improving click-through rates.',
+  fix: 'Implement breadcrumb navigation on all inner pages. Add BreadcrumbList schema markup. Test with Google\'s Rich Results Test.'
+}, {
+  keys: ['mega menu', 'dropdown touch', 'dropdown mobile', 'touch menu'],
+  why: 'Dropdown and mega menus designed for hover interactions fail on touchscreen devices.',
+  biz: 'Mobile users unable to access dropdown navigation abandon the site, reducing conversion on mobile.',
+  fix: 'Replace hover-triggered dropdowns with tap-activated menus. Test all dropdown interactions on real touch devices.'
+}, {
+  keys: ['focus indicator', 'focus visible', 'keyboard focus', 'focus style'],
+  why: 'Visible focus indicators are required for keyboard-only and assistive technology users.',
+  biz: 'Missing focus styles fail WCAG 2.1 AA compliance and can create legal accessibility exposure.',
+  fix: 'Ensure all interactive elements have a visible :focus style. Do not use outline: none without an alternative. Test by navigating the site using only the keyboard.'
+}, {
+  keys: ['content priority mobile', 'mobile content order', 'content preserved mobile'],
+  why: 'Content order on mobile should match user priorities — key information should not be buried below the fold.',
+  biz: 'Mobile users who cannot quickly see the value proposition bounce before converting.',
+  fix: 'Review the mobile layout for each key page. Ensure headline, value proposition, and primary CTA are visible above the fold on a 375px screen.'
+}, {
+  keys: ['mobile checkout', 'mobile conversion flow', 'checkout mobile', 'mobile form'],
+  why: 'Mobile checkout flows have higher abandonment rates than desktop due to friction in forms and payment.',
+  biz: 'A poor mobile checkout directly reduces revenue — mobile accounts for over 50% of ecommerce transactions.',
+  fix: 'Test the full checkout flow on a real mobile device. Simplify form fields, enable autofill, and minimise the number of steps to purchase.'
+}, {
+  keys: ['apple pay', 'google pay', 'mobile payment', 'digital wallet'],
+  why: 'Mobile payment options eliminate the friction of entering card details on small screens.',
+  biz: 'Sites without Apple Pay or Google Pay have higher mobile checkout abandonment than competitors who offer them.',
+  fix: 'Implement Apple Pay and Google Pay via your payment provider (Stripe, Braintree, etc.). Ensure they appear on the payment step of checkout.'
+}, {
+  keys: ['heatmap', 'session recording', 'session replay', 'user recording'],
+  why: 'Heatmaps and session recordings reveal where users click, scroll, and drop off — data that analytics alone cannot provide.',
+  biz: 'Without behavioural data, CRO decisions are based on assumptions rather than evidence.',
+  fix: 'Install a session recording tool (Hotjar, Microsoft Clarity — free tier available). Set up heatmaps on key conversion pages and review recordings weekly.'
+}, {
+  keys: ['value prop', 'value proposition', '5 seconds', 'hero communicates', 'hero section'],
+  why: 'Visitors decide within 5 seconds whether a page is relevant. A weak hero fails this test.',
+  biz: 'A hero section that does not communicate the value proposition increases bounce rates and reduces conversions.',
+  fix: 'Test the hero with a 5-second usability test. Ensure the headline clearly states what the site offers, who it is for, and why it matters — without requiring scrolling.'
+}, {
+  keys: ['exit intent', 'exit popup', 'exit strategy', 'abandonment popup'],
+  why: 'Exit intent popups capture visitors who are about to leave, offering a last conversion opportunity.',
+  biz: 'Without an exit strategy, 70-90% of visitors who intend to leave will not return.',
+  fix: 'Implement an exit intent popup with a compelling offer (discount, lead magnet, or content offer). Test timing and messaging. Tools: Privy, OptinMonster, Klaviyo.'
 }];
 function getImpactAndFix(itemText, howTo) {
   const combined = (itemText + ' ' + (howTo || '')).toLowerCase();
@@ -31267,7 +31453,9 @@ function generateReportCopy(score, results) {
   score.categories.forEach(cat => {
     const fn = SECTION_INSIGHTS[cat.id];
     if (cat.evaluated === 0) {
-      sectionInsights[cat.id] = `${cat.label} was not evaluated in this audit and should be assessed in a follow-up.`;
+      sectionInsights[cat.id] = cat.allNA
+        ? `${cat.label} — all items marked Not Applicable. This category does not apply to this site's configuration.`
+        : `${cat.label} was not evaluated in this audit and should be assessed in a follow-up.`;
     } else {
       const base = fn ? fn(cat.score) : `${cat.label} has areas for improvement that merit further review.`;
       const cov = catCovLevel(cat.evaluated, cat.total);
@@ -31351,6 +31539,8 @@ function downloadPDF(config, auditUrl, score, results) {
   const agencyEmail = config.agencyEmail || '';
   const agencyWebsite = config.agencyWebsite || '';
   const agencyTitle = config.agencyTitle || '';
+  const agencyName = (config.agencyName || '').trim() || 'Your Agency';
+  const agencyNameShort = agencyName.length > 40 ? agencyName.slice(0, 38) + '..' : agencyName;
   let y = 0;
   const copy = generateReportCopy(score, results);
 
@@ -31500,7 +31690,7 @@ function downloadPDF(config, auditUrl, score, results) {
   doc.setFontSize(8.5);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(25, 30, 48);
-  doc.text(st(config.agencyName), agLogoEndX, hBarH + 11);
+  doc.text(st(agencyNameShort), agLogoEndX, hBarH + 11);
 
   // Agency contact (title / website / email — one compact line)
   const contactParts = [agencyTitle, agencyWebsite, agencyEmail].filter(Boolean);
@@ -31758,7 +31948,9 @@ function downloadPDF(config, auditUrl, score, results) {
 
     // Confidence label & colour
     let confLabel, confRgb;
-    if (noData) {
+    if (noData && cat.allNA) {
+      confLabel = 'Not applicable'; confRgb = [140, 150, 175];
+    } else if (noData) {
       confLabel = 'Not evaluated'; confRgb = [180, 185, 205];
     } else if (catCov.isLow) {
       confLabel = 'Low confidence'; confRgb = [190, 130, 20];
@@ -32138,7 +32330,7 @@ function downloadPDF(config, auditUrl, score, results) {
             if (cov2.isMed) return `${cov2.scoreLabel}: ${catScore.score}/100  Grade ${catScore.grade}  ·  ${catScore.evaluated}/${catScore.total} reviewed  ·  Medium confidence`;
             return `${cov2.scoreLabel}: ${catScore.score}/100  Grade ${catScore.grade}  ·  ${catScore.evaluated}/${catScore.total} reviewed  ·  High confidence`;
           })()
-        : 'Not evaluated — complete this section to unlock the score';
+        : catScore?.allNA ? 'Not applicable — all items marked N/A for this site' : 'Not evaluated — complete this section to unlock the score';
       doc.setFontSize(6);
       doc.setFont('helvetica', cov.isLow ? 'bold' : 'normal');
       doc.setTextColor(...onCatDark);
@@ -32393,7 +32585,7 @@ function downloadPDF(config, auditUrl, score, results) {
   doc.setFontSize(8);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(...brandRgb);
-  doc.text(`Questions? ${config.agencyName} is here to help.`, M + 5, y + 7);
+  doc.text(`Questions? ${agencyNameShort} is here to help.`, M + 5, y + 7);
   if (agencyEmail || agencyWebsite) {
     doc.setFontSize(7);
     doc.setFont('helvetica', 'normal');
@@ -32448,7 +32640,7 @@ function downloadPDF(config, auditUrl, score, results) {
   doc.setFontSize(10);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(20, 25, 45);
-  doc.text(st(config.agencyName), M + 6, lcy);
+  doc.text(st(agencyNameShort), M + 6, lcy);
   lcy += 6;
   if (agencyTitle) {
     doc.setFontSize(7.5);
@@ -32547,7 +32739,7 @@ function downloadPDF(config, auditUrl, score, results) {
 
   drawFooter();
   const safeClient = (clientName || auditUrl).replace(/https?:\/\//, '').replace(/[^a-zA-Z0-9.-]/g, '_');
-  doc.save(`${config.agencyName.replace(/\s+/g, '_')}_Audit_${safeClient}.pdf`);
+  doc.save(`${agencyName.replace(/\s+/g, '_').replace(/[^a-zA-Z0-9_-]/g, '')}_Audit_${safeClient}.pdf`);
 }
 
 // ─── CONSTANTS ────────────────────────────────────────────────────────────────
@@ -32685,8 +32877,9 @@ function Sidebar({
     label: 'New Audit'
   }, {
     id: 'whitelabel',
-    icon: '◈',
-    label: 'White Label'
+    icon: '🏷️',
+    label: 'White Label PDF',
+    badge: 'Export'
   }];
   if (isMobile) {
     return /*#__PURE__*/React.createElement("header", {
@@ -32719,10 +32912,10 @@ function Sidebar({
         border: 'none',
         cursor: 'pointer',
         background: page === n.id ? `${C.accent}18` : 'transparent',
-        color: page === n.id ? C.accent : C.muted
+        color: page === n.id ? C.accent : n.badge ? C.accent : C.muted
       }
     }, /*#__PURE__*/React.createElement("span", { style: { fontSize: 16 } }, n.icon),
-    /*#__PURE__*/React.createElement("span", { style: { fontSize: 9, fontWeight: page === n.id ? 600 : 400 } }, n.label)))),
+    /*#__PURE__*/React.createElement("span", { style: { fontSize: 9, fontWeight: page === n.id || n.badge ? 600 : 400 } }, n.label)))),
     /*#__PURE__*/React.createElement("button", {
       onClick: onToggleTheme,
       style: {
@@ -32784,12 +32977,12 @@ function Sidebar({
       gap: 10,
       padding: '10px 12px',
       borderRadius: 8,
-      border: 'none',
+      border: n.badge && page !== n.id ? `1px solid ${C.accent}33` : 'none',
       cursor: 'pointer',
       marginBottom: 2,
       width: '100%',
-      background: page === n.id ? `${C.accent}18` : 'transparent',
-      color: page === n.id ? C.accent : C.muted
+      background: page === n.id ? `${C.accent}18` : n.badge ? `${C.accent}08` : 'transparent',
+      color: page === n.id ? C.accent : n.badge ? C.accent : C.muted
     }
   }, /*#__PURE__*/React.createElement("span", {
     style: {
@@ -32800,9 +32993,22 @@ function Sidebar({
   }, n.icon), /*#__PURE__*/React.createElement("span", {
     style: {
       fontSize: 13,
-      fontWeight: page === n.id ? 600 : 400
+      fontWeight: page === n.id || n.badge ? 600 : 400,
+      flex: 1,
+      textAlign: 'left'
     }
-  }, n.label))), /*#__PURE__*/React.createElement("div", {
+  }, n.label), n.badge && page !== n.id && /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 9,
+      fontWeight: 700,
+      background: C.accent,
+      color: '#fff',
+      padding: '2px 6px',
+      borderRadius: 10,
+      textTransform: 'uppercase',
+      letterSpacing: '0.04em'
+    }
+  }, n.badge))), /*#__PURE__*/React.createElement("div", {
     style: {
       borderTop: `1px solid ${C.border}`,
       margin: '10px 0'
@@ -33044,8 +33250,12 @@ function CategoryDetail({
 }) {
   const cat = AUDIT_CATEGORIES.find(c => c.id === catId);
   const [filter, setFilter] = useState('all');
+  const [focusMode, setFocusMode] = useState('all');
   const allItems = cat.sections.flatMap(s => s.items);
-  const filtered = filter === 'all' ? allItems : allItems.filter(i => (results[i.id] ?? 'none') === filter);
+  const priorityFiltered = focusMode === 'critical' ? allItems.filter(i => i.priority === 'Critical')
+    : focusMode === 'core' ? allItems.filter(i => i.priority === 'Critical' || i.priority === 'High')
+    : allItems;
+  const filtered = filter === 'all' ? priorityFiltered : priorityFiltered.filter(i => (results[i.id] ?? 'none') === filter);
   const counts = {
     Pass: allItems.filter(i => results[i.id] === 'Pass').length,
     Partial: allItems.filter(i => results[i.id] === 'Partial').length,
@@ -33115,25 +33325,54 @@ function CategoryDetail({
       gap: 8,
       flexWrap: 'wrap'
     }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: { display: 'flex', gap: 6, flexWrap: 'wrap', marginBottom: 8 }
   }, [{
     key: 'all',
-    label: `All (${allItems.length})`,
+    label: '🔍 All Items',
+    color: C.muted
+  }, {
+    key: 'core',
+    label: '⚡ Core (Critical + High)',
+    color: C.amber
+  }, {
+    key: 'critical',
+    label: '🔥 Quick Start (Critical only)',
+    color: C.red
+  }].map(f => /*#__PURE__*/React.createElement("button", {
+    key: f.key,
+    onClick: () => setFocusMode(f.key),
+    style: {
+      padding: '5px 12px',
+      borderRadius: 20,
+      fontSize: 11,
+      fontWeight: 600,
+      cursor: 'pointer',
+      border: `1px solid ${focusMode === f.key ? f.color : C.border}`,
+      background: focusMode === f.key ? `${f.color}22` : 'transparent',
+      color: focusMode === f.key ? f.color : C.muted
+    }
+  }, f.label))), /*#__PURE__*/React.createElement("div", {
+    style: { display: 'flex', gap: 6, flexWrap: 'wrap' }
+  }, [{
+    key: 'all',
+    label: `All (${priorityFiltered.length})`,
     color: C.accent
   }, {
     key: 'Fail',
-    label: `Fail (${counts.Fail})`,
+    label: `Fail (${priorityFiltered.filter(i => results[i.id] === 'Fail').length})`,
     color: C.red
   }, {
     key: 'Partial',
-    label: `Partial (${counts.Partial})`,
+    label: `Partial (${priorityFiltered.filter(i => results[i.id] === 'Partial').length})`,
     color: C.amber
   }, {
     key: 'Pass',
-    label: `Pass (${counts.Pass})`,
+    label: `Pass (${priorityFiltered.filter(i => results[i.id] === 'Pass').length})`,
     color: C.green
   }, {
     key: 'N/A',
-    label: `N/A (${counts['N/A']})`,
+    label: `N/A (${priorityFiltered.filter(i => results[i.id] === 'N/A').length})`,
     color: C.muted
   }].map(f => /*#__PURE__*/React.createElement("button", {
     key: f.key,
@@ -33148,7 +33387,7 @@ function CategoryDetail({
       background: filter === f.key ? `${f.color}22` : 'transparent',
       color: filter === f.key ? f.color : C.muted
     }
-  }, f.label))), /*#__PURE__*/React.createElement("div", {
+  }, f.label)))), /*#__PURE__*/React.createElement("div", {
     style: {
       padding: '16px 28px'
     }
@@ -33259,7 +33498,9 @@ function DashboardView({
   const completionPct = score?.completionPct ?? 0;
   const confidence = score?.confidence ?? 'Low';
   const naCount = Object.values(results).filter(v => v === 'N/A').length;
-  const onlyNA = totalEval === 0 && naCount > 0;
+  const totalItems = Object.keys(results).length;
+  const onlyNA = totalEval === 0 && naCount > 0 && naCount < totalItems;
+  const allNA = totalEval === 0 && naCount > 0 && naCount === totalItems;
   const nothingDone = totalEval === 0 && naCount === 0;
   const justStarted = totalEval > 0 && totalEval <= 2;
   const firstIsFail = totalEval === 1 && Object.values(results).find(v => v !== 'N/A') === 'Fail';
@@ -33270,8 +33511,11 @@ function DashboardView({
   const smartMsg = nothingDone ? {
     text: "Start your audit to unlock your site's performance score.",
     icon: '🚀'
+  } : allNA ? {
+    text: 'All items marked Not Applicable. Mark some items as Pass, Partial, or Fail to generate a score.',
+    icon: '💡'
   } : onlyNA ? {
-    text: 'No applicable checkpoints reviewed yet. Try marking some items.',
+    text: 'Some items marked N/A. Continue reviewing the remaining applicable checks.',
     icon: '💡'
   } : firstIsFail ? {
     text: "Good start — you've found your first issue. Keep going!",
@@ -33378,7 +33622,7 @@ function DashboardView({
     }
   }, showHelp ? "Hide help" : "How this toolkit works"), showHelp && /*#__PURE__*/React.createElement("div", {
     style: {
-      maxWidth: 360,
+      maxWidth: 400,
       background: C.surface,
       border: `1px solid ${C.border}`,
       borderRadius: 10,
@@ -33390,7 +33634,20 @@ function DashboardView({
     }
   }, /*#__PURE__*/React.createElement("ol", {
     style: { paddingLeft: 18, margin: 0 }
-  }, /*#__PURE__*/React.createElement("li", null, "Click ", /*#__PURE__*/React.createElement("strong", null, "New Audit"), " \u2192 enter the website URL"), /*#__PURE__*/React.createElement("li", null, "Work through 211 checkpoints \u2014 mark Pass / Partial / Fail / N/A"), /*#__PURE__*/React.createElement("li", null, "Click ", /*#__PURE__*/React.createElement("strong", null, "Complete Audit"), " to save results to your dashboard"), /*#__PURE__*/React.createElement("li", null, "Go to ", /*#__PURE__*/React.createElement("strong", null, "White Label"), " \u2192 add your agency name & logo"), /*#__PURE__*/React.createElement("li", null, "Click ", /*#__PURE__*/React.createElement("strong", null, "Export PDF"), " to download a branded client report"))));
+  }, /*#__PURE__*/React.createElement("li", null, "Click ", /*#__PURE__*/React.createElement("strong", null, "New Audit"), " \u2192 enter the website URL"), /*#__PURE__*/React.createElement("li", null, "Work through 211 checkpoints \u2014 mark Pass / Partial / Fail / N/A"), /*#__PURE__*/React.createElement("li", null, "Click ", /*#__PURE__*/React.createElement("strong", null, "Complete Audit"), " to save results to your dashboard"), /*#__PURE__*/React.createElement("li", null, "Use the ", /*#__PURE__*/React.createElement("strong", null, "\ud83d\udd25 Quick Start"), " filter in any category to focus on Critical items first")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 12,
+      padding: '10px 14px',
+      background: `${C.accent}15`,
+      border: `1px solid ${C.accent}44`,
+      borderRadius: 8,
+      fontSize: 12,
+      color: C.text,
+      lineHeight: 1.7
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: { fontWeight: 700, fontSize: 12, marginBottom: 4, color: C.accent }
+  }, "\ud83c\udff7\ufe0f White Label PDF Export"), "Go to ", /*#__PURE__*/React.createElement("strong", null, "White Label"), " in the sidebar to add your agency name, logo, brand color, and contact info. Every exported PDF will carry your brand \u2014 perfect for sending to clients.")));
   return /*#__PURE__*/React.createElement("div", {
     style: {
       padding: '28px 36px',
@@ -34739,20 +34996,34 @@ function WhiteLabelView({
       flex: 1,
       overflowY: 'auto'
     }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: { display: 'flex', alignItems: 'center', gap: 12, marginBottom: 6 }
   }, /*#__PURE__*/React.createElement("h1", {
     style: {
       fontSize: 26,
       fontWeight: 800,
       color: C.text,
-      marginBottom: 8
+      margin: 0
     }
-  }, "White Label"), /*#__PURE__*/React.createElement("p", {
+  }, "🏷️ White Label PDF Export"), /*#__PURE__*/React.createElement("span", {
+    style: {
+      fontSize: 11,
+      fontWeight: 700,
+      background: C.accent,
+      color: '#fff',
+      padding: '3px 10px',
+      borderRadius: 12,
+      textTransform: 'uppercase',
+      letterSpacing: '0.06em'
+    }
+  }, "Pro Feature")), /*#__PURE__*/React.createElement("p", {
     style: {
       color: C.muted,
       fontSize: 13,
-      marginBottom: 28
+      marginBottom: 28,
+      maxWidth: 520
     }
-  }, "Customize branding on client-facing PDF reports."), /*#__PURE__*/React.createElement("div", {
+  }, "Add your agency name, logo, brand color, and contact info. Every exported PDF report will carry your brand — ready to send directly to clients."), /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'grid',
       gridTemplateColumns: isMobile ? '1fr' : '320px 1fr',
@@ -35352,7 +35623,28 @@ function WhiteLabelView({
     }, "\u2715 Delete")));
   })), /*#__PURE__*/React.createElement("div", {
     style: {
-      marginTop: 28,
+      marginTop: 24,
+      border: `1px solid ${C.accent}33`,
+      borderRadius: 10,
+      padding: '16px 20px',
+      background: `${C.accent}06`
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      fontSize: 11,
+      fontWeight: 700,
+      color: C.accent,
+      textTransform: 'uppercase',
+      letterSpacing: '0.08em',
+      marginBottom: 12
+    }
+  }, "\uD83D\uDCD6 Quick Start Guide"), /*#__PURE__*/React.createElement("ol", {
+    style: { paddingLeft: 18, margin: 0, fontSize: 12, color: C.muted, lineHeight: 2 }
+  }, /*#__PURE__*/React.createElement("li", null, /*#__PURE__*/React.createElement("strong", null, "New Audit"), " \u2014 enter the client's website URL and start a new audit session"), /*#__PURE__*/React.createElement("li", null, "Work through checkpoints in each category \u2014 mark ", /*#__PURE__*/React.createElement("strong", null, "Pass / Partial / Fail / N/A"), " for each item"), /*#__PURE__*/React.createElement("li", null, "Use ", /*#__PURE__*/React.createElement("strong", null, "\uD83D\uDD25 Quick Start filter"), " to focus on Critical priority items first \u2014 ideal for a first pass"), /*#__PURE__*/React.createElement("li", null, /*#__PURE__*/React.createElement("strong", null, "Complete Audit"), " \u2014 saves results to your dashboard. Scores update automatically"), /*#__PURE__*/React.createElement("li", null, "Come here (\uD83C\uDFF7\uFE0F ", /*#__PURE__*/React.createElement("strong", null, "White Label"), ") \u2014 set your agency name, logo, and brand color"), /*#__PURE__*/React.createElement("li", null, /*#__PURE__*/React.createElement("strong", null, "Export PDF"), " \u2014 generates a fully branded report ready to share with your client")), /*#__PURE__*/React.createElement("div", {
+    style: { marginTop: 12, fontSize: 11, color: C.muted, lineHeight: 1.7 }
+  }, "\uD83D\uDCA1 Tip: Use ", /*#__PURE__*/React.createElement("strong", null, "N/A"), " for checks that genuinely don't apply to this site \u2014 they are excluded from the score, keeping results accurate.")), /*#__PURE__*/React.createElement("div", {
+    style: {
+      marginTop: 16,
       border: `1px solid ${C.border}`,
       borderRadius: 10,
       padding: '16px 20px'
@@ -35368,7 +35660,7 @@ function WhiteLabelView({
     }
   }, "\uD83D\uDCBE Data & Backup"), /*#__PURE__*/React.createElement("div", {
     style: { fontSize: 12, color: C.muted, marginBottom: 14, lineHeight: 1.6 }
-  }, "Export all audits to a JSON file. Import to restore on another device or after clearing data."), /*#__PURE__*/React.createElement("div", {
+  }, "Export all audits to a JSON file. Import to restore on another device or after clearing data or switching browser."), /*#__PURE__*/React.createElement("div", {
     style: { display: 'flex', gap: 10, flexWrap: 'wrap' }
   }, /*#__PURE__*/React.createElement("button", {
     onClick: onExport,
@@ -35461,9 +35753,20 @@ function loadAudits() {
   return [];
 }
 function saveAudits(audits) {
-  try {
-    localStorage.setItem('auditpro_audits', JSON.stringify(audits.slice(0, 20)));
-  } catch {}
+  const attempts = [audits.slice(0, 20), audits.slice(0, 10), audits.slice(0, 5), audits.slice(0, 1)];
+  for (const batch of attempts) {
+    try {
+      localStorage.setItem('auditpro_audits', JSON.stringify(batch));
+      return;
+    } catch (e) {
+      if (e.name !== 'QuotaExceededError' && e.name !== 'NS_ERROR_DOM_QUOTA_REACHED') throw e;
+    }
+  }
+  // All attempts failed — storage is full, notify once per session
+  if (!window._auditproQuotaWarned) {
+    window._auditproQuotaWarned = true;
+    setTimeout(() => alert('Storage is full — your audit data could not be saved. Use Settings > Export Backup to save your data, then clear browser storage.'), 100);
+  }
 }
 
 function generateDemoResults() {
