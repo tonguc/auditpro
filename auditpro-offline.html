@@ -32417,7 +32417,6 @@ function downloadPDF(config, auditUrl, score, results) {
   y += cardH + 8;
 
   // ── About This Audit — styled info box ────────────────────────────────────
-  const totalItems2 = score.categories.reduce((s, c) => s + c.total, 0);
   const aboutText = st(`This UX + SEO audit was conducted for ${auditUrl} on ${dateShort}. It covers ${totalItems2} checkpoints across Technical SEO, On-Page Content, UX Heuristics, Conversion & CTA, and AI Visibility. Some checks require verification with external tools (Google Search Console, PageSpeed Insights, Screaming Frog, etc.). This report is a professional client deliverable — review it in the context of the site's specific goals.`);
   doc.setFontSize(7.5);
   doc.setFont('helvetica', 'normal');
