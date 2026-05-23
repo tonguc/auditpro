@@ -31835,14 +31835,16 @@ function downloadPDF(config, auditUrl, score, results) {
   y += 10;
   if (copy) {
     // Performance interpretation — italic one-liner above the box
-    const interpLines = doc.splitTextToSize(copy.performanceInterpretation, W - 2 * M);
     doc.setFontSize(7);
     doc.setFont('helvetica', 'italic');
+    const interpLines = doc.splitTextToSize(copy.performanceInterpretation, W - 2 * M);
     doc.setTextColor(110, 115, 135);
     doc.text(interpLines, M, y);
     y += interpLines.length * 3.8 + 3;
 
     // Executive Summary box — paragraphs separated by \n\n
+    doc.setFontSize(7.5);
+    doc.setFont('helvetica', 'normal');
     const execParas = st(copy.executiveSummary).split('\n\n');
     const execAllLines = [];
     execParas.forEach((para, pi) => {
@@ -31868,9 +31870,9 @@ function downloadPDF(config, auditUrl, score, results) {
     y += execH + 4;
 
     // Confidence text
-    const confLines = doc.splitTextToSize(st(copy.confidenceText), W - 2 * M);
     doc.setFontSize(6.5);
     doc.setFont('helvetica', 'italic');
+    const confLines = doc.splitTextToSize(st(copy.confidenceText), W - 2 * M);
     doc.setTextColor(145, 150, 168);
     doc.text(confLines, M, y);
     y += confLines.length * 3.8 + 3;
@@ -31987,87 +31989,112 @@ function downloadPDF(config, auditUrl, score, results) {
     doc.setFontSize(6);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(155, 160, 178);
-    doc.text(`${enrichedIssues.length} issue${enrichedIssues.length > 1 ? 's' : ''}  ·  ranked by impact`, W - M, y, {
-      align: 'right'
-    });
-    y += 5;
-    doc.setFontSize(7);
-    doc.setFont('helvetica', 'italic');
-    doc.setTextColor(110, 115, 135);
-    doc.text('These issues are ranked by impact and represent the fastest path to improving performance.', M, y, {
-      maxWidth: W - 2 * M
-    });
-    y += 5;
-    doc.setDrawColor(215, 218, 228);
+    doc.text(`${enrichedIssues.length} issue${enrichedIssues.length > 1 ? 's' : ''}  ·  ranked by impact`, W - M, y, { align: 'right' });
+    y += 6;
+
+    // Column header row
+    doc.setFontSize(5.5);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(155, 160, 178);
+    doc.text('PRIORITY', M + 4, y);
+    doc.text('ISSUE  ·  WHY IT MATTERS  ·  ACTION', M + 30, y);
+    y += 3;
+    doc.setDrawColor(210, 215, 228);
     doc.setLineWidth(0.2);
     doc.line(M, y, W - M, y);
-    y += 3;
+    y += 0.5;
+
+    const txtW = W - 2 * M - 32; // text width after badge column
     enrichedIssues.slice(0, 6).forEach((item, i) => {
-      const tw = W - 2 * M - 6;
-      // Pre-measure all text to compute dynamic row height
-      doc.setFontSize(8);
+      const bCol = item.priority === 'Critical' ? [214, 45,  60]
+                 : item.priority === 'High'     ? [205, 112,  0]
+                 : item.priority === 'Medium'   ? [ 12, 145, 210]
+                 :                               [ 14, 172, 118];
+
+      // Pre-measure lines for dynamic row height
+      doc.setFontSize(7.5);
       doc.setFont('helvetica', 'bold');
-      const titleLines = doc.splitTextToSize(st(item.item), tw).slice(0, 2);
+      const titleLines = doc.splitTextToSize(st(item.item), txtW);
+
       doc.setFontSize(6.5);
       doc.setFont('helvetica', 'normal');
-      const impLines = doc.splitTextToSize(`Why it matters: ${st(item.impact)}`, tw).slice(0, 2);
-      const bizLines = item.businessImpact ? doc.splitTextToSize(`Business impact: ${st(item.businessImpact)}`, tw).slice(0, 1) : [];
-      const fixLines = doc.splitTextToSize(`Action: ${st(item.fix)}`, tw).slice(0, 2);
-      // rowH = badge area (9) + title + gap (2) + impact + biz + fix + bottom pad (3)
-      const rowH = 9 + titleLines.length * 4.5 + 2 + impLines.length * 4 + (bizLines.length ? 4 : 0) + fixLines.length * 4 + 3;
-      checkPageBreak(rowH + 2);
-      // Her satıra arka plan — tek düze görünüm için her zaman çizilir
-      doc.setFillColor(247, 248, 252);
+      const impLines = doc.splitTextToSize(st(item.impact), txtW);
+      const fixLines = doc.splitTextToSize(st(item.fix), txtW);
+
+      const rowH = 4 + titleLines.length * 4.6 + 2 + impLines.length * 4 + 2 + fixLines.length * 4 + 3;
+      checkPageBreak(rowH + 1);
+
+      // Row background — alternating
+      const rowBg = i % 2 === 0 ? [249, 250, 253] : [255, 255, 255];
+      doc.setFillColor(...rowBg);
       doc.rect(M, y, W - 2 * M, rowH, 'F');
-      // Priority badge — başlık hizasında, sol ve üstten eşit boşlukla
-      const bCol = item.priority === 'Critical' ? [214, 45, 60] : item.priority === 'High' ? [205, 112, 0] : item.priority === 'Medium' ? [12, 145, 210] : [14, 172, 118];
+
+      // Left priority colour bar (3mm)
       doc.setFillColor(...bCol);
-      doc.roundedRect(M + 2, y + 3, 18, 5, 1, 1, 'F');
+      doc.rect(M, y, 3, rowH, 'F');
+
+      // Priority badge (pill) — left column
+      const badgeY = y + 4;
+      doc.setFillColor(...bCol);
+      doc.roundedRect(M + 5, badgeY, 20, 5.5, 1.5, 1.5, 'F');
       doc.setFontSize(5.5);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(255, 255, 255);
-      doc.text(item.priority.toUpperCase(), M + 11, y + 6.1, {
-        align: 'center'
-      });
-      // Category tag
-      const shortCat = item.catLabel.replace('Technical SEO', 'Tech SEO').replace('On-Page & Content', 'On-Page').replace('UX Heuristics', 'UX').replace('Conversion & CTA', 'CRO').replace('AI & SERP Visibility', 'AI/SERP');
+      doc.text(item.priority.toUpperCase(), M + 15, badgeY + 3.7, { align: 'center' });
+
+      // Category tag — below badge
+      const shortCat = item.catLabel
+        .replace('Technical SEO',     'Tech SEO')
+        .replace('On-Page & Content', 'On-Page')
+        .replace('UX Heuristics',     'UX')
+        .replace('Conversion & CTA',  'CRO')
+        .replace('AI & SERP Visibility', 'AI/SERP');
       doc.setFontSize(5.5);
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(...item.catRgb);
-      doc.text(shortCat, M + 23, y + 6.1);
-      // Content starts below badge area
-      let ry = y + 11;
-      // Title (up to 2 lines)
-      doc.setFontSize(8);
+      doc.text(shortCat, M + 15, badgeY + 9, { align: 'center' });
+
+      // Right column — title, impact, action
+      let ry = y + 4;
+      // Title
+      doc.setFontSize(7.5);
       doc.setFont('helvetica', 'bold');
-      doc.setTextColor(22, 28, 48);
-      doc.text(titleLines, M + 2, ry);
-      ry += titleLines.length * 4.5 + 2;
-      // Why it matters (up to 2 lines)
+      doc.setTextColor(20, 25, 45);
+      doc.text(titleLines, M + 30, ry);
+      ry += titleLines.length * 4.6 + 2;
+
+      // Why it matters — inline label + text
       doc.setFontSize(6.5);
       doc.setFont('helvetica', 'normal');
-      doc.setTextColor(80, 85, 105);
-      doc.text(impLines, M + 2, ry);
-      ry += impLines.length * 4 + 0.5;
-      // Business impact (1 line, italic)
-      if (bizLines.length) {
-        doc.setFont('helvetica', 'italic');
-        doc.setTextColor(100, 110, 135);
-        doc.text(bizLines, M + 2, ry);
-        ry += 4;
-      }
-      // Action (up to 2 lines)
+      doc.setTextColor(90, 95, 115);
+      doc.text(impLines, M + 30, ry);
+      ry += impLines.length * 4 + 2;
+
+      // Action — arrow indicator + text
+      doc.setFontSize(6.5);
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(...brandRgb);
+      doc.text('→', M + 30, ry);
       doc.setFont('helvetica', 'normal');
-      doc.setTextColor(95, 108, 138);
-      doc.text(fixLines, M + 2, ry);
+      doc.setTextColor(50, 90, 150);
+      doc.text(fixLines, M + 35, ry);
+
       y += rowH;
+
+      // Thin divider
+      doc.setDrawColor(225, 228, 238);
+      doc.setLineWidth(0.15);
+      doc.line(M, y, W - M, y);
     });
+
     if (enrichedIssues.length > 6) {
       doc.setFontSize(6.5);
       doc.setFont('helvetica', 'italic');
       doc.setTextColor(158, 163, 180);
-      doc.text(`+ ${enrichedIssues.length - 6} more issues in the sections below.`, M + 2, y + 4);
+      doc.text(`+ ${enrichedIssues.length - 6} more issues in the sections below.`, M + 4, y + 4);
       y += 7;
+    } else {
+      y += 2;
     }
   }
   drawFooter();
@@ -32126,14 +32153,15 @@ function downloadPDF(config, auditUrl, score, results) {
     // Section insight from rule engine
     if (copy && copy.sectionInsights[cat.id]) {
       const insightTxt = st(copy.sectionInsights[cat.id]);
-      const iLines = doc.splitTextToSize(insightTxt, W - 2 * M - 16);
-      const iH = Math.max(10, 5 + iLines.length * 4);
+      // Font must be set BEFORE splitTextToSize so line widths are measured correctly
+      doc.setFontSize(7);
+      doc.setFont('helvetica', 'italic');
+      const iLines = doc.splitTextToSize(insightTxt, W - 2 * M - 14);
+      const iH = Math.max(10, 5 + iLines.length * 4.2);
       doc.setFillColor(...lighten(catColor, 0.92));
       doc.rect(M, y, W - 2 * M, iH, 'F');
       doc.setFillColor(...catColor);
       doc.rect(M, y, 2, iH, 'F');
-      doc.setFontSize(7);
-      doc.setFont('helvetica', 'italic');
       doc.setTextColor(55, 60, 80);
       doc.text(iLines, M + 5, y + 4.5 + (iLines.length > 1 ? 0 : 1));
       y += iH + 4;
@@ -32146,9 +32174,9 @@ function downloadPDF(config, auditUrl, score, results) {
       const introParas = introTxt.split('\n\n');
       introParas.forEach(para => {
         checkPageBreak(14);
-        const pLines = doc.splitTextToSize(para, W - 2 * M);
         doc.setFontSize(7.5);
         doc.setFont('helvetica', 'normal');
+        const pLines = doc.splitTextToSize(para, W - 2 * M);
         doc.setTextColor(55, 60, 80);
         doc.text(pLines, M, y);
         y += pLines.length * 4 + 3;
