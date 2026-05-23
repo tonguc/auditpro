@@ -30754,7 +30754,7 @@ const SECTION_INSIGHTS = {
   onpage: s => s >= 80 ? 'On-Page SEO is well-optimised. Content is clearly structured, keyword-aligned, and formatted to drive both rankings and click-through rates.' : s >= 60 ? 'On-Page weaknesses in meta data, headings, and content structure are reducing keyword relevance and click-through rates in search results.' : 'On-Page issues are directly limiting organic traffic. Weak or missing titles, descriptions, and headings reduce how often and how prominently the site appears in search.',
   ux: s => s >= 80 ? 'User experience is strong. The site is accessible, easy to navigate, and structured to support engagement and task completion.' : s >= 60 ? 'UX gaps are creating friction that frustrates visitors, increases bounce rates, and reduces engagement and conversion potential.' : 'User experience problems are causing significant visitor drop-off. People are struggling to navigate, find information, or trust the site — which directly reduces conversions.',
   cro: s => s >= 80 ? 'Conversion optimisation is solid. Clear CTAs, trust signals, and a smooth user journey are supporting strong conversion rates.' : s >= 60 ? 'Conversion gaps are preventing visitors from taking action. Unclear calls-to-action and missing trust signals are reducing enquiries, sign-ups, and sales.' : 'Conversion rate performance is weak. The site is losing potential customers at key decision points — due to absent CTAs, poor trust signals, and conversion friction.',
-  serp: s => s >= 80 ? 'AI Visibility is well-established. The brand has strong entity signals, structured content, and authorship cues that support citation across AI-driven search.' : s >= 60 ? 'AI Visibility has gaps. Some signals are in place, but the brand may be absent from AI-generated answers in key topic categories across ChatGPT, Perplexity, and Google AI.' : 'AI Visibility is weak. The site is poorly positioned for AI-driven search — including ChatGPT, Perplexity, and Google AI Overviews — which is rapidly becoming a primary discovery channel.'
+  serp: s => s >= 80 ? 'AI Visibility signals are well-established. The brand has strong entity signals, structured content, and authorship cues that support potential citation across AI-driven search experiences.' : s >= 60 ? 'AI Visibility signals have gaps. Some foundations are in place, but the brand may not appear in AI-generated responses for key topics across ChatGPT, Perplexity, and Google AI experiences.' : 'AI Visibility signals are weak. The site lacks the entity signals, structured content, and authorship cues that improve potential visibility in AI-assisted search experiences.'
 };
 const IMPACT_MAP = [
 // ── Technical SEO ──────────────────────────────────────────────────────────
@@ -31190,7 +31190,7 @@ const IMPACT_MAP = [
   keys: ['llms.txt', 'ai readable', 'ai-readable', 'llm readable'],
   why: 'AI-readable structure helps large language models understand key site information.',
   biz: 'Weak AI-readable structure reduces discoverability in emerging AI search channels.',
-  fix: 'Add llms.txt or create clear AI-readable content hubs with concise summaries and key links.'
+  fix: 'Where relevant, consider adding /llms.txt or other AI-readable content structures. Treat this as an emerging practice rather than a guaranteed ranking or citation factor.'
 }, {
   keys: ['ai brand answer', 'brand in ai', 'chatgpt answer', 'perplexity answer', 'gemini answer'],
   why: 'Appearing in AI-generated answers increases future discovery and brand trust.',
@@ -31473,7 +31473,7 @@ const ESTIMATED_IMPACT = {
   serp: 'Primary expected gain: stronger presence in AI-generated answers and modern search experiences.'
 };
 const AI_SERP_INTRO = score => {
-  const base = 'AI-driven search is becoming an important discovery layer across ChatGPT, Perplexity, Gemini, and Google AI experiences. This section evaluates whether the brand and content are structured in a way that can be understood, trusted, and cited by modern search and AI systems.';
+  const base = 'AI-assisted search experiences are becoming an important discovery layer. This section evaluates whether the brand and content are structured to be understood, trusted, and potentially cited by modern search and AI systems.';
   if (score < 50) return base + '\n\nThis is a growing opportunity area. Many competitors have not yet optimised for AI visibility, so improvements here can create a meaningful early advantage.';
   if (score < 75) return base + '\n\nSome AI visibility signals are already in place, but gaps remain in crawler access, entity clarity, content structure, or trust signals.';
   return base + '\n\nThe site has strong AI visibility foundations. Continue strengthening entity signals, original content, and authoritative references.';
@@ -32400,14 +32400,17 @@ function downloadPDF(config, auditUrl, score, results) {
       doc.setFontSize(6);
       doc.setFont('helvetica', cov.isLow ? 'bold' : 'normal');
       doc.setTextColor(...onCatDark);
-      doc.text(covLine, M, 22.5);
+      // For serp with zero evaluated, skip covLine — subtitle below will replace it
+      if (!(cat.id === 'serp' && catScore.evaluated === 0)) {
+        doc.text(covLine, M, 22.5);
+      }
     }
-    // AI Visibility subtitle (only if no coverage line needed or append after)
+    // AI Visibility subtitle — replaces covLine when section not yet started
     if (cat.id === 'serp' && catScore && catScore.evaluated === 0) {
       doc.setFontSize(6.5);
       doc.setFont('helvetica', 'italic');
       doc.setTextColor(...onCatMuted);
-      doc.text('Optimize your presence in ChatGPT, Perplexity, Gemini & next-gen search engines', M, 22.5);
+      doc.text('Assess readiness for ChatGPT, Perplexity, Gemini & next-generation search experiences', M, 22.5);
     }
     doc.setFillColor(...brandRgb);
     doc.rect(0, 26, W, 0.7, 'F');
@@ -32594,7 +32597,7 @@ function downloadPDF(config, auditUrl, score, results) {
   }, {
     num: '4',
     title: 'Strengthen AI Visibility and Trust Signals',
-    body: 'AI search engines (ChatGPT, Perplexity, Google AI Overviews) are becoming major traffic sources. Ensure your brand, authors, and content are optimised for this layer.',
+    body: 'AI-assisted search experiences are becoming an important discovery layer. Assess whether your brand, authors, and content are structured for potential visibility in this environment.',
     hot: false
   }, isLowCovPDF || isDirectCovPDF ? {
     num: '5',
