@@ -31708,85 +31708,125 @@ function downloadPDF(config, auditUrl, score, results) {
 
   // ── Section Scores ────────────────────────────────────────────────────────
   y += boxH + 10;
+  // Section heading
   doc.setFontSize(9);
   doc.setFont('helvetica', 'bold');
   doc.setTextColor(30, 35, 45);
   doc.text('Section Scores', M, y);
-  y += 6;
-  const catRowH = 12;
+  y += 5;
+
+  // Column layout (content width = W - 2*M = 180mm)
+  // [3 bar][7 gap][cat 60mm][coverage 48mm][sep][score 26mm][sep][confidence 29mm]
+  const colBarW  = 3;
+  const colCatX  = M + 10;      // category name start
+  const colBarX  = M + 76;      // coverage bar start
+  const colBarW2 = 34;          // coverage bar width
+  const colPctX  = colBarX + colBarW2 + 2; // pct label
+  const colSep1  = M + 120;     // first separator x
+  const colScX   = M + 133;     // score centre
+  const colSep2  = M + 148;     // second separator
+  const colConfX = M + 151;     // confidence label start
+
+  // Column header row
+  const hdrY = y;
+  doc.setFontSize(5.5);
+  doc.setFont('helvetica', 'bold');
+  doc.setTextColor(155, 160, 178);
+  doc.text('CATEGORY',       colCatX,  hdrY);
+  doc.text('COVERAGE',       colBarX,  hdrY);
+  doc.text('REVIEWED SCORE', colScX,   hdrY, { align: 'center' });
+  doc.text('CONFIDENCE',     colConfX, hdrY);
+  y += 4;
+
+  // Top border
+  doc.setDrawColor(210, 215, 228);
+  doc.setLineWidth(0.2);
+  doc.line(M, y, W - M, y);
+  y += 0.5;
+
+  const catRowH = 13;
   score.categories.forEach((cat, i) => {
     const catRgb = hexToRgb(cat.color);
-    const noData = cat.evaluated === 0;
+    const noData  = cat.evaluated === 0;
+    const catCov  = catCovLevel(cat.evaluated, cat.total);
+    const covPct  = cat.total > 0 ? cat.evaluated / cat.total : 0;
+
+    // Confidence label & colour
+    let confLabel, confRgb;
+    if (noData) {
+      confLabel = 'Not evaluated'; confRgb = [180, 185, 205];
+    } else if (catCov.isLow) {
+      confLabel = 'Low confidence'; confRgb = [190, 130, 20];
+    } else if (catCov.isDirect) {
+      confLabel = 'Partial confidence'; confRgb = [60, 130, 200];
+    } else if (catCov.isMed) {
+      confLabel = 'Good confidence'; confRgb = [30, 165, 115];
+    } else {
+      confLabel = 'High confidence'; confRgb = [16, 140, 90];
+    }
+
+    // Row background
     const rowBg = i % 2 === 0 ? [249, 250, 252] : [255, 255, 255];
     doc.setFillColor(...rowBg);
     doc.rect(M, y, W - 2 * M, catRowH, 'F');
-    // Left color bar
+    // Left colour bar
     doc.setFillColor(...(noData ? [210, 215, 225] : catRgb));
-    doc.rect(M, y, 3, catRowH, 'F');
+    doc.rect(M, y, colBarW, catRowH, 'F');
+
     // Category name
-    const fullLbl = cat.label;
     doc.setFontSize(7.5);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(noData ? 175 : 28, noData ? 180 : 33, noData ? 200 : 52);
-    doc.text(st(fullLbl), M + 7, y + 7.5);
-    // Coverage bar (40mm wide, starting at M+80)
-    const barX = M + 80;
-    const barW = 40;
-    const barH = 2.5;
-    const barY = y + catRowH / 2 - barH / 2;
-    const covPct = cat.total > 0 ? cat.evaluated / cat.total : 0;
+    doc.text(st(cat.label), colCatX, y + 8);
+
+    // Coverage bar track
+    const barH  = 2.5;
+    const barY  = y + catRowH / 2 - barH / 2;
     doc.setFillColor(220, 224, 235);
-    doc.roundedRect(barX, barY, barW, barH, 1, 1, 'F');
+    doc.roundedRect(colBarX, barY, colBarW2, barH, 1, 1, 'F');
     if (covPct > 0) {
       doc.setFillColor(...(noData ? [190, 195, 210] : catRgb));
-      doc.roundedRect(barX, barY, barW * covPct, barH, 1, 1, 'F');
+      doc.roundedRect(colBarX, barY, Math.max(2, colBarW2 * covPct), barH, 1, 1, 'F');
     }
-    // Coverage percentage text
-    doc.setFontSize(6);
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(130, 135, 155);
-    doc.text(`${Math.round(covPct * 100)}%`, barX + barW + 3, y + 7.5);
-    // Separator line
-    doc.setDrawColor(210, 215, 228);
+    // Coverage %
+    doc.setFontSize(6.5);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(noData ? 180 : 80, noData ? 185 : 85, noData ? 205 : 110);
+    doc.text(`${Math.round(covPct * 100)}%`, colPctX, y + 8);
+
+    // Separator lines
+    doc.setDrawColor(218, 222, 232);
     doc.setLineWidth(0.15);
-    doc.line(M + 135, y + 3, M + 135, y + catRowH - 3);
-    // Score
-    const scoreX = M + 148;
+    doc.line(colSep1, y + 2, colSep1, y + catRowH - 2);
+    doc.line(colSep2, y + 2, colSep2, y + catRowH - 2);
+
+    // Reviewed score
     if (noData) {
       doc.setFontSize(7);
       doc.setFont('helvetica', 'italic');
-      doc.setTextColor(180, 185, 200);
-      doc.text('Not evaluated', scoreX, y + 7.5, { align: 'center' });
+      doc.setTextColor(190, 195, 210);
+      doc.text('—', colScX, y + 8.5, { align: 'center' });
     } else {
-      const catCov = catCovLevel(cat.evaluated, cat.total);
       doc.setFontSize(10);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(...catRgb);
-      doc.text(`${cat.score}`, scoreX - 8, y + 8, { align: 'center' });
+      doc.text(`${cat.score}`, colScX - 5, y + 8.5, { align: 'right' });
       doc.setFontSize(6);
       doc.setFont('helvetica', 'normal');
-      doc.setTextColor(130, 135, 155);
-      doc.text('/100', scoreX - 2, y + 8);
-      // Grade or coverage label
-      if (catCov.isLow) {
-        doc.setFontSize(5.5);
-        doc.setFont('helvetica', 'italic');
-        doc.setTextColor(180, 140, 40);
-        doc.text('grade withheld', W - M - 2, y + 7.5, { align: 'right' });
-      } else {
-        doc.setFontSize(8);
-        doc.setFont('helvetica', 'bold');
-        doc.setTextColor(...catRgb);
-        doc.text(`${cat.grade}`, W - M - 8, y + 8.5, { align: 'center' });
-        doc.setFontSize(5.5);
-        doc.setFont('helvetica', 'normal');
-        doc.setTextColor(155, 160, 178);
-        doc.text('grade', W - M - 2, y + 5.5, { align: 'right' });
-      }
+      doc.setTextColor(150, 155, 172);
+      doc.text('/100', colScX - 4, y + 8.5);
     }
+
+    // Confidence label
+    doc.setFontSize(6.5);
+    doc.setFont('helvetica', catCov.isHigh ? 'bold' : 'normal');
+    doc.setTextColor(...confRgb);
+    doc.text(confLabel, colConfX, y + 8);
+
     y += catRowH;
   });
-  // Bottom border under last row
+
+  // Bottom border
   doc.setDrawColor(210, 215, 228);
   doc.setLineWidth(0.2);
   doc.line(M, y, W - M, y);
@@ -31903,45 +31943,38 @@ function downloadPDF(config, auditUrl, score, results) {
   doc.setTextColor(30, 35, 45);
   doc.text('Audit Summary', M, y);
   y += 5;
-  const totalPass = score.categories.reduce((s, c) => s + c.passed, 0);
-  const totalFail = score.categories.reduce((s, c) => s + c.failed, 0);
-  const totalPartial = score.categories.reduce((s, c) => s + c.partial, 0);
-  const totalItems = score.categories.reduce((s, c) => s + c.total, 0);
-  const statW = (W - 2 * M - 9) / 4;
+  const totalPass    = score.categories.reduce((s, c) => s + c.passed,   0);
+  const totalFail    = score.categories.reduce((s, c) => s + c.failed,   0);
+  const totalPartial = score.categories.reduce((s, c) => s + c.partial,  0);
+  const totalItems   = score.categories.reduce((s, c) => s + c.total,    0);
+  const totalReviewed = score.categories.reduce((s, c) => s + c.evaluated, 0);
+  const statW = (W - 2 * M - 12) / 5;
   [{
-    label: 'Total Items',
-    value: `${totalItems}`,
-    color: [40, 42, 55]
+    label: 'Total Checks', value: `${totalItems}`,    color: [50, 55, 70],              bg: [244, 246, 250]
   }, {
-    label: 'Passed',
-    value: `${totalPass}`,
-    color: STATUS_COLORS_PDF.Pass
+    label: 'Reviewed',     value: `${totalReviewed}`, color: [60, 100, 180],            bg: [240, 245, 255]
   }, {
-    label: 'Partial',
-    value: `${totalPartial}`,
-    color: STATUS_COLORS_PDF.Partial
+    label: 'Passed',       value: `${totalPass}`,     color: STATUS_COLORS_PDF.Pass,    bg: [240, 252, 246]
   }, {
-    label: 'Failed',
-    value: `${totalFail}`,
-    color: STATUS_COLORS_PDF.Fail
+    label: 'Partial',      value: `${totalPartial}`,  color: STATUS_COLORS_PDF.Partial, bg: [255, 250, 235]
+  }, {
+    label: 'Failed',       value: `${totalFail}`,     color: STATUS_COLORS_PDF.Fail,    bg: [255, 243, 245]
   }].forEach((stat, i) => {
     const x = M + i * (statW + 3);
-    doc.setFillColor(244, 246, 250);
-    doc.roundedRect(x, y, statW, 17, 2, 2, 'F');
+    doc.setFillColor(...stat.bg);
+    doc.roundedRect(x, y, statW, 16, 2, 2, 'F');
+    doc.setFillColor(...stat.color);
+    doc.roundedRect(x, y, statW, 2.5, 2, 0, 'F');
     doc.setFontSize(13);
     doc.setFont('helvetica', 'bold');
     doc.setTextColor(...stat.color);
-    doc.text(stat.value, x + statW / 2, y + 9.5, {
-      align: 'center'
-    });
-    doc.setFontSize(6);
+    doc.text(stat.value, x + statW / 2, y + 10, { align: 'center' });
+    doc.setFontSize(5.5);
     doc.setFont('helvetica', 'normal');
     doc.setTextColor(120, 125, 140);
-    doc.text(stat.label, x + statW / 2, y + 14.5, {
-      align: 'center'
-    });
+    doc.text(stat.label.toUpperCase(), x + statW / 2, y + 14, { align: 'center' });
   });
-  y += 26;
+  y += 25;
 
   // ── Top Priority Issues (enriched via rule engine) ────────────────────────
   const enrichedIssues = copy ? copy.priorityIssues : [];
