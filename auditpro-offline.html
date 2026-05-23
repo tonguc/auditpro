@@ -31947,18 +31947,17 @@ function downloadPDF(config, auditUrl, score, results) {
       // rowH = badge area (9) + title + gap (2) + impact + biz + fix + bottom pad (3)
       const rowH = 9 + titleLines.length * 4.5 + 2 + impLines.length * 4 + (bizLines.length ? 4 : 0) + fixLines.length * 4 + 3;
       checkPageBreak(rowH + 2);
-      if (i % 2 === 0) {
-        doc.setFillColor(247, 248, 252);
-        doc.rect(M, y, W - 2 * M, rowH, 'F');
-      }
-      // Priority badge
+      // Her satıra arka plan — tek düze görünüm için her zaman çizilir
+      doc.setFillColor(247, 248, 252);
+      doc.rect(M, y, W - 2 * M, rowH, 'F');
+      // Priority badge — başlık hizasında, sol ve üstten eşit boşlukla
       const bCol = item.priority === 'Critical' ? [214, 45, 60] : item.priority === 'High' ? [205, 112, 0] : item.priority === 'Medium' ? [12, 145, 210] : [14, 172, 118];
       doc.setFillColor(...bCol);
-      doc.roundedRect(M, y + 2, 18, 5, 1, 1, 'F');
+      doc.roundedRect(M + 2, y + 3, 18, 5, 1, 1, 'F');
       doc.setFontSize(5.5);
       doc.setFont('helvetica', 'bold');
       doc.setTextColor(255, 255, 255);
-      doc.text(item.priority.toUpperCase(), M + 9, y + 5.1, {
+      doc.text(item.priority.toUpperCase(), M + 11, y + 6.1, {
         align: 'center'
       });
       // Category tag
@@ -31966,7 +31965,7 @@ function downloadPDF(config, auditUrl, score, results) {
       doc.setFontSize(5.5);
       doc.setFont('helvetica', 'normal');
       doc.setTextColor(...item.catRgb);
-      doc.text(shortCat, M + 21, y + 5.1);
+      doc.text(shortCat, M + 23, y + 6.1);
       // Content starts below badge area
       let ry = y + 11;
       // Title (up to 2 lines)
