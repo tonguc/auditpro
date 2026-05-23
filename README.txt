@@ -18,6 +18,20 @@ HOW TO START
 3. Click "Start First Audit" or "Load Demo Audit" to explore.
 4. For full instructions, open QuickStart.html.
 
+IMPORTANT: HOW SCORING WORKS
+-----------------------------
+AuditPro is a MANUAL audit toolkit. You review each checkpoint yourself
+and mark the result. It does not crawl or automatically analyze websites.
+
+- Scores are calculated only from reviewed, applicable checkpoints.
+- Blank items (not yet reviewed) and N/A items are excluded from scoring.
+- Higher coverage = higher confidence in your results.
+- Letter grades appear only when 60%+ of relevant checkpoints are reviewed.
+  Below that threshold, AuditPro shows a directional or preliminary score,
+  clearly labelled with its confidence level.
+- Partial audits are useful for early diagnostics.
+- Full audits (60%+ coverage) are recommended for final client deliverables.
+
 IMPORTANT NOTES
 ---------------
 - This is a MANUAL audit toolkit. You review each checkpoint yourself.
@@ -25,8 +39,6 @@ IMPORTANT NOTES
 - No internet connection required. No account or subscription needed.
 - All data is stored in your browser's local storage (not on any server).
 - Clearing browser data will erase your audits. Use Export Backup regularly.
-- Scores and grades reflect only the checkpoints you have reviewed.
-  A grade is shown only when 60%+ of checks have been completed.
 - Chrome and Edge are recommended. Avoid closing the tab during PDF export.
 
 WHITE LABEL PDF EXPORT

@@ -35,11 +35,11 @@ async function freshPage(seed = {}) {
   page.close = async () => { await origClose(); await context.close(); };
   await page.setViewportSize({ width: 1440, height: 900 });
   await page.goto(FILE, { waitUntil: 'networkidle' });
-  if (Object.keys(seed).length) {
-    await page.evaluate(s => Object.entries(s).forEach(([k,v]) => localStorage.setItem(k, v)), seed);
-    await page.reload({ waitUntil: 'networkidle' });
-    await page.waitForTimeout(800);
-  }
+  // Always dismiss onboarding modal (simulates returning user) + apply caller seed
+  const fullSeed = { auditpro_onboarded: '1', ...seed };
+  await page.evaluate(s => Object.entries(s).forEach(([k,v]) => localStorage.setItem(k, v)), fullSeed);
+  await page.reload({ waitUntil: 'networkidle' });
+  await page.waitForTimeout(800);
   return page;
 }
 

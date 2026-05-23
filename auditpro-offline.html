@@ -35949,6 +35949,69 @@ function generateDemoResults() {
 
 // ─── APP ──────────────────────────────────────────────────────────────────────
 
+function OnboardingModal({onDismiss}) {
+  return /*#__PURE__*/React.createElement("div", {
+    style: {
+      position: 'fixed', inset: 0,
+      background: 'rgba(0,0,0,0.65)',
+      zIndex: 2000,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      padding: 20
+    }
+  }, /*#__PURE__*/React.createElement("div", {
+    style: {
+      background: C.surface,
+      border: `1px solid ${C.border}`,
+      borderRadius: 16,
+      padding: '36px 40px',
+      maxWidth: 500,
+      width: '100%',
+      boxShadow: '0 24px 64px rgba(0,0,0,0.45)'
+    }
+  },
+    /*#__PURE__*/React.createElement("div", {
+      style: { fontSize: 20, fontWeight: 800, color: C.text, marginBottom: 18 }
+    }, "Before You Audit"),
+    /*#__PURE__*/React.createElement("div", {
+      style: { fontSize: 13.5, fontWeight: 600, color: C.text, lineHeight: 1.65, marginBottom: 12 }
+    }, "AuditPro is a manual UX + SEO + CRO + AI Visibility audit toolkit."),
+    /*#__PURE__*/React.createElement("div", {
+      style: { fontSize: 13, color: C.muted, lineHeight: 1.7, marginBottom: 12 }
+    }, "It does not crawl or automatically analyze your website. You review each checkpoint yourself and mark the result based on your findings."),
+    /*#__PURE__*/React.createElement("div", {
+      style: { fontSize: 13, color: C.muted, lineHeight: 1.7, marginBottom: 12 }
+    }, "Scores are calculated only from reviewed applicable checkpoints. Blank items and N/A items are excluded from scoring."),
+    /*#__PURE__*/React.createElement("div", {
+      style: { fontSize: 13, color: C.muted, lineHeight: 1.7, marginBottom: 20 }
+    }, "For the most reliable client-ready report, complete as many relevant checks as possible. Partial audits are useful for early diagnostics; full audits are recommended for final client deliverables."),
+    /*#__PURE__*/React.createElement("div", {
+      style: {
+        background: C.bg, border: `1px solid ${C.border}`,
+        borderRadius: 8, padding: '10px 14px', marginBottom: 24,
+        fontSize: 12, color: C.muted, lineHeight: 1.6
+      }
+    }, "💡 Higher coverage = higher confidence. Letter grades appear only after sufficient coverage is reached."),
+    /*#__PURE__*/React.createElement("button", {
+      onClick: onDismiss,
+      style: {
+        background: C.accent, color: '#fff', border: 'none',
+        borderRadius: 9, padding: '13px 24px',
+        fontSize: 14, fontWeight: 700, width: '100%',
+        cursor: 'pointer', marginBottom: 12
+      }
+    }, "I Understand — Start Auditing"),
+    /*#__PURE__*/React.createElement("div", { style: { textAlign: 'center' } },
+      /*#__PURE__*/React.createElement("button", {
+        onClick: onDismiss,
+        style: {
+          background: 'none', border: 'none',
+          color: C.muted, fontSize: 12,
+          cursor: 'pointer', textDecoration: 'underline'
+        }
+      }, "Don’t show this again")
+    )
+  ));
+}
 function App() {
   const [page, setPage] = useState('dashboard');
   const [score, setScore] = useState(null);
@@ -35971,6 +36034,14 @@ function App() {
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
   }, []);
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    try { return !localStorage.getItem('auditpro_onboarded'); }
+    catch { return false; }
+  });
+  const handleDismissOnboarding = () => {
+    try { localStorage.setItem('auditpro_onboarded', '1'); } catch {}
+    setShowOnboarding(false);
+  };
 
   // Keep C in sync — runs before children render
   Object.assign(C, isDark ? DARK_C : LIGHT_C);
@@ -36153,7 +36224,7 @@ function App() {
     };
     reader.readAsText(file);
   };
-  return /*#__PURE__*/React.createElement("div", {
+  return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("div", {
     style: {
       display: 'flex',
       flexDirection: isMobile ? 'column' : 'row',
@@ -36213,7 +36284,7 @@ function App() {
     isMobile: isMobile,
     isDark: isDark,
     onToggleTheme: handleToggleTheme
-  })));
+  }))), showOnboarding && /*#__PURE__*/React.createElement(OnboardingModal, {onDismiss: handleDismissOnboarding}));
 }
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(/*#__PURE__*/React.createElement(App, null));
