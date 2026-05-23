@@ -31133,6 +31133,11 @@ const IMPACT_MAP = [
   why: 'Mobile users need fast, thumb-friendly navigation with minimal friction.',
   biz: 'Poor mobile navigation reduces engagement and conversion rates on small screens.',
   fix: 'Simplify mobile menus, increase tap targets to at least 44px, and prioritise key actions.'
+}, {
+  keys: ['touch target', 'tap target', '48px', 'tap.*size', 'touch.*size'],
+  why: 'Small tap targets cause accidental taps and user frustration on touch screens.',
+  biz: 'Undersized touch targets increase mobile bounce rates and reduce task completion.',
+  fix: 'Increase the size and spacing of all buttons, links, and interactive elements to at least 48×48px. Check with Lighthouse (Accessibility > Tap targets) and use min-height/min-width in CSS to enforce minimum hit areas.'
 },
 // ── AI / SERP Visibility ───────────────────────────────────────────────────
 {
@@ -32129,7 +32134,7 @@ function downloadPDF(config, auditUrl, score, results) {
         ? (() => {
             const cov2 = catCovLevel(catScore.evaluated, catScore.total);
             if (cov2.isLow) return `${cov2.scoreLabel}: ${catScore.score}/100  ·  ${catScore.evaluated}/${catScore.total} reviewed  ·  Low confidence  ·  Grade withheld`;
-            if (cov2.isDirect) return `${cov2.scoreLabel}: ${catScore.score}/100  ·  ${catScore.evaluated}/${catScore.total} reviewed  ·  Medium-Low confidence  ·  Grade withheld`;
+            if (cov2.isDirect) return `${cov2.scoreLabel}: ${catScore.score}/100  ·  ${catScore.evaluated}/${catScore.total} reviewed  ·  Medium-low confidence  ·  Grade withheld`;
             if (cov2.isMed) return `${cov2.scoreLabel}: ${catScore.score}/100  Grade ${catScore.grade}  ·  ${catScore.evaluated}/${catScore.total} reviewed  ·  Medium confidence`;
             return `${cov2.scoreLabel}: ${catScore.score}/100  Grade ${catScore.grade}  ·  ${catScore.evaluated}/${catScore.total} reviewed  ·  High confidence`;
           })()
@@ -32163,7 +32168,7 @@ function downloadPDF(config, auditUrl, score, results) {
       doc.rect(M, y, 2, iH, 'F');
       doc.setTextColor(55, 60, 80);
       doc.text(iLines, M + 5, y + 4.5 + (iLines.length > 1 ? 0 : 1));
-      y += iH + 4;
+      y += iH + 9;
     }
 
     // AI Visibility intro paragraph
@@ -32183,7 +32188,7 @@ function downloadPDF(config, auditUrl, score, results) {
       y += 2;
     }
     cat.sections.forEach((sec, secIdx) => {
-      if (secIdx > 0) y += 5;
+      if (secIdx > 0) y += 8;
       checkPageBreak(20);
       doc.setFillColor(...lighten(catColor, 0.88));
       doc.rect(M, y, W - 2 * M, 8, 'F');
@@ -32521,7 +32526,7 @@ function downloadPDF(config, auditUrl, score, results) {
   y += aboutH + 6;
 
   // ── How Scores Are Calculated — styled info box ───────────────────────────
-  const scoringText = st('Scores are based only on reviewed applicable checks. Blank items are excluded entirely — they do not count as passes or failures. N/A items are excluded as they do not apply to this site. Below 30% coverage: preliminary result, grade withheld. 30–59% coverage: directional result, grade shown with qualifier. 60–79%: indicative result. 80%+: full audit score. A high score from a small number of reviewed checks does not imply the full website is strong.');
+  const scoringText = st('Scores are based only on reviewed applicable checks. Blank items are excluded entirely — they do not count as passes or failures. N/A items are excluded as they do not apply to this site. Below 30% coverage: preliminary result, grade withheld. 30–59% coverage: directional reviewed score, medium-low confidence — no letter grade is assigned at this level. 60–79%: indicative result, grade shown. 80%+: full audit score, final grade. A high score from a small number of reviewed checks does not imply the full website is strong.');
   doc.setFontSize(7.5);
   doc.setFont('helvetica', 'normal');
   const scoringLines = doc.splitTextToSize(scoringText, W - 2 * M - 16);
