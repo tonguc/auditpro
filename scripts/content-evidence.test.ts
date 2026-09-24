@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict';
+import {inspectContent,attachLinkChecks} from '../lib/content-evidence';
+const result=inspectContent('<head><base href="https://example.com/section/"></head><body><h1>Main &amp; title</h1><h3>Sub</h3><h2>Next</h2><template><h6>Fake</h6><img src=fake></template><img src=a alt=""><img src=b><img src=c alt="Description"><a href="item?q=1">Item</a><a href="#same">Jump</a></body>',new URL('https://example.com/'));
+assert.equal(result.headings.length,3);assert.equal(result.headings[0].text,'Main & title');
+assert.equal(result.headings[1].skipped,true);assert.equal(result.headings[2].skipped,false);
+assert.equal(result.images.length,3);assert.equal(result.images[0].alt,'');assert.equal(result.images[1].alt,null);
+assert.equal(result.images[0].src,'https://example.com/section/a');
+assert.equal(result.links.length,1);assert.equal(result.links[0].target,'https://example.com/section/item?q=1');
+const wrong=attachLinkChecks(result.links,[{url:'https://example.com/section/item',status:200,verified:true,finalUrl:'https://example.com/section/item'}]);
+assert.equal(wrong[0].status,undefined,'different query must not inherit a success');
+assert.equal(attachLinkChecks(result.links,[{url:result.links[0].target,status:404,verified:true,finalUrl:result.links[0].target}])[0].status,404);
+assert.equal(inspectContent('<h1>A</h1><h1>B</h1>',new URL('https://example.com')).headings.some(row=>row.skipped),false,'multiple H1 alone is not a failed hierarchy');
+console.log('Content evidence: inert markup, heading levels, alt states, base URLs and exact link status passed.');

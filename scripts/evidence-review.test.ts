@@ -1,0 +1,17 @@
+import assert from 'node:assert/strict';
+import {evidenceReviewReason,evidenceReviewReasons} from '../lib/evidence-review';
+import type {MeasurementEvidence} from '../lib/measurement-contract';
+const sample: MeasurementEvidence={source:'browser',confidence:'medium',scoreEligible:false,contractVersion:'0.7.0'};
+assert.equal(evidenceReviewReason(undefined),'reviewUnknown');
+assert.equal(evidenceReviewReason(sample),'reviewUnknown');
+assert.equal(evidenceReviewReason({...sample,reasonCode:'method-not-calibrated'}),'reviewMethod');
+assert.equal(evidenceReviewReason({...sample,reasonCode:'incomplete-browser-resources'}),'reviewResources');
+assert.equal(evidenceReviewReason({...sample,scope:{tested:2,discovered:5,complete:false}}),'reviewCoverage');
+assert.equal(evidenceReviewReason({...sample,reasonCode:'duplicate-metric-diagnostic'}),'reviewDuplicate');
+assert.equal(evidenceReviewReason({...sample,source:'ai-engine'}),'reviewUnknown','source alone cannot establish missing API credentials');
+console.log('Evidence review reasons preserve uncertainty without inventing defects.');
+assert.deepEqual(evidenceReviewReasons({...sample,reasonCode:'method-not-calibrated',scope:{tested:2,discovered:5,complete:false},pageResults:[{url:'https://example.com/',status:'N/A',measurementState:'incomplete-resources',declarations:['A','B']},{url:'https://example.com/b',status:'N/A',measurementState:'incomplete-resources'}]}),['reviewResources','reviewCoverage','reviewMetadata','reviewMethod']);
+assert.deepEqual(evidenceReviewReasons({...sample,reasonCode:'incomplete-browser-resources',pageResults:[{url:'https://example.com/',status:'N/A',measurementState:'incomplete-resources'}]}),['reviewResources'],'top-level and per-page records do not duplicate reasons');
+assert.deepEqual(evidenceReviewReasons({...sample,pageResults:[{url:'https://example.com/',status:'N/A',measurementState:'incomplete-coverage'}]}),['reviewCoverage']);
+assert.deepEqual(evidenceReviewReasons({...sample,scope:{tested:2,discovered:5,complete:true},pageResults:[{url:'https://example.com/',status:'N/A',measurementState:'complete'}]}),['reviewUnknown'],'sample size and N/A alone do not establish incomplete measurement');
+assert.deepEqual(evidenceReviewReasons({...sample,source:'ai-engine',reasonCode:'unrecognized'}),['reviewUnknown'],'no invented API, cost or engine blocker');

@@ -1,0 +1,20 @@
+{
+  "scope": "Two simultaneous five-page read-only crawls; not a capacity or sustained stress benchmark",
+  "wallMs": 74603,
+  "runs": [
+    {
+      "id": 1,
+      "status": 200,
+      "pages": 5,
+      "durationMs": 73918,
+      "browserPages": 5
+    },
+    {
+      "id": 2,
+      "status": 200,
+      "pages": 5,
+      "durationMs": 74597,
+      "browserPages": 5
+    }
+  ]
+}

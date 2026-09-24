@@ -1,0 +1,31 @@
+[
+  {
+    "url": "https://tonguckaracay.com/en",
+    "pages": 5,
+    "rendered": 5,
+    "results": {
+      "o1": "Pass",
+      "o5": "Pass",
+      "t28": "Pass",
+      "u37": "Fail",
+      "o4": "Pass",
+      "o8": "Pass"
+    },
+    "missingDescriptions": []
+  },
+  {
+    "url": "https://drkemaltuskan.com/",
+    "pages": 5,
+    "rendered": 5,
+    "results": {
+      "o1": "Pass",
+      "o5": "Fail",
+      "t28": "Pass",
+      "o4": "Pass",
+      "o8": "Pass"
+    },
+    "missingDescriptions": [
+      "https://drkemaltuskan.com/blog/burun-tikanikligi-nedenleri/"
+    ]
+  }
+]

@@ -1,0 +1,84 @@
+{
+  "scope": "Same captured HTML, independent Python HTMLParser vs Povlex parse5. Bounded metadata presence validation, not human expert or complete site accuracy.",
+  "unavailable": [],
+  "comparisons": [
+    {
+      "url": "https://tonguckaracay.com/en",
+      "sha256": "d5c738b992bba562c65807b082249b75bd6e71585d3e63526ae271e91e8398fe",
+      "titlesMatch": true,
+      "descriptionsMatch": true,
+      "titleDecision": "Pass",
+      "titleExpected": "Pass",
+      "descriptionDecision": "Pass",
+      "descriptionExpected": "Pass",
+      "titles": [
+        "SEO & Digital Marketing Consultant | Tonguç Karaçay"
+      ],
+      "descriptions": [
+        "Growing your business digitally with UI/UX Design, SEO, Online Advertising, and AI solutions. 25+ years of experience, 35+ brands including Turkish Airlines, BMW, Galatasaray."
+      ]
+    },
+    {
+      "url": "https://tonguckaracay.com/about",
+      "sha256": "43128d4c125a78a0d38e4a9a360fd62e53e6351f29b09151d40657df79b96f0e",
+      "titlesMatch": true,
+      "descriptionsMatch": true,
+      "titleDecision": "Pass",
+      "titleExpected": "Pass",
+      "descriptionDecision": "Pass",
+      "descriptionExpected": "Pass",
+      "titles": [
+        "About | Tonguç Karaçay - AI-Driven UX & Growth Partner"
+      ],
+      "descriptions": [
+        "25+ years of experience in UI/UX design, SEO, and AI solutions. Serving 35+ brands including Turkish Airlines, BMW, Galatasaray. International consulting services."
+      ]
+    },
+    {
+      "url": "https://tonguckaracay.com/contact",
+      "sha256": "fd2462398cae0bac2775147dea887edbbc770ce8a8637625d5b8d5e950988630",
+      "titlesMatch": true,
+      "descriptionsMatch": true,
+      "titleDecision": "Pass",
+      "titleExpected": "Pass",
+      "descriptionDecision": "Pass",
+      "descriptionExpected": "Pass",
+      "titles": [
+        "Free SEO Consulting | Contact | Tonguç Karaçay"
+      ],
+      "descriptions": [
+        "Request a free consultation for your digital marketing, SEO, or UI/UX project. 25+ years of experience and measurable results. Get in touch today."
+      ]
+    },
+    {
+      "url": "https://drkemaltuskan.com/",
+      "sha256": "c5c5d44a4e5f76f6a9c332fadcdf5eb37777c000f212f54f3f5f56f780dc2b1a",
+      "titlesMatch": true,
+      "descriptionsMatch": true,
+      "titleDecision": "Pass",
+      "titleExpected": "Pass",
+      "descriptionDecision": "Pass",
+      "descriptionExpected": "Pass",
+      "titles": [
+        "KBB Uzmanı, Burun Estetiği, Horlama ve Alerji Tedavisi| Dr. Kemal Tuskan"
+      ],
+      "descriptions": [
+        "KBB alanında uzman teşhis ve tedavi çözümleri! Burun tıkanıklığı, sinüzit, horlama, burun estetiği, dolgu, botoks ve alerji tedavilerinde modern yaklaşımlar."
+      ]
+    },
+    {
+      "url": "https://drkemaltuskan.com/blog/burun-tikanikligi-nedenleri/",
+      "sha256": "f2f93d9c6c85dcd94e28b5cb7a3f01fd8699409537ff04b1f61e472a67caaab3",
+      "titlesMatch": true,
+      "descriptionsMatch": true,
+      "titleDecision": "Pass",
+      "titleExpected": "Pass",
+      "descriptionDecision": "Fail",
+      "descriptionExpected": "Fail",
+      "titles": [
+        "Burun Tıkanıklığının Nedenleri, Belirtileri ve Tedavi Yöntemleri - Dr. Kemal Tuskan"
+      ],
+      "descriptions": []
+    }
+  ]
+}

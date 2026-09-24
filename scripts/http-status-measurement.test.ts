@@ -1,0 +1,31 @@
+import assert from 'node:assert/strict';
+import {measureHttpStatuses as measure} from '../lib/http-status-measurement';
+const ok={url:'https://example.com/',outcome:'analyzed' as const,status:200};
+const bad={url:'https://example.com/map-error',outcome:'http-error' as const,status:500};
+const limited={url:'https://example.com/limited',outcome:'limit' as const};
+assert.equal(measure([ok],[],[]).status,'Pass');
+assert.equal(measure([],[],[]).scoreEligible,false);
+assert.equal(measure([ok,limited],[],[]).status,'N/A');
+assert.equal(measure([{...limited,outcome:'unavailable'}],[],[]).status,'N/A');
+const failure=measure([ok,bad,limited],[],[]);
+assert.equal(failure.status,'Fail');assert.equal(failure.scoreEligible,true);
+assert.equal(failure.scope.complete,false);assert.equal(failure.pageResults[2].status,'N/A');
+const intermittent=measure([bad],[{url:bad.url,finalUrl:bad.url,status:200,verified:true}],[bad.url]);
+assert.equal(intermittent.pageResults.length,1);assert.equal(intermittent.status,'Fail');
+assert.equal(measure([ok],[],['https://example.com/untested']).status,'N/A');
+assert.equal(measure([],[{url:ok.url,finalUrl:ok.url,status:404,verified:true}],[ok.url]).status,'Fail');
+assert.equal(measure([],[{url:ok.url,finalUrl:ok.url,status:0,verified:false}],[ok.url]).scoreEligible,false);
+// Link-verification budget: addresses discovered beyond the requested checks stay
+// untested and can never become passes (t56 scope strictness, P2 B5).
+const manyLinks=Array.from({length:150},(_,i)=>`https://example.com/page-${i}`);
+const verifiedHundred=manyLinks.slice(0,100).map(url=>({url,finalUrl:url,status:200,verified:true}));
+const budget=measure([],verifiedHundred,manyLinks);
+assert.equal(budget.status,'N/A');
+assert.equal(budget.scoreEligible,false);
+assert.equal(budget.scope.complete,false);
+assert.equal(budget.scope.discovered,150);
+assert.equal(budget.scope.tested,100);
+const budgetFailure=measure([],[{url:manyLinks[0],finalUrl:manyLinks[0],status:404,verified:true},...verifiedHundred.slice(1)],manyLinks);
+assert.equal(budgetFailure.status,'Fail','observed failures remain evidence beyond the budget');
+assert.equal(budgetFailure.scoreEligible,true);
+console.log('HTTP status calibration passed: errors, missing coverage, deduplication, intermittent responses and link budgets.');

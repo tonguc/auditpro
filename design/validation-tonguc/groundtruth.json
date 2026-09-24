@@ -1,0 +1,822 @@
+{
+  "robots": {
+    "url": "https://tonguckaracay.com/robots.txt",
+    "status": 200,
+    "type": "text/plain; charset=utf-8",
+    "text": "# https://www.robotstxt.org/robotstxt.html\n\nUser-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /_next/\nDisallow: /admin/\n\n# AI Crawlers — explicitly allowed for citation and indexing\nUser-agent: GPTBot\nAllow: /\n\nUser-agent: ClaudeBot\nAllow: /\n\nUser-agent: Google-Extended\nAllow: /\n\nUser-agent: PerplexityBot\nAllow: /\n\nUser-agent: Meta-ExternalAgent\nAllow: /\n\nUser-agent: CCBot\nAllow: /\n\n# Sitemap\nSitemap: https://tonguckaracay.com/sitemap.xml\n\n# AI content guide\n# llms.txt: https://tonguckaracay.com/llms.txt\n"
+  },
+  "maps": [
+    {
+      "url": "https://tonguckaracay.com/sitemap.xml",
+      "status": 200,
+      "type": "application/xml",
+      "text": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n<url>\n<loc>https://tonguckaracay.com</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>weekly</changefreq>\n<priority>1</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/hakkimda</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.8</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/iletisim</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/blog</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>weekly</changefreq>\n<priority>0.9</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/gizlilik-politikasi</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>yearly</changefreq>\n<priority>0.3</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/kullanim-kosullari</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>yearly</changefreq>\n<priority>0.3</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/hizmetler/ui-ux-tasarim</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.8</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/hizmetler/seo-danismanligi</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.8</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/hizmetler/online-reklamcilik</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.8</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/hizmetler/yapay-zeka-cozumleri</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.8</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/hizmetler/sosyal-medya-yonetimi</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.8</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/ai-egitimi</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.9</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>weekly</changefreq>\n<priority>1</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/about</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.8</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/contact</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/blog</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>weekly</changefreq>\n<priority>0.9</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/privacy-policy</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>yearly</changefreq>\n<priority>0.3</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/terms-of-service</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>yearly</changefreq>\n<priority>0.3</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/services/ui-ux-design</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.8</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/services/seo-consulting</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.8</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/services/online-advertising</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.8</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/services/ai-solutions</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.8</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/services/social-media-management</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.8</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/ai-training</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.9</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/hasta-takip-hatirlatma-ai-agent-kurulumu</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/claude-mcp-instagram-icerik-takvimi-otomasyonu</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/geo-checklist-turkce-icerik-optimizasyonu</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/kobi-yapay-zeka-egitim-programi</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/instagram-reels-yapay-zeka-trend-analizi-icerik-planlama</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/musteri-hizmetleri-chatbotunda-token-maliyetini-dusuren-ayarlamalar</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/claude-gpt-4-token-maliyet-karsilastirmasi</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/anahtar-kelime-analizi-yapan-seo-araclari</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/heading-tags-nedir-h1-etiketi-nasil-kullanilir</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/e-ticaret-yerel-seo-rehberi</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/ucretsiz-turkce-yapay-zeka-araclari-e-ticaret</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/ai-agent-vps-kendi-sunucu-karsilastirmasi</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/chatgpt-ile-e-ticaret-urun-aciklamasi-yazma</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/ai-agent-musteri-hizmetleri-otomasyonu</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/ai-agent-nedir-dijital-pazarlamada-nasil-kullanilir</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/prompt-muhendisligi-ile-para-kazanma</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/yapay-zeka-araclari-ve-kullanim-alanlari</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/google-ads-kampanya-optimizasyonu-rehberi</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/yapay-zeka-ui-tasarim-araclari</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/chatgpt-geo-nasil-yapilir</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/geo-nedir-nasil-yapilir</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/kaliteli-ve-ozgun-icerigin-seo-icin-onemi</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en-etkili-dijital-pazarlama-yontemleri</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/icerik-pazarlamasi-ve-seo-optimizasyonu</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/dropshipping-ile-dijital-pazarlama</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/profesyonel-seo-uzmani-nedir-nasil-olunur</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/seo-ile-organik-trafigi-artirmanin-yontemleri</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/serp-nedir-google-icin-neden-onemlidir</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/sosyal-medya-yonetimi-ve-online-pazarlama</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/site-ici-seo-nasil-yapilir</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/google-analytics-ile-site-optimizasyonu</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/kullanmaniz-gereken-seo-araclari</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/dijital-pazarlama-stratejileri-ve-araclari</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/inbound-marketing-nedir-nasil-yapilir</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/kaliteli-backlink-nedir-nasil-alinir</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/ui-ux-designer-nedir-nasil-calisirlar</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/seo-nedir-nasil-yapilir</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/ai-agent-patient-follow-up-appointment-reminders</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/automate-instagram-content-calendar-claude-mcp</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/geo-targeted-content-optimization-checklist</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/ai-tools-small-business-owners-training</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/ai-trend-analysis-instagram-reels-content-planning</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/how-to-reduce-token-costs-in-customer-service-chatbots</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/claude-gpt-4-token-cost-comparison</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/best-keyword-research-seo-tools</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/what-are-heading-tags-how-to-use-h1</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/free-turkish-ai-tools-ecommerce</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/local-seo-for-ecommerce-guide</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/ai-agent-vps-vs-own-server-comparison</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/chatgpt-ecommerce-product-descriptions-guide</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/ai-agent-customer-service-automation</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/ai-prompt-engineering-ways-to-make-money</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/ai-tools-and-use-cases-complete-guide</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/what-is-ai-agent-digital-marketing-guide</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/google-ads-campaign-optimization-guide</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/ai-ui-design-tools</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/how-to-get-cited-in-chatgpt</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/what-is-geo-generative-engine-optimization</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/importance-of-quality-original-content-for-seo</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/most-effective-digital-marketing-methods</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/content-marketing-and-seo-optimization</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/dropshipping-and-digital-marketing</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/what-is-seo-specialist-how-to-become-one</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/how-to-increase-organic-traffic-with-seo</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/what-is-serp-why-it-matters-for-google</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/social-media-management-and-online-marketing</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/on-page-seo-complete-guide</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/website-optimization-with-google-analytics</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/essential-seo-tools-you-should-use</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/digital-marketing-strategies-and-tools</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/what-is-inbound-marketing-how-to-do-it</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/what-are-quality-backlinks-how-to-get-them</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/what-is-ui-ux-designer-how-do-they-work</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n<url>\n<loc>https://tonguckaracay.com/en/what-is-seo-how-does-it-work</loc>\n<lastmod>2026-08-11T15:20:28.066Z</lastmod>\n<changefreq>monthly</changefreq>\n<priority>0.7</priority>\n</url>\n</urlset>\n"
+    }
+  ],
+  "sitemapUrls": [
+    "https://tonguckaracay.com",
+    "https://tonguckaracay.com/hakkimda",
+    "https://tonguckaracay.com/iletisim",
+    "https://tonguckaracay.com/blog",
+    "https://tonguckaracay.com/gizlilik-politikasi",
+    "https://tonguckaracay.com/kullanim-kosullari",
+    "https://tonguckaracay.com/hizmetler/ui-ux-tasarim",
+    "https://tonguckaracay.com/hizmetler/seo-danismanligi",
+    "https://tonguckaracay.com/hizmetler/online-reklamcilik",
+    "https://tonguckaracay.com/hizmetler/yapay-zeka-cozumleri",
+    "https://tonguckaracay.com/hizmetler/sosyal-medya-yonetimi",
+    "https://tonguckaracay.com/ai-egitimi",
+    "https://tonguckaracay.com/en",
+    "https://tonguckaracay.com/en/about",
+    "https://tonguckaracay.com/en/contact",
+    "https://tonguckaracay.com/en/blog",
+    "https://tonguckaracay.com/en/privacy-policy",
+    "https://tonguckaracay.com/en/terms-of-service",
+    "https://tonguckaracay.com/en/services/ui-ux-design",
+    "https://tonguckaracay.com/en/services/seo-consulting",
+    "https://tonguckaracay.com/en/services/online-advertising",
+    "https://tonguckaracay.com/en/services/ai-solutions",
+    "https://tonguckaracay.com/en/services/social-media-management",
+    "https://tonguckaracay.com/en/ai-training",
+    "https://tonguckaracay.com/hasta-takip-hatirlatma-ai-agent-kurulumu",
+    "https://tonguckaracay.com/claude-mcp-instagram-icerik-takvimi-otomasyonu",
+    "https://tonguckaracay.com/geo-checklist-turkce-icerik-optimizasyonu",
+    "https://tonguckaracay.com/kobi-yapay-zeka-egitim-programi",
+    "https://tonguckaracay.com/instagram-reels-yapay-zeka-trend-analizi-icerik-planlama",
+    "https://tonguckaracay.com/musteri-hizmetleri-chatbotunda-token-maliyetini-dusuren-ayarlamalar",
+    "https://tonguckaracay.com/claude-gpt-4-token-maliyet-karsilastirmasi",
+    "https://tonguckaracay.com/anahtar-kelime-analizi-yapan-seo-araclari",
+    "https://tonguckaracay.com/heading-tags-nedir-h1-etiketi-nasil-kullanilir",
+    "https://tonguckaracay.com/e-ticaret-yerel-seo-rehberi",
+    "https://tonguckaracay.com/ucretsiz-turkce-yapay-zeka-araclari-e-ticaret",
+    "https://tonguckaracay.com/ai-agent-vps-kendi-sunucu-karsilastirmasi",
+    "https://tonguckaracay.com/chatgpt-ile-e-ticaret-urun-aciklamasi-yazma",
+    "https://tonguckaracay.com/ai-agent-musteri-hizmetleri-otomasyonu",
+    "https://tonguckaracay.com/ai-agent-nedir-dijital-pazarlamada-nasil-kullanilir",
+    "https://tonguckaracay.com/prompt-muhendisligi-ile-para-kazanma",
+    "https://tonguckaracay.com/yapay-zeka-araclari-ve-kullanim-alanlari",
+    "https://tonguckaracay.com/google-ads-kampanya-optimizasyonu-rehberi",
+    "https://tonguckaracay.com/yapay-zeka-ui-tasarim-araclari",
+    "https://tonguckaracay.com/chatgpt-geo-nasil-yapilir",
+    "https://tonguckaracay.com/geo-nedir-nasil-yapilir",
+    "https://tonguckaracay.com/kaliteli-ve-ozgun-icerigin-seo-icin-onemi",
+    "https://tonguckaracay.com/en-etkili-dijital-pazarlama-yontemleri",
+    "https://tonguckaracay.com/icerik-pazarlamasi-ve-seo-optimizasyonu",
+    "https://tonguckaracay.com/dropshipping-ile-dijital-pazarlama",
+    "https://tonguckaracay.com/profesyonel-seo-uzmani-nedir-nasil-olunur",
+    "https://tonguckaracay.com/seo-ile-organik-trafigi-artirmanin-yontemleri",
+    "https://tonguckaracay.com/serp-nedir-google-icin-neden-onemlidir",
+    "https://tonguckaracay.com/sosyal-medya-yonetimi-ve-online-pazarlama",
+    "https://tonguckaracay.com/site-ici-seo-nasil-yapilir",
+    "https://tonguckaracay.com/google-analytics-ile-site-optimizasyonu",
+    "https://tonguckaracay.com/kullanmaniz-gereken-seo-araclari",
+    "https://tonguckaracay.com/dijital-pazarlama-stratejileri-ve-araclari",
+    "https://tonguckaracay.com/inbound-marketing-nedir-nasil-yapilir",
+    "https://tonguckaracay.com/kaliteli-backlink-nedir-nasil-alinir",
+    "https://tonguckaracay.com/ui-ux-designer-nedir-nasil-calisirlar",
+    "https://tonguckaracay.com/seo-nedir-nasil-yapilir",
+    "https://tonguckaracay.com/en/ai-agent-patient-follow-up-appointment-reminders",
+    "https://tonguckaracay.com/en/automate-instagram-content-calendar-claude-mcp",
+    "https://tonguckaracay.com/en/geo-targeted-content-optimization-checklist",
+    "https://tonguckaracay.com/en/ai-tools-small-business-owners-training",
+    "https://tonguckaracay.com/en/ai-trend-analysis-instagram-reels-content-planning",
+    "https://tonguckaracay.com/en/how-to-reduce-token-costs-in-customer-service-chatbots",
+    "https://tonguckaracay.com/en/claude-gpt-4-token-cost-comparison",
+    "https://tonguckaracay.com/en/best-keyword-research-seo-tools",
+    "https://tonguckaracay.com/en/what-are-heading-tags-how-to-use-h1",
+    "https://tonguckaracay.com/en/free-turkish-ai-tools-ecommerce",
+    "https://tonguckaracay.com/en/local-seo-for-ecommerce-guide",
+    "https://tonguckaracay.com/en/ai-agent-vps-vs-own-server-comparison",
+    "https://tonguckaracay.com/en/chatgpt-ecommerce-product-descriptions-guide",
+    "https://tonguckaracay.com/en/ai-agent-customer-service-automation",
+    "https://tonguckaracay.com/en/ai-prompt-engineering-ways-to-make-money",
+    "https://tonguckaracay.com/en/ai-tools-and-use-cases-complete-guide",
+    "https://tonguckaracay.com/en/what-is-ai-agent-digital-marketing-guide",
+    "https://tonguckaracay.com/en/google-ads-campaign-optimization-guide",
+    "https://tonguckaracay.com/en/ai-ui-design-tools",
+    "https://tonguckaracay.com/en/how-to-get-cited-in-chatgpt",
+    "https://tonguckaracay.com/en/what-is-geo-generative-engine-optimization",
+    "https://tonguckaracay.com/en/importance-of-quality-original-content-for-seo",
+    "https://tonguckaracay.com/en/most-effective-digital-marketing-methods",
+    "https://tonguckaracay.com/en/content-marketing-and-seo-optimization",
+    "https://tonguckaracay.com/en/dropshipping-and-digital-marketing",
+    "https://tonguckaracay.com/en/what-is-seo-specialist-how-to-become-one",
+    "https://tonguckaracay.com/en/how-to-increase-organic-traffic-with-seo",
+    "https://tonguckaracay.com/en/what-is-serp-why-it-matters-for-google",
+    "https://tonguckaracay.com/en/social-media-management-and-online-marketing",
+    "https://tonguckaracay.com/en/on-page-seo-complete-guide",
+    "https://tonguckaracay.com/en/website-optimization-with-google-analytics",
+    "https://tonguckaracay.com/en/essential-seo-tools-you-should-use",
+    "https://tonguckaracay.com/en/digital-marketing-strategies-and-tools",
+    "https://tonguckaracay.com/en/what-is-inbound-marketing-how-to-do-it",
+    "https://tonguckaracay.com/en/what-are-quality-backlinks-how-to-get-them",
+    "https://tonguckaracay.com/en/what-is-ui-ux-designer-how-do-they-work",
+    "https://tonguckaracay.com/en/what-is-seo-how-does-it-work"
+  ],
+  "resolved": [
+    {
+      "requested": "https://tonguckaracay.com",
+      "final": "https://tonguckaracay.com/en",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/hakkimda",
+      "final": "https://tonguckaracay.com/en/hakkimda",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/iletisim",
+      "final": "https://tonguckaracay.com/en/iletisim",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/blog",
+      "final": "https://tonguckaracay.com/en/blog",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/hizmetler/ui-ux-tasarim",
+      "final": "https://tonguckaracay.com/en/hizmetler/ui-ux-tasarim",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/hizmetler/seo-danismanligi",
+      "final": "https://tonguckaracay.com/en/hizmetler/seo-danismanligi",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/hizmetler/online-reklamcilik",
+      "final": "https://tonguckaracay.com/en/hizmetler/online-reklamcilik",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/hizmetler/yapay-zeka-cozumleri",
+      "final": "https://tonguckaracay.com/en/hizmetler/yapay-zeka-cozumleri",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/gizlilik-politikasi",
+      "final": "https://tonguckaracay.com/en/gizlilik-politikasi",
+      "status": 500,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/hizmetler/sosyal-medya-yonetimi",
+      "final": "https://tonguckaracay.com/en/hizmetler/sosyal-medya-yonetimi",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en",
+      "final": "https://tonguckaracay.com/en",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/kullanim-kosullari",
+      "final": "https://tonguckaracay.com/en/kullanim-kosullari",
+      "status": 500,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/ai-egitimi",
+      "final": "https://tonguckaracay.com/en/ai-egitimi",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/about",
+      "final": "https://tonguckaracay.com/en/about",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/contact",
+      "final": "https://tonguckaracay.com/en/contact",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/privacy-policy",
+      "final": "https://tonguckaracay.com/en/privacy-policy",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/terms-of-service",
+      "final": "https://tonguckaracay.com/en/terms-of-service",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/services/ui-ux-design",
+      "final": "https://tonguckaracay.com/en/services/ui-ux-design",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/services/seo-consulting",
+      "final": "https://tonguckaracay.com/en/services/seo-consulting",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/services/ai-solutions",
+      "final": "https://tonguckaracay.com/en/services/ai-solutions",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/services/online-advertising",
+      "final": "https://tonguckaracay.com/en/services/online-advertising",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/services/social-media-management",
+      "final": "https://tonguckaracay.com/en/services/social-media-management",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/ai-training",
+      "final": "https://tonguckaracay.com/en/ai-training",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/blog",
+      "final": "https://tonguckaracay.com/en/blog",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/hasta-takip-hatirlatma-ai-agent-kurulumu",
+      "final": "https://tonguckaracay.com/en/ai-agent-patient-follow-up-appointment-reminders",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/claude-mcp-instagram-icerik-takvimi-otomasyonu",
+      "final": "https://tonguckaracay.com/en/automate-instagram-content-calendar-claude-mcp",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/geo-checklist-turkce-icerik-optimizasyonu",
+      "final": "https://tonguckaracay.com/en/geo-targeted-content-optimization-checklist",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/kobi-yapay-zeka-egitim-programi",
+      "final": "https://tonguckaracay.com/en/ai-tools-small-business-owners-training",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/instagram-reels-yapay-zeka-trend-analizi-icerik-planlama",
+      "final": "https://tonguckaracay.com/en/ai-trend-analysis-instagram-reels-content-planning",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/musteri-hizmetleri-chatbotunda-token-maliyetini-dusuren-ayarlamalar",
+      "final": "https://tonguckaracay.com/en/how-to-reduce-token-costs-in-customer-service-chatbots",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/anahtar-kelime-analizi-yapan-seo-araclari",
+      "final": "https://tonguckaracay.com/en/best-keyword-research-seo-tools",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/claude-gpt-4-token-maliyet-karsilastirmasi",
+      "final": "https://tonguckaracay.com/en/claude-gpt-4-token-cost-comparison",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/heading-tags-nedir-h1-etiketi-nasil-kullanilir",
+      "final": "https://tonguckaracay.com/en/what-are-heading-tags-how-to-use-h1",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/ucretsiz-turkce-yapay-zeka-araclari-e-ticaret",
+      "final": "https://tonguckaracay.com/en/free-turkish-ai-tools-ecommerce",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/ai-agent-vps-kendi-sunucu-karsilastirmasi",
+      "final": "https://tonguckaracay.com/en/ai-agent-vps-vs-own-server-comparison",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/chatgpt-ile-e-ticaret-urun-aciklamasi-yazma",
+      "final": "https://tonguckaracay.com/en/chatgpt-ecommerce-product-descriptions-guide",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/ai-agent-nedir-dijital-pazarlamada-nasil-kullanilir",
+      "final": "https://tonguckaracay.com/en/what-is-ai-agent-digital-marketing-guide",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/ai-agent-musteri-hizmetleri-otomasyonu",
+      "final": "https://tonguckaracay.com/en/ai-agent-customer-service-automation",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/e-ticaret-yerel-seo-rehberi",
+      "final": "https://tonguckaracay.com/en/e-ticaret-yerel-seo-rehberi",
+      "status": 500,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/prompt-muhendisligi-ile-para-kazanma",
+      "final": "https://tonguckaracay.com/en/ai-prompt-engineering-ways-to-make-money",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/yapay-zeka-araclari-ve-kullanim-alanlari",
+      "final": "https://tonguckaracay.com/en/ai-tools-and-use-cases-complete-guide",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/google-ads-kampanya-optimizasyonu-rehberi",
+      "final": "https://tonguckaracay.com/en/google-ads-campaign-optimization-guide",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/yapay-zeka-ui-tasarim-araclari",
+      "final": "https://tonguckaracay.com/en/ai-ui-design-tools",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/chatgpt-geo-nasil-yapilir",
+      "final": "https://tonguckaracay.com/en/how-to-get-cited-in-chatgpt",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/geo-nedir-nasil-yapilir",
+      "final": "https://tonguckaracay.com/en/what-is-geo-generative-engine-optimization",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/kaliteli-ve-ozgun-icerigin-seo-icin-onemi",
+      "final": "https://tonguckaracay.com/en/importance-of-quality-original-content-for-seo",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/icerik-pazarlamasi-ve-seo-optimizasyonu",
+      "final": "https://tonguckaracay.com/en/content-marketing-and-seo-optimization",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en-etkili-dijital-pazarlama-yontemleri",
+      "final": "https://tonguckaracay.com/en/most-effective-digital-marketing-methods",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/dropshipping-ile-dijital-pazarlama",
+      "final": "https://tonguckaracay.com/en/dropshipping-and-digital-marketing",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/profesyonel-seo-uzmani-nedir-nasil-olunur",
+      "final": "https://tonguckaracay.com/en/what-is-seo-specialist-how-to-become-one",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/seo-ile-organik-trafigi-artirmanin-yontemleri",
+      "final": "https://tonguckaracay.com/en/how-to-increase-organic-traffic-with-seo",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/serp-nedir-google-icin-neden-onemlidir",
+      "final": "https://tonguckaracay.com/en/what-is-serp-why-it-matters-for-google",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/sosyal-medya-yonetimi-ve-online-pazarlama",
+      "final": "https://tonguckaracay.com/en/social-media-management-and-online-marketing",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/site-ici-seo-nasil-yapilir",
+      "final": "https://tonguckaracay.com/en/on-page-seo-complete-guide",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/google-analytics-ile-site-optimizasyonu",
+      "final": "https://tonguckaracay.com/en/website-optimization-with-google-analytics",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/kullanmaniz-gereken-seo-araclari",
+      "final": "https://tonguckaracay.com/en/essential-seo-tools-you-should-use",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/dijital-pazarlama-stratejileri-ve-araclari",
+      "final": "https://tonguckaracay.com/en/digital-marketing-strategies-and-tools",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/inbound-marketing-nedir-nasil-yapilir",
+      "final": "https://tonguckaracay.com/en/what-is-inbound-marketing-how-to-do-it",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/kaliteli-backlink-nedir-nasil-alinir",
+      "final": "https://tonguckaracay.com/en/what-are-quality-backlinks-how-to-get-them",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/ai-agent-patient-follow-up-appointment-reminders",
+      "final": "https://tonguckaracay.com/en/ai-agent-patient-follow-up-appointment-reminders",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/seo-nedir-nasil-yapilir",
+      "final": "https://tonguckaracay.com/en/what-is-seo-how-does-it-work",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/automate-instagram-content-calendar-claude-mcp",
+      "final": "https://tonguckaracay.com/en/automate-instagram-content-calendar-claude-mcp",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/ui-ux-designer-nedir-nasil-calisirlar",
+      "final": "https://tonguckaracay.com/en/what-is-ui-ux-designer-how-do-they-work",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/geo-targeted-content-optimization-checklist",
+      "final": "https://tonguckaracay.com/en/geo-targeted-content-optimization-checklist",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/ai-tools-small-business-owners-training",
+      "final": "https://tonguckaracay.com/en/ai-tools-small-business-owners-training",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/how-to-reduce-token-costs-in-customer-service-chatbots",
+      "final": "https://tonguckaracay.com/en/how-to-reduce-token-costs-in-customer-service-chatbots",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/ai-trend-analysis-instagram-reels-content-planning",
+      "final": "https://tonguckaracay.com/en/ai-trend-analysis-instagram-reels-content-planning",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/claude-gpt-4-token-cost-comparison",
+      "final": "https://tonguckaracay.com/en/claude-gpt-4-token-cost-comparison",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/best-keyword-research-seo-tools",
+      "final": "https://tonguckaracay.com/en/best-keyword-research-seo-tools",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/what-are-heading-tags-how-to-use-h1",
+      "final": "https://tonguckaracay.com/en/what-are-heading-tags-how-to-use-h1",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/free-turkish-ai-tools-ecommerce",
+      "final": "https://tonguckaracay.com/en/free-turkish-ai-tools-ecommerce",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/local-seo-for-ecommerce-guide",
+      "final": "https://tonguckaracay.com/en/local-seo-for-ecommerce-guide",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/chatgpt-ecommerce-product-descriptions-guide",
+      "final": "https://tonguckaracay.com/en/chatgpt-ecommerce-product-descriptions-guide",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/ai-agent-vps-vs-own-server-comparison",
+      "final": "https://tonguckaracay.com/en/ai-agent-vps-vs-own-server-comparison",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/ai-tools-and-use-cases-complete-guide",
+      "final": "https://tonguckaracay.com/en/ai-tools-and-use-cases-complete-guide",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/ai-prompt-engineering-ways-to-make-money",
+      "final": "https://tonguckaracay.com/en/ai-prompt-engineering-ways-to-make-money",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/what-is-ai-agent-digital-marketing-guide",
+      "final": "https://tonguckaracay.com/en/what-is-ai-agent-digital-marketing-guide",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/google-ads-campaign-optimization-guide",
+      "final": "https://tonguckaracay.com/en/google-ads-campaign-optimization-guide",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/how-to-get-cited-in-chatgpt",
+      "final": "https://tonguckaracay.com/en/how-to-get-cited-in-chatgpt",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/ai-ui-design-tools",
+      "final": "https://tonguckaracay.com/en/ai-ui-design-tools",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/ai-agent-customer-service-automation",
+      "final": "https://tonguckaracay.com/en/ai-agent-customer-service-automation",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/what-is-geo-generative-engine-optimization",
+      "final": "https://tonguckaracay.com/en/what-is-geo-generative-engine-optimization",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/importance-of-quality-original-content-for-seo",
+      "final": "https://tonguckaracay.com/en/importance-of-quality-original-content-for-seo",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/most-effective-digital-marketing-methods",
+      "final": "https://tonguckaracay.com/en/most-effective-digital-marketing-methods",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/content-marketing-and-seo-optimization",
+      "final": "https://tonguckaracay.com/en/content-marketing-and-seo-optimization",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/dropshipping-and-digital-marketing",
+      "final": "https://tonguckaracay.com/en/dropshipping-and-digital-marketing",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/what-is-serp-why-it-matters-for-google",
+      "final": "https://tonguckaracay.com/en/what-is-serp-why-it-matters-for-google",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/what-is-seo-specialist-how-to-become-one",
+      "final": "https://tonguckaracay.com/en/what-is-seo-specialist-how-to-become-one",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/how-to-increase-organic-traffic-with-seo",
+      "final": "https://tonguckaracay.com/en/how-to-increase-organic-traffic-with-seo",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/website-optimization-with-google-analytics",
+      "final": "https://tonguckaracay.com/en/website-optimization-with-google-analytics",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/on-page-seo-complete-guide",
+      "final": "https://tonguckaracay.com/en/on-page-seo-complete-guide",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/social-media-management-and-online-marketing",
+      "final": "https://tonguckaracay.com/en/social-media-management-and-online-marketing",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/essential-seo-tools-you-should-use",
+      "final": "https://tonguckaracay.com/en/essential-seo-tools-you-should-use",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/digital-marketing-strategies-and-tools",
+      "final": "https://tonguckaracay.com/en/digital-marketing-strategies-and-tools",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/what-are-quality-backlinks-how-to-get-them",
+      "final": "https://tonguckaracay.com/en/what-are-quality-backlinks-how-to-get-them",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/what-is-inbound-marketing-how-to-do-it",
+      "final": "https://tonguckaracay.com/en/what-is-inbound-marketing-how-to-do-it",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/what-is-ui-ux-designer-how-do-they-work",
+      "final": "https://tonguckaracay.com/en/what-is-ui-ux-designer-how-do-they-work",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    },
+    {
+      "requested": "https://tonguckaracay.com/en/what-is-seo-how-does-it-work",
+      "final": "https://tonguckaracay.com/en/what-is-seo-how-does-it-work",
+      "status": 200,
+      "type": "text/html; charset=utf-8"
+    }
+  ],
+  "checks": [
+    {
+      "status": 200,
+      "url": "https://tonguckaracay.com/en",
+      "title": "SEO & Digital Marketing Consultant | Tonguç Karaçay",
+      "description": "Growing your business digitally with UI/UX Design, SEO, Online Advertising, and AI solutions. 25+ years of experience, 35+ brands including Turkish Airlines, BMW, Galatasaray.",
+      "robots": "index, follow",
+      "canonical": "https://tonguckaracay.com/en",
+      "violations": [
+        {
+          "id": "link-name",
+          "nodes": [
+            {
+              "target": [
+                ".w-10.h-10.rounded-lg:nth-child(1)"
+              ],
+              "html": "<a href=\"https://www.linkedin...\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"w-10 h-10 rounded-lg...\">",
+              "summary": "Fix all of the following:\n  Element is in tab order and does not have accessible text\n\nFix any of the following:\n  Element does not have text that is visible to screen readers\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute"
+            },
+            {
+              "target": [
+                ".w-10.h-10.rounded-lg:nth-child(2)"
+              ],
+              "html": "<a href=\"https://www.instagram.com/tonguckaracay\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"w-10 h-10 rounded-lg bg-surface-card border border-surface-border text-primary-400 flex items-center justify-center hover:text-accent-500 hover:border-accent-500/50 transition-all\">",
+              "summary": "Fix all of the following:\n  Element is in tab order and does not have accessible text\n\nFix any of the following:\n  Element does not have text that is visible to screen readers\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute"
+            },
+            {
+              "target": [
+                "a[href$=\"tonguc\"]"
+              ],
+              "html": "<a href=\"https://behance.net/tonguc\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"w-10 h-10 rounded-lg bg-surface-card border border-surface-border text-primary-400 flex items-center justify-center hover:text-accent-500 hover:border-accent-500/50 transition-all\">",
+              "summary": "Fix all of the following:\n  Element is in tab order and does not have accessible text\n\nFix any of the following:\n  Element does not have text that is visible to screen readers\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "status": 200,
+      "url": "https://tonguckaracay.com/en/services/ui-ux-design",
+      "title": "UI/UX Design Services | Conversion-Focused Interface Design | Tonguç Karaçay",
+      "description": "Professional UI/UX design services to transform your digital products. Research-driven approach, 25+ years experience, proven track record with enterprise clients. Book a free discovery call.",
+      "robots": "index, follow",
+      "canonical": "https://tonguckaracay.com/en",
+      "violations": [
+        {
+          "id": "link-name",
+          "nodes": [
+            {
+              "target": [
+                ".hover\\:border-accent-500\\/50.bg-surface-card.border:nth-child(1)"
+              ],
+              "html": "<a href=\"https://www.linkedin...\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"w-10 h-10 rounded-lg...\">",
+              "summary": "Fix all of the following:\n  Element is in tab order and does not have accessible text\n\nFix any of the following:\n  Element does not have text that is visible to screen readers\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute"
+            },
+            {
+              "target": [
+                ".hover\\:border-accent-500\\/50.bg-surface-card.border:nth-child(2)"
+              ],
+              "html": "<a href=\"https://www.instagram.com/tonguckaracay\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"w-10 h-10 rounded-lg bg-surface-card border border-surface-border text-primary-400 flex items-center justify-center hover:text-accent-500 hover:border-accent-500/50 transition-all\">",
+              "summary": "Fix all of the following:\n  Element is in tab order and does not have accessible text\n\nFix any of the following:\n  Element does not have text that is visible to screen readers\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute"
+            },
+            {
+              "target": [
+                "a[href$=\"tonguc\"]"
+              ],
+              "html": "<a href=\"https://behance.net/tonguc\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"w-10 h-10 rounded-lg bg-surface-card border border-surface-border text-primary-400 flex items-center justify-center hover:text-accent-500 hover:border-accent-500/50 transition-all\">",
+              "summary": "Fix all of the following:\n  Element is in tab order and does not have accessible text\n\nFix any of the following:\n  Element does not have text that is visible to screen readers\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "status": 200,
+      "url": "https://tonguckaracay.com/en/services/seo-consulting",
+      "title": "SEO Consulting Services | Increase Organic Traffic | Tonguç Karaçay",
+      "description": "Professional SEO consulting to boost your search rankings. Technical SEO, content strategy, link building. 25+ years experience, measurable results. Get your free SEO audit today.",
+      "robots": "index, follow",
+      "canonical": "https://tonguckaracay.com/en",
+      "violations": [
+        {
+          "id": "link-name",
+          "nodes": [
+            {
+              "target": [
+                ".hover\\:border-accent-500\\/50.bg-surface-card.border:nth-child(1)"
+              ],
+              "html": "<a href=\"https://www.linkedin...\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"w-10 h-10 rounded-lg...\">",
+              "summary": "Fix all of the following:\n  Element is in tab order and does not have accessible text\n\nFix any of the following:\n  Element does not have text that is visible to screen readers\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute"
+            },
+            {
+              "target": [
+                ".hover\\:border-accent-500\\/50.bg-surface-card.border:nth-child(2)"
+              ],
+              "html": "<a href=\"https://www.instagram.com/tonguckaracay\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"w-10 h-10 rounded-lg bg-surface-card border border-surface-border text-primary-400 flex items-center justify-center hover:text-accent-500 hover:border-accent-500/50 transition-all\">",
+              "summary": "Fix all of the following:\n  Element is in tab order and does not have accessible text\n\nFix any of the following:\n  Element does not have text that is visible to screen readers\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute"
+            },
+            {
+              "target": [
+                "a[href$=\"tonguc\"]"
+              ],
+              "html": "<a href=\"https://behance.net/tonguc\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"w-10 h-10 rounded-lg bg-surface-card border border-surface-border text-primary-400 flex items-center justify-center hover:text-accent-500 hover:border-accent-500/50 transition-all\">",
+              "summary": "Fix all of the following:\n  Element is in tab order and does not have accessible text\n\nFix any of the following:\n  Element does not have text that is visible to screen readers\n  aria-label attribute does not exist or is empty\n  aria-labelledby attribute does not exist, references elements that do not exist or references elements that are empty\n  Element has no title attribute"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "status": 200,
+      "url": "https://tonguckaracay.com/demos/finance-os/index.html",
+      "title": "Finance OS — Budget Dashboard",
+      "violations": []
+    }
+  ]
+}

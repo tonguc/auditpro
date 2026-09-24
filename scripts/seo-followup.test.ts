@@ -1,0 +1,116 @@
+import assert from 'node:assert/strict';
+import {testSitemapDiscovery} from './sitemap-discovery.test';
+import { robotsDecision, robotsPageEvidence } from '../lib/robots-evidence';
+import { inspectCanonicalTargets, type CanonicalResource, type CanonicalDetail } from '../lib/canonical-targets';
+import { compareSchemaText } from '../lib/schema-visible';
+const decision = (text: string, path: string, bot = 'googlebot', status = 200) => robotsDecision(text, status, new URL(path, 'https://example.com'), bot).allowed;
+const evidence = robotsPageEvidence('User-agent: *\nDisallow: /private',200,'https://example.com/robots.txt','https://example.com',[new URL('https://example.com/private'),new URL('https://other.example/private'),new URL('https://example.com/private')]);
+assert.equal(evidence.length,8,'four bots, two distinct pages');
+assert.equal(evidence[0].allowed,false); assert.equal(evidence[0].rule,'Disallow: /private'); assert.equal(evidence[0].group,'*');
+assert.equal(evidence[1].allowed,null,'never reuse an origin policy for another origin');
+assert.equal(evidence[1].reasonCode,'different-origin');
+assert.equal(robotsDecision('',503,new URL('https://example.com'),'googlebot').reasonCode,'unavailable');
+// Encoded matching is deliberately not guessed: 'unsupported' ('complex' is reserved
+// for bounded-matcher size/wildcard limits).
+assert.equal(robotsDecision('',200,new URL('https://example.com/%20'),'googlebot').reasonCode,'unsupported');
+assert.equal(robotsDecision('User-agent: *\nDisallow: /',200,new URL('https://example.com/'),'googlebot','application/json').reasonCode,'unsupported');
+assert.equal(robotsDecision('User-agent: *\nDisallow: /',200,new URL('https://example.com/'),'googlebot','').reasonCode,'unsupported');
+assert.equal(robotsDecision('User-agent: *\nDisallow: /',200,new URL('https://example.com/'),'googlebot','text/plain; charset=utf-8').allowed,false);
+assert.equal(decision('User-agent: *\nDisallow: /private', '/public'), true);
+assert.equal(decision('User-agent: *\nDisallow: /private', '/private/a'), false);
+assert.equal(decision('User-agent: *\nDisallow: /\nUser-agent: Googlebot\nAllow: /', '/'), true);
+assert.equal(decision('User-agent: *\nDisallow: /\nAllow: /', '/'), true);
+assert.equal(decision('User-agent: *\nDisallow: /private\nAllow: /private/public', '/private/public/a'), true);
+assert.equal(decision('User-agent: *\nDisallow: /*.pdf$', '/a.pdf'), false);
+assert.equal(decision('User-agent: *\nDisallow: /*.pdf$', '/a.pdf?download=1'), true);
+assert.equal(decision('User-agent: *\nDisallow:', '/'), true);
+assert.equal(decision('User-agent: googlebot\nDisallow: /a\nUser-agent: googlebot\nDisallow: /b', '/b'), false);
+assert.equal(decision('User-agent: GPTBot\nDisallow: /', '/', 'oai-searchbot'), true);
+assert.equal(decision('User-agent: *\nDisallow: /Private', '/private'), true);
+assert.equal(decision('User-agent: *\nDisallow: /', '/', 'googlebot', 503), null);
+assert.equal(decision('User-agent: *\nDisallow: /', '/', 'googlebot', 429), null);
+assert.equal(decision('', '/caf%C3%A9'), null);
+// --- RFC 9309 reference fixtures (§5.1, §5.2): group selection, precedence, special characters.
+const rfc51 = 'User-Agent: *\nDisallow: *.gif$\nDisallow: /example/\nAllow: /publications/\n\nUser-Agent: foobot\nDisallow:/\nAllow:/example/page.html\nAllow:/example/allowed.gif\n\nUser-Agent: barbot\nUser-Agent: bazbot\nDisallow: /example/page.html\n\nUser-Agent: quxbot\n';
+assert.equal(decision(rfc51, '/example/page.html', 'foobot'), true);
+assert.equal(decision(rfc51, '/example/other', 'foobot'), false);
+assert.equal(decision(rfc51, '/example/allowed.gif', 'foobot'), true);
+assert.equal(decision(rfc51, '/example/page.html', 'bazbot'), false, 'one group may carry several user-agent lines (barbot + bazbot)');
+assert.equal(decision(rfc51, '/example/other', 'bazbot'), true);
+assert.equal(decision(rfc51, '/anything', 'quxbot'), true, 'an empty group at EOF allows everything');
+assert.equal(decision(rfc51, '/logo.gif', 'otherbot'), false, 'a leading-wildcard rule (Disallow: *.gif$) is valid per RFC 9309 §5.1');
+assert.equal(decision(rfc51, '/logo.gif/x', 'otherbot'), true, '$ anchors to the end of the match');
+assert.equal(decision(rfc51, '/publications/paper', 'otherbot'), true);
+assert.equal(decision(rfc51, '/example/x', 'otherbot'), false);
+// RFC 9309 §5.2: the longest rule wins regardless of Allow/Disallow.
+const rfc52 = 'User-Agent: foobot\nAllow: /example/page/\nDisallow: /example/page/disallowed.gif';
+assert.equal(decision(rfc52, '/example/page/disallowed.gif', 'foobot'), false);
+assert.equal(decision(rfc52, '/example/page/allowed.gif', 'foobot'), true);
+// Group selection: case-insensitive prefix tokens, most specific wins, "*" is only a fallback.
+assert.equal(decision('User-agent: googlebot-news\nDisallow: /news', '/news', 'googlebot'), true, 'a more specific sibling token does not capture this bot');
+assert.equal(decision('User-agent: google\nDisallow: /g', '/g', 'googlebot'), false, 'a group token prefix-matches the product token');
+assert.equal(decision('User-agent: google\nDisallow: /g\nUser-agent: googlebot\nAllow: /g', '/g', 'googlebot'), true, 'the most specific group wins over a shorter prefix token');
+assert.equal(decision('User-agent: google\nDisallow: /g\nUser-agent: *\nAllow: /', '/g', 'googlebot'), false, 'a matching token beats the wildcard group');
+assert.equal(robotsDecision('User-agent: google\nDisallow: /', 200, new URL('https://example.com/g'), 'googlebot').group, 'google');
+// Rules before the first user-agent line are ignored (RFC 9309 §2.2.2).
+assert.equal(decision('Disallow: /\nUser-agent: *\nAllow: /', '/'), true);
+// Bounded-matcher complexity is distinct from not-guessed encodings.
+assert.equal(robotsDecision('User-agent: *\nDisallow: /a*b*c*d*e*f*g*h*i*j*k*l', 200, new URL('https://example.com/x'), 'googlebot').reasonCode, 'complex', 'wildcard overload exceeds the bounded matcher');
+assert.equal(decision('User-agent: *\nDisallow: /private # comment', '/private'), false);
+const block = JSON.stringify({ '@graph': [{ '@type': 'Organization', name: 'Povlex', telephone: '123456' }] });
+assert.equal(compareSchemaText([block], 'Welcome to Povlex').matched, 1);
+assert.equal(compareSchemaText([block], 'Povlex 123456').matched, 2);
+assert.equal(compareSchemaText(['{bad}'], '').invalid, 1);
+assert.equal(compareSchemaText([], '').tested, 0);
+
+export async function testCanonicalTargets() {
+  await testSitemapDiscovery();
+  const pages = [1, 2, 3].map(n => ({ html: `<link rel=canonical href="https://target.example/${n}">`, url: new URL(`https://example.com/${n}`), response: new Response('') }));
+  let calls = 0;
+  const load = async (target: string): Promise<CanonicalResource> => { calls++; return { url: target, status: 200, text: '<meta name=robots content=noindex><link rel=canonical href=/other>', contentType: 'text/html', robots: '', link: '' }; };
+  const details: CanonicalDetail[]=[];
+  const notes = await inspectCanonicalTargets(pages, load, 1, details);
+  assert.equal(details[0].noindex,true); assert.equal(details[0].chain,true);
+  assert.equal(details[1].state,'budget'); assert.equal(details[1].httpStatus,undefined);
+  assert.equal(calls, 1);
+  assert.match(notes[0], /noindex\/none/);
+  assert.match(notes[0], /chain/);
+  assert.match(notes[1], /budget/);
+  const failed = await inspectCanonicalTargets(pages.slice(0, 1), async () => { throw new Error('SSRF'); });
+  assert.match(failed[0], /public-URL protection/);
+  const unavailable = await inspectCanonicalTargets(pages.slice(0, 1), async target => ({ ...await load(target), status: 404 }));
+  assert.match(unavailable[0], /HTTP 404/);
+  const self = { html: '<link rel=canonical href="https://example.com/">', url: new URL('https://example.com/'), response: new Response('') };
+  let selfCalls = 0;
+  await inspectCanonicalTargets([self], async target => { selfCalls++; return load(target); });
+  assert.equal(selfCalls, 0);
+  const unknown: CanonicalDetail[]=[];
+  await inspectCanonicalTargets(pages.slice(0,1),async target=>({...await load(target),status:0}),5,unknown);
+  assert.equal(unknown[0].state,'unavailable'); assert.equal(unknown[0].httpStatus,undefined);
+  const nonHtml: CanonicalDetail[]=[];
+  await inspectCanonicalTargets(pages.slice(0,1),async target=>({...await load(target),contentType:'application/pdf'}),5,nonHtml);
+  assert.equal(nonHtml[0].state,'non-html','PDF is not automatically an invalid canonical');
+  const broken: CanonicalDetail[]=[];
+  await inspectCanonicalTargets(pages.slice(0,1),async target=>({...await load(target),status:404}),5,broken);
+  assert.equal(broken[0].state,'http-error'); assert.equal(broken[0].httpStatus,404);
+  const absent: CanonicalDetail[]=[];
+  await inspectCanonicalTargets([{...self,html:''}],load,5,absent);
+  assert.equal(absent[0].state,'missing');
+  const redirected: CanonicalDetail[]=[];
+  await inspectCanonicalTargets(pages.slice(0,1),async target=>({...await load(target),url:'https://target.example/final'}),5,redirected);
+  assert.equal(redirected[0].redirected,true); assert.equal(redirected[0].finalUrl,'https://target.example/final');
+  const trace:CanonicalDetail[]=[];
+  await inspectCanonicalTargets(pages.slice(0,1),async target=>({...await load(target),url:'https://target.example/final',text:'<link rel=canonical href="https://example.com/1">',redirectTrace:[{url:target,status:301,target:'https://target.example/final'}]}),5,trace);
+  assert.equal(trace[0].redirectTrace?.[0].status,301);
+  assert.equal(trace[0].targetCanonical,'https://example.com/1');
+  assert.equal(trace[0].returnsToSource,true);
+  const invalidTarget:CanonicalDetail[]=[];
+  await inspectCanonicalTargets(pages.slice(0,1),async target=>({...await load(target),text:'<link rel=canonical href=/a><link rel=canonical href=/b>'}),5,invalidTarget);
+  assert.equal(invalidTarget[0].targetCanonicalInvalid,true);
+  assert.equal(invalidTarget[0].state,'review','target validity does not establish source intent');
+  let failureCalls=0; const shared:CanonicalDetail[]=[];
+  await inspectCanonicalTargets(pages.map(page=>({...page,html:'<link rel=canonical href="https://target.example/shared">'})),async()=>{failureCalls++;throw new Error('unavailable');},1,shared);
+  assert.equal(failureCalls,1,'failed shared target must not exhaust request budget repeatedly');
+  assert.ok(shared.every(row=>row.state==='unavailable'),'cached unavailability must not turn into budget state');
+  console.log('Robots, schema-text and canonical-target regression tests passed.');
+}

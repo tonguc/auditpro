@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {inspectContent} from '../lib/content-evidence';
+import {navigationHints} from '../lib/navigation-hints';
+const links=inspectContent('<p>privacy terms about</p><template><a href="/about">About</a></template><svg><a href="/about">About</a></svg><a href="/x?next=privacy">Other</a><a href="/roundabout">Other</a><a href="/en/about-us">Team</a><a href="/gizlilik-politikasi">Gizlilik</a><a href="/s">Kullanım Koşulları</a><a href="https://outside.example/about">About</a>',new URL('https://example.com/')).links;
+assert.deepEqual(navigationHints(links,'about').map(link=>link.target),['https://example.com/en/about-us']);
+assert.deepEqual(navigationHints(links,'policy').map(link=>link.target),['https://example.com/gizlilik-politikasi','https://example.com/s']);
+assert.equal(navigationHints([{target:'https://example.com/hakk%C4%B1m%C4%B1zda',text:''}],'about').length,1);
+assert.equal(navigationHints([{target:'https://example.com/a',text:'Hakkımızda'}],'about').length,1);
+assert.deepEqual(navigationHints([{target:'https://example.com/confidentialite',text:'Confidentialité'}],'policy'),[],'unsupported labels remain unclassified, not failures');
+console.log('Navigation candidates: real internal anchors, inert/foreign exclusion, token boundaries, Turkish labels and query exclusion passed.');

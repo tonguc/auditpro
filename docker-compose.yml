@@ -1,0 +1,132 @@
+services:
+  app:
+    build:
+      context: .
+      target: runner
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      APP_URL: https://${APP_DOMAIN}
+      BETTER_AUTH_URL: https://${APP_DOMAIN}
+      BETTER_AUTH_SECRET: ${BETTER_AUTH_SECRET}
+      DATABASE_URL: postgresql://auditpro:${POSTGRES_PASSWORD}@database:5432/auditpro
+      DATABASE_POOL_SIZE: ${DATABASE_POOL_SIZE:-10}
+      AUDITPRO_DEFAULT_PLAN: ${AUDITPRO_DEFAULT_PLAN:-free}
+      AUDITPRO_DEPLOYMENT_MODE: ${AUDITPRO_DEPLOYMENT_MODE:-production}
+      AUDITPRO_PILOT_UNLIMITED_PAGES: ${AUDITPRO_PILOT_UNLIMITED_PAGES:-false}
+      AUDITPRO_SIGNUP_ENABLED: ${AUDITPRO_SIGNUP_ENABLED:-false}
+      AUDITPRO_PUBLIC_ANALYSIS_ENABLED: ${AUDITPRO_PUBLIC_ANALYSIS_ENABLED:-false}
+      AUDITPRO_PUBLIC_PAGE_LIMIT: ${AUDITPRO_PUBLIC_PAGE_LIMIT:-25}
+      AUDITPRO_RENDERED_PAGE_LIMIT: ${AUDITPRO_RENDERED_PAGE_LIMIT:-5}
+      AUDITPRO_INLINE_ANALYSIS_JOBS: "false"
+      AUDITPRO_STALE_JOB_MS: ${AUDITPRO_STALE_JOB_MS:-1800000}
+      AUDITPRO_WORKER_POLL_MS: ${AUDITPRO_WORKER_POLL_MS:-2500}
+      AUDITPRO_LOG_LEVEL: ${AUDITPRO_LOG_LEVEL:-info}
+      AUDITPRO_LAUNCH_READINESS_REPORT_DIR: /app/launch-readiness-reports
+      AUDITPRO_LAUNCH_READINESS_MAX_AGE_MS: ${AUDITPRO_LAUNCH_READINESS_MAX_AGE_MS:-86400000}
+      AUDITPRO_BACKUP_DIR: /app/backups
+      AUDITPRO_BACKUP_MAX_AGE_MS: ${AUDITPRO_BACKUP_MAX_AGE_MS:-86400000}
+      AUDITPRO_REQUIRE_PDF_RENDER: ${AUDITPRO_REQUIRE_PDF_RENDER:-true}
+      AUDITPRO_ADMIN_SECRET: ${AUDITPRO_ADMIN_SECRET}
+      AUDITPRO_BILLING_SYNC_SECRET: ${AUDITPRO_BILLING_SYNC_SECRET}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+      AUDITPRO_STRIPE_PRO_PRICE_ID: ${AUDITPRO_STRIPE_PRO_PRICE_ID}
+      AUDITPRO_STRIPE_AGENCY_PRICE_ID: ${AUDITPRO_STRIPE_AGENCY_PRICE_ID}
+      AUDITPRO_STRIPE_ENTERPRISE_PRICE_ID: ${AUDITPRO_STRIPE_ENTERPRISE_PRICE_ID}
+      AUDITPRO_AI_VISIBILITY_ENABLED: ${AUDITPRO_AI_VISIBILITY_ENABLED:-false}
+      AUDITPRO_PILOT_AI_ENABLED: ${AUDITPRO_PILOT_AI_ENABLED:-false}
+      AUDITPRO_PILOT_AI_BUDGET_EUR: ${AUDITPRO_PILOT_AI_BUDGET_EUR:-10}
+      AUDITPRO_PILOT_AI_MAX_SCANS: ${AUDITPRO_PILOT_AI_MAX_SCANS:-10}
+      AUDITPRO_PILOT_AI_MAX_DOMAINS: ${AUDITPRO_PILOT_AI_MAX_DOMAINS:-5}
+      AUDITPRO_PILOT_AI_SCANS_PER_DOMAIN: ${AUDITPRO_PILOT_AI_SCANS_PER_DOMAIN:-2}
+      AUDITPRO_PILOT_AI_RESERVED_EUR_PER_SCAN: ${AUDITPRO_PILOT_AI_RESERVED_EUR_PER_SCAN:-1}
+      AUDITPRO_CLAUDE_SEARCH_EUR_PER_REQUEST: ${AUDITPRO_CLAUDE_SEARCH_EUR_PER_REQUEST:-0.01}
+      AUDITPRO_PILOT_AI_INPUT_EUR_PER_1K: ${AUDITPRO_PILOT_AI_INPUT_EUR_PER_1K:-0.005}
+      AUDITPRO_PILOT_AI_OUTPUT_EUR_PER_1K: ${AUDITPRO_PILOT_AI_OUTPUT_EUR_PER_1K:-0.025}
+      AI_GATEWAY_API_KEY: ${AI_GATEWAY_API_KEY}
+      AUDITPRO_AI_OPENAI_MODEL: ${AUDITPRO_AI_OPENAI_MODEL:-openai/gpt-5.6-luna}
+      AUDITPRO_AI_GEMINI_MODEL: ${AUDITPRO_AI_GEMINI_MODEL:-google/gemini-3.5-flash-lite}
+      AUDITPRO_AI_PERPLEXITY_MODEL: ${AUDITPRO_AI_PERPLEXITY_MODEL:-perplexity/sonar}
+      AUDITPRO_AI_CLAUDE_MODEL: ${AUDITPRO_AI_CLAUDE_MODEL:-anthropic/claude-sonnet-4.6}
+      AUDITPRO_AI_INPUT_EUR_PER_1K: ${AUDITPRO_AI_INPUT_EUR_PER_1K:-0.002}
+      AUDITPRO_AI_OUTPUT_EUR_PER_1K: ${AUDITPRO_AI_OUTPUT_EUR_PER_1K:-0.006}
+    volumes:
+      - ./launch-readiness-reports:/app/launch-readiness-reports:ro
+      - ./backups:/app/backups:ro
+    depends_on:
+      migrator:
+        condition: service_completed_successfully
+
+  worker:
+    build:
+      context: .
+      target: worker
+    restart: unless-stopped
+    stop_grace_period: 35m
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://auditpro:${POSTGRES_PASSWORD}@database:5432/auditpro
+      DATABASE_POOL_SIZE: ${DATABASE_POOL_SIZE:-10}
+      AUDITPRO_DEFAULT_PLAN: ${AUDITPRO_DEFAULT_PLAN:-free}
+      AUDITPRO_WORKER_ID: auditpro-worker-1
+      AUDITPRO_STALE_JOB_MS: ${AUDITPRO_STALE_JOB_MS:-1800000}
+      AUDITPRO_WORKER_POLL_MS: ${AUDITPRO_WORKER_POLL_MS:-2500}
+      AUDITPRO_LOG_LEVEL: ${AUDITPRO_LOG_LEVEL:-info}
+      AUDITPRO_RENDERED_PAGE_LIMIT: ${AUDITPRO_RENDERED_PAGE_LIMIT:-5}
+      AUDITPRO_AI_VISIBILITY_ENABLED: ${AUDITPRO_AI_VISIBILITY_ENABLED:-false}
+      AI_GATEWAY_API_KEY: ${AI_GATEWAY_API_KEY}
+    depends_on:
+      migrator:
+        condition: service_completed_successfully
+
+  database:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: auditpro
+      POSTGRES_USER: auditpro
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - auditpro_database:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U auditpro -d auditpro"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  migrator:
+    build:
+      context: .
+      target: migrator
+    env_file:
+      - .env
+    restart: "no"
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://auditpro:${POSTGRES_PASSWORD}@database:5432/auditpro
+      DATABASE_POOL_SIZE: ${DATABASE_POOL_SIZE:-2}
+    depends_on:
+      database:
+        condition: service_healthy
+
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    environment:
+      APP_DOMAIN: ${APP_DOMAIN}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      app:
+        condition: service_healthy
+
+volumes:
+  auditpro_database:
+  caddy_data:
+  caddy_config:

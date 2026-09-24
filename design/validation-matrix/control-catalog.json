@@ -1,0 +1,2000 @@
+{
+  "generatedAt": "2026-09-16T20:42:11.587Z",
+  "counts": {
+    "verified-bounded": 8,
+    "observation": 42,
+    "external-evidence-required": 149
+  },
+  "rows": [
+    {
+      "id": "serp1",
+      "title": "Site appears in Google top 10 for main keyword",
+      "category": "serp",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Target intent, market, language and engine/source-specific evidence",
+      "siteTypeApplicability": "GEO/SERP denetimleri hedef anahtar kelime odaklı içerik stratejisinde uygulanır.",
+      "section": "serp_visibility"
+    },
+    {
+      "id": "serp2",
+      "title": "SERP intent matches content type",
+      "category": "serp",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Target intent, market, language and engine/source-specific evidence",
+      "siteTypeApplicability": "SERP niyet uyumu anahtar kelime hedefli her pazar için uygulanır.",
+      "section": "serp_visibility"
+    },
+    {
+      "id": "serp3",
+      "title": "Content addresses relevant user needs and information gaps",
+      "category": "serp",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Target intent, market, language and engine/source-specific evidence",
+      "siteTypeApplicability": "Kullanıcı ihtiyacı uyumu ürün/hizmet ve içerik sayfalarında uygulanır.",
+      "section": "serp_visibility"
+    },
+    {
+      "id": "serp4",
+      "title": "Featured snippet / answer box opportunity detected",
+      "category": "serp",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Target intent, market, language and engine/source-specific evidence",
+      "siteTypeApplicability": "Özet kutu/cevap bölümü fırsatı bilgi odaklı içeriklerde uygulanır.",
+      "section": "aeo"
+    },
+    {
+      "id": "serp5",
+      "title": "Relevant audience questions are answered accurately",
+      "category": "serp",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Target intent, market, language and engine/source-specific evidence",
+      "siteTypeApplicability": "Soru-cevap derinliği destek ve eğitim odaklı içerikte anlamlıdır.",
+      "section": "aeo"
+    },
+    {
+      "id": "serp6",
+      "title": "Content answers a clear, specific question",
+      "category": "serp",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Target intent, market, language and engine/source-specific evidence",
+      "siteTypeApplicability": "Net mesaj odaklı tek amaçlı sayfalarda uygulanır.",
+      "section": "aeo"
+    },
+    {
+      "id": "serp7",
+      "title": "Content structured in short, scannable chunks",
+      "category": "serp",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Target intent, market, language and engine/source-specific evidence",
+      "siteTypeApplicability": "İçerik okunabilirlik akışında uygulanır.",
+      "section": "aeo"
+    },
+    {
+      "id": "serp9",
+      "title": "Google AI Overview detected for this keyword",
+      "category": "serp",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Target intent, market, language and engine/source-specific evidence",
+      "siteTypeApplicability": "AI Overview tespiti motor odaklı içerik denetiminde uygulanır.",
+      "section": "aio"
+    },
+    {
+      "id": "serp10",
+      "title": "Site cited as source in Google AI Overview",
+      "category": "serp",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Target intent, market, language and engine/source-specific evidence",
+      "siteTypeApplicability": "Marka görünürlüğü AI alıntılarına hizmet odaklı içerikte uygulanır.",
+      "section": "aio"
+    },
+    {
+      "id": "serp11",
+      "title": "Content structured for AI answer extraction",
+      "category": "serp",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Target intent, market, language and engine/source-specific evidence",
+      "siteTypeApplicability": "AI yanıt çıkarımı için yapı kontrolü bilgi ürünlerinde uygulanır.",
+      "section": "aio"
+    },
+    {
+      "id": "serp12",
+      "title": "Brand appears in AI-generated answers for core queries",
+      "category": "serp",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Target intent, market, language and engine/source-specific evidence",
+      "siteTypeApplicability": "AI görünürlük denetimi marka konuşma ağında uygulanır.",
+      "section": "geo"
+    },
+    {
+      "id": "serp13",
+      "title": "AI crawlers not blocked in robots.txt",
+      "category": "serp",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Target intent, market, language and engine/source-specific evidence",
+      "siteTypeApplicability": "AI bot erişimi robots politikası SEO ve GEO hedefli sitelerde uygulanır.",
+      "section": "geo"
+    },
+    {
+      "id": "serp15",
+      "title": "Content includes unique data, insights or first-hand information",
+      "category": "serp",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Target intent, market, language and engine/source-specific evidence",
+      "siteTypeApplicability": "Orijinal veri/öngörü kontrolleri uzman içerik ve araştırma sitelerinde anlamlıdır.",
+      "section": "geo"
+    },
+    {
+      "id": "serp16",
+      "title": "Brand has entity signals (Knowledge Graph / structured presence)",
+      "category": "serp",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Target intent, market, language and engine/source-specific evidence",
+      "siteTypeApplicability": "Entity sinyalleri marka profil çabası olan tüm kurumsal sitelerde uygulanır.",
+      "section": "geo"
+    },
+    {
+      "id": "serp17",
+      "title": "Author byline and bio on all content pages",
+      "category": "serp",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Target intent, market, language and engine/source-specific evidence",
+      "siteTypeApplicability": "Yazar byline denetimi editoryel içerik sunan sitelerde uygulanır.",
+      "section": "eeat"
+    },
+    {
+      "id": "serp18",
+      "title": "Person schema markup on author pages",
+      "category": "serp",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Target intent, market, language and engine/source-specific evidence",
+      "siteTypeApplicability": "Person schema denetimi yazar bazlı içerik sitelerinde uygulanır.",
+      "section": "eeat"
+    },
+    {
+      "id": "serp19",
+      "title": "About page demonstrates real expertise & credibility",
+      "category": "serp",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Target intent, market, language and engine/source-specific evidence",
+      "siteTypeApplicability": "Hakkında güvenilirlik denetimi güven temelli marka sitelerinde anlamlıdır.",
+      "section": "eeat"
+    },
+    {
+      "id": "serp20",
+      "title": "References high-authority sources (.gov, .edu, research)",
+      "category": "serp",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Target intent, market, language and engine/source-specific evidence",
+      "siteTypeApplicability": "Otorite kaynak referansları içerik sayfalarında uygulanır.",
+      "section": "eeat"
+    },
+    {
+      "id": "serp21",
+      "title": "Content shows human editorial oversight (not raw AI output)",
+      "category": "serp",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Target intent, market, language and engine/source-specific evidence",
+      "siteTypeApplicability": "İnsan editleme denetimi üretilen içerik riski olan sitelerde uygulanır.",
+      "section": "eeat"
+    },
+    {
+      "id": "t1",
+      "title": "robots.txt retrieval and sampled-path rules",
+      "category": "technical",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "Kural tabanlı erişim ve robots politikası SEO giriş kontrolü için her site tipinde gereklidir.",
+      "section": "crawl"
+    },
+    {
+      "id": "t2",
+      "title": "XML sitemap exists and is valid",
+      "category": "technical",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "Sitemap varlık denetimi tüm siteler için uygulanır; XML varlığın işlevi sektöre göre değişir.",
+      "section": "crawl"
+    },
+    {
+      "id": "t4",
+      "title": "No important pages are noindex",
+      "category": "technical",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "Noindex denetimi site kapsamlı index stratejisinde geçerlidir; içerik stratejisine göre ayrıştırılmalıdır.",
+      "section": "crawl"
+    },
+    {
+      "id": "t5",
+      "title": "Canonical tags correctly implemented",
+      "category": "technical",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "Canonical denetimi crawl edilebilir sayfa seti olan tüm siteler için uygulanır.",
+      "section": "crawl"
+    },
+    {
+      "id": "t6",
+      "title": "No orphan pages (0 internal links)",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "crawl"
+    },
+    {
+      "id": "t7",
+      "title": "Crawl depth ≤ 3 clicks from homepage",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "crawl"
+    },
+    {
+      "id": "t8",
+      "title": "Pagination handled correctly",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Pagination denetimi ürün listeleri, kategori ve haber akışı siteleri için kritik; portföy sitelerinde sınırlı uygulanır.",
+      "section": "crawl"
+    },
+    {
+      "id": "t9",
+      "title": "No redirect chains (max 1 hop)",
+      "category": "technical",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "crawl"
+    },
+    {
+      "id": "t10",
+      "title": "No broken internal links (404s)",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "crawl"
+    },
+    {
+      "id": "t11",
+      "title": "International / hreflang tags correct",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "crawl"
+    },
+    {
+      "id": "t12",
+      "title": "GSC shows no crawl anomalies",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "crawl"
+    },
+    {
+      "id": "t13",
+      "title": "JavaScript not blocking key content",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "crawl"
+    },
+    {
+      "id": "t14",
+      "title": "Page paths and URL parameter declarations",
+      "category": "technical",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "URL parametre davranışı query odaklı sitelerde önceliklidir; istatistiksel amaçlı sayfalarda farklı yorumlanır.",
+      "section": "crawl"
+    },
+    {
+      "id": "t15",
+      "title": "LCP ≤ 2.5s (Largest Contentful Paint)",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "CWV ölçümleri sadece teknik ölçüm hattı ile tamamlanmalıdır; bu kontrol bir çerçeve yalnızdır.",
+      "section": "cwv"
+    },
+    {
+      "id": "t16",
+      "title": "FID / INP ≤ 200ms (Interaction to Next Paint)",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "CWV ölçümleri gerçek kullanıcı davranışı yerine tarayıcı paneli/sentetik ölçümle tamamlanmalıdır.",
+      "section": "cwv"
+    },
+    {
+      "id": "t17",
+      "title": "CLS ≤ 0.1 (Cumulative Layout Shift)",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "CLS denetimi medya/tema yoğun sayfalarda önemlidir.",
+      "section": "cwv"
+    },
+    {
+      "id": "t18",
+      "title": "Mobile PageSpeed score ≥ 70",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Mobile PageSpeed kontrolü trafik yoğun mobil sitelerde önceliklidir.",
+      "section": "cwv"
+    },
+    {
+      "id": "t19",
+      "title": "Desktop PageSpeed score ≥ 85",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Desktop CWV kontrolü kurumsal ürün sitelerinde daha anlamlıdır.",
+      "section": "cwv"
+    },
+    {
+      "id": "t20",
+      "title": "Image source declarations",
+      "category": "technical",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "Görsel envanteri tüm sitelerde uygulanır; kalite yorumu içerik tipine bağlıdır.",
+      "section": "cwv"
+    },
+    {
+      "id": "t21",
+      "title": "Image width and height declarations",
+      "category": "technical",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "Görsel boyut denetimi medya ağırlıklı sayfalarda daha değerli bir sinyal olur.",
+      "section": "cwv"
+    },
+    {
+      "id": "t22",
+      "title": "Image loading declarations",
+      "category": "technical",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "Yükleme bildirimi denetimi, çok görsel sayfalarda ve uzun form sayfalarında anlamlıdır.",
+      "section": "cwv"
+    },
+    {
+      "id": "t23",
+      "title": "Render-blocking JS/CSS minimized",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Render-blocking denetimi frontend mimarisine göre sitelerin çoğunda tamamlayıcıdır.",
+      "section": "cwv"
+    },
+    {
+      "id": "t24",
+      "title": "Crawler response-header timing",
+      "category": "technical",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "Header zamanlaması izleme, sabit CDN davranışı olan yapılarda daha kullanılabilir.",
+      "section": "cwv"
+    },
+    {
+      "id": "t25",
+      "title": "Font loading optimized (font-display: swap)",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Font yükleme denetimi tipografi odaklı sitelerde öne çıkar.",
+      "section": "cwv"
+    },
+    {
+      "id": "t26",
+      "title": "Script loading declarations",
+      "category": "technical",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "Script yükleme denetimi SPA/hybrid yapılarda daha belirleyicidir.",
+      "section": "cwv"
+    },
+    {
+      "id": "t27",
+      "title": "SSL certificate valid and not expiring soon",
+      "category": "technical",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "SSL denetimi tüm sitelerde uygulanır.",
+      "section": "https"
+    },
+    {
+      "id": "t28",
+      "title": "Fetched pages are served over HTTPS",
+      "category": "technical",
+      "status": "verified-bounded",
+      "measurement": "Fetched sample uses HTTPS",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "HTTPS servis denetimi temel güvenlik/gibi kontrol olarak evrensel uygulanır.",
+      "section": "https"
+    },
+    {
+      "id": "t29",
+      "title": "HTTP → HTTPS redirect in place",
+      "category": "technical",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "HTTP→HTTPS yönlendirme denetimi tek domainli üretim yapılarında temel geçerlidir.",
+      "section": "https"
+    },
+    {
+      "id": "t30",
+      "title": "www / non-www canonicalized",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "www/non-www normalizasyonu marka alanı stratejisinde önemlidir.",
+      "section": "https"
+    },
+    {
+      "id": "t31",
+      "title": "HSTS response declarations",
+      "category": "technical",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "Güvenlik başlık denetimi genel olarak uygulanır; politika yorumu domain özelidir.",
+      "section": "https"
+    },
+    {
+      "id": "t32",
+      "title": "No mixed content (HTTP resources on HTTPS pages)",
+      "category": "technical",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "Mixed content denetimi mixed içerik üreten sitelerde kritiktir.",
+      "section": "https"
+    },
+    {
+      "id": "t33",
+      "title": "Security response header declarations",
+      "category": "technical",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "Güvenlik header denetimi yüksek seviyeli güvenlik politikalarında önemlidir.",
+      "section": "https"
+    },
+    {
+      "id": "t34",
+      "title": "No sensitive data exposed in source or URLs",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Gizli veri riski incelemesi ürün/hizmet siteleri için en kritik",
+      "section": "https"
+    },
+    {
+      "id": "t35",
+      "title": "Organization schema implemented",
+      "category": "technical",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Only applicable entity/content types; absence is not a universal defect",
+      "siteTypeApplicability": "Organization schema, markalı siteler için anlamlıdır; tek ürün alt-alanı için zorunlu değildir.",
+      "section": "schema"
+    },
+    {
+      "id": "t37",
+      "title": "BreadcrumbList schema on inner pages",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "BreadcrumbList schema, derin kategori yapısı olan sitelerde uygulanır.",
+      "section": "schema"
+    },
+    {
+      "id": "t38",
+      "title": "Product schema on product pages",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Product schema, ürün ve e-ticaret kataloglarında uygulanır.",
+      "section": "schema"
+    },
+    {
+      "id": "t39",
+      "title": "Article/BlogPosting schema on blog posts",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Article/BlogPosting schema, haber/blog yayın sitelerinde uygulanır.",
+      "section": "schema"
+    },
+    {
+      "id": "t40",
+      "title": "FAQ schema on FAQ pages",
+      "category": "technical",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Only applicable entity/content types; absence is not a universal defect",
+      "siteTypeApplicability": "FAQ schema, içerik ve destek sayfalarında anlamlıdır.",
+      "section": "schema"
+    },
+    {
+      "id": "t41",
+      "title": "Review/Rating schema correct",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Review/Rating schema, ürün/paket/servis güven sinyali toplayan sitelerde uygulanır.",
+      "section": "schema"
+    },
+    {
+      "id": "t42",
+      "title": "No schema markup errors in GSC",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Schema hata denetimi için schema üreten tüm sitelerde uygulanır.",
+      "section": "schema"
+    },
+    {
+      "id": "t43",
+      "title": "LocalBusiness schema if applicable",
+      "category": "technical",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Only applicable entity/content types; absence is not a universal defect",
+      "siteTypeApplicability": "LocalBusiness schema, yerel işletme ve ofis hizmeti sunan sitelerde uygulanır.",
+      "section": "schema"
+    },
+    {
+      "id": "t44",
+      "title": "Mobile-first indexing compatible",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Mobil-first inceleme Google odaklı sitelerde uygulanır.",
+      "section": "mobile"
+    },
+    {
+      "id": "t45",
+      "title": "Viewport meta tag correct",
+      "category": "technical",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "Viewport denetimi responsive tasarım sunan tüm sitelerde uygulanır.",
+      "section": "mobile"
+    },
+    {
+      "id": "t46",
+      "title": "No horizontal scroll on mobile",
+      "category": "technical",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "Dokunmatik kaydırma/taşma denetimi mobil öncelikli tüm sitelerde uygulanır.",
+      "section": "mobile"
+    },
+    {
+      "id": "t47",
+      "title": "Touch target size observation (48px heuristic)",
+      "category": "technical",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "Dokunmatik hedef denetimi özellikle mobil akış odaklı sitelerde anlamlıdır.",
+      "section": "mobile"
+    },
+    {
+      "id": "t48",
+      "title": "No intrusive interstitials on mobile",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Kullanıcı deneyimi engelleyicileri her sayfada görülmeli.",
+      "section": "mobile"
+    },
+    {
+      "id": "t49",
+      "title": "AMP implemented if news/article site",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "AMP odaklıdır; haber ve uzun metinli yayın sitelerinde geçerlilik kazanır.",
+      "section": "mobile"
+    },
+    {
+      "id": "t50",
+      "title": "404 page is helpful and links back to site",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "404 deneyimi genel olarak tüm siteler için değerlidir.",
+      "section": "mobile"
+    },
+    {
+      "id": "t51",
+      "title": "Thin content pages handled (noindex or improved)",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "İçerik kalitesi denetimi içerik odaklı sitelerde kritik.",
+      "section": "mobile"
+    },
+    {
+      "id": "t52",
+      "title": "Duplicate content managed via canonicals",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Duplicate içerik yönetimi çok sayfalı içerik sitelerinde anlamlıdır.",
+      "section": "mobile"
+    },
+    {
+      "id": "t53",
+      "title": "Site language correctly declared in HTML tag",
+      "category": "technical",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "Dil bildirimleri tüm çok dilli veya uluslararası hedeflerde önceliklidir.",
+      "section": "intl"
+    },
+    {
+      "id": "t54",
+      "title": "International targeting configured in GSC",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Uluslararası hedefleme sadece bölgesel/çok dil hedefi olan sitelerde uygulanır.",
+      "section": "intl"
+    },
+    {
+      "id": "t55",
+      "title": "CDN in use for static assets",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "CDN denetimi dağıtık dağıtım yapan sitelerde anlamlı.",
+      "section": "intl"
+    },
+    {
+      "id": "t56",
+      "title": "Checked addresses return successful HTTP responses",
+      "category": "technical",
+      "status": "verified-bounded",
+      "measurement": "Observed HTTP response status across discovered crawl and link targets; unavailable or unrequested addresses remain unknown",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "Genel erişilebilirlik denetimi tüm siteler için bir ön kontrol.",
+      "section": "intl"
+    },
+    {
+      "id": "t57",
+      "title": "Log file analysis shows no crawl waste",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Log-tabanlı analiz, trafik hacmi yüksek sitelerde operasyonel olarak uygulanır.",
+      "section": "intl"
+    },
+    {
+      "id": "t58",
+      "title": "Internal search result pages blocked from index",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Arama sonuçları engelleme, e-ticaret olmayan CMS'lar için nadiren kritik.",
+      "section": "intl"
+    },
+    {
+      "id": "t59",
+      "title": "Faceted navigation handled correctly",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Parametre yönetimi filtreli katalog sitelerinde yüksek önceliklidir.",
+      "section": "intl"
+    },
+    {
+      "id": "t60",
+      "title": "Print CSS pages not indexed",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Yazdırma CSS denetimi belge yayınlı sitelerde anlamlıdır.",
+      "section": "intl"
+    },
+    {
+      "id": "t61",
+      "title": "Session IDs or tracking params not indexed",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Takip parametresi denetimi CRM/analitik odaklı sitelerde uygulanır.",
+      "section": "intl"
+    },
+    {
+      "id": "t62",
+      "title": "Breadcrumb navigation present",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Breadcrumb navigasyon çok seviyeli bilgi mimarisinde anlamlıdır.",
+      "section": "intl"
+    },
+    {
+      "id": "t63",
+      "title": "XML sitemap excludes noindex and redirect URLs",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Sitemap filtrelenmesi sitenin indeksleme stratejisine göre önem kazanır.",
+      "section": "intl"
+    },
+    {
+      "id": "t64",
+      "title": "Response-header observations across sampled pages",
+      "category": "technical",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "Header timing karşılaştırması site şablonu stabilite gerektirir.",
+      "section": "intl"
+    },
+    {
+      "id": "t65",
+      "title": "No AI-generated content penalties (GSC traffic)",
+      "category": "technical",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "AI ceza/performans denetimi reklam ve içerik hacimli sitelerde anlamlıdır.",
+      "section": "intl"
+    },
+    {
+      "id": "o1",
+      "title": "Fetched pages contain nonempty title tags",
+      "category": "onpage",
+      "status": "verified-bounded",
+      "measurement": "Fetched HTML contains a nonempty title",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "Genel metin ve başlık denetimi, yayınlanan tüm sayfalara uygulanır.",
+      "section": "title"
+    },
+    {
+      "id": "o3",
+      "title": "Primary keyword appears in title tag (near start)",
+      "category": "onpage",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "title"
+    },
+    {
+      "id": "o4",
+      "title": "Title tags are unique within the fetched sample",
+      "category": "onpage",
+      "status": "verified-bounded",
+      "measurement": "Title uniqueness within the fetched sample",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "Başlık eşsizliği sadece karşılaştırılan sayfalar için anlamlıdır; site tipine göre varyasyon kabul edilebilir.",
+      "section": "title"
+    },
+    {
+      "id": "o5",
+      "title": "Fetched pages contain nonempty meta descriptions",
+      "category": "onpage",
+      "status": "verified-bounded",
+      "measurement": "Fetched HTML contains a nonempty meta description",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "Meta açıklama denetimi tüm sayfalar için uygulanır; içerik ağırlığı ve reklam formatına göre fark doğar.",
+      "section": "title"
+    },
+    {
+      "id": "o6",
+      "title": "Meta description includes primary + secondary keyword",
+      "category": "onpage",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "title"
+    },
+    {
+      "id": "o7",
+      "title": "Meta description has a clear call-to-action",
+      "category": "onpage",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "title"
+    },
+    {
+      "id": "o8",
+      "title": "Meta descriptions are unique within the fetched sample",
+      "category": "onpage",
+      "status": "verified-bounded",
+      "measurement": "Meta description uniqueness within the fetched sample",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "Meta açıklama benzersizliği karşılaştırmalı olarak ve minimum iki sayfa olduğunda değerlendirilir.",
+      "section": "title"
+    },
+    {
+      "id": "o9",
+      "title": "Open Graph / Twitter Card tags present",
+      "category": "onpage",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "title"
+    },
+    {
+      "id": "o11",
+      "title": "H1 contains primary keyword",
+      "category": "onpage",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "headings"
+    },
+    {
+      "id": "o13",
+      "title": "Heading hierarchy correct (H1→H2→H3)",
+      "category": "onpage",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "headings"
+    },
+    {
+      "id": "o14",
+      "title": "H2s contain secondary keywords",
+      "category": "onpage",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "headings"
+    },
+    {
+      "id": "o15",
+      "title": "Headings are descriptive (not \"Section 1\")",
+      "category": "onpage",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "headings"
+    },
+    {
+      "id": "o16",
+      "title": "FAQ sections use H2/H3 for questions",
+      "category": "onpage",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "headings"
+    },
+    {
+      "id": "o17",
+      "title": "No keyword stuffing in headings",
+      "category": "onpage",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "headings"
+    },
+    {
+      "id": "o21",
+      "title": "No keyword cannibalization",
+      "category": "onpage",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "keywords"
+    },
+    {
+      "id": "o22",
+      "title": "Target keyword in image alt text (where relevant)",
+      "category": "onpage",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "keywords"
+    },
+    {
+      "id": "o23",
+      "title": "Target keyword in URL slug",
+      "category": "onpage",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "keywords"
+    },
+    {
+      "id": "o24",
+      "title": "Long-tail keyword variations covered",
+      "category": "onpage",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "keywords"
+    },
+    {
+      "id": "o25",
+      "title": "Featured snippet optimization attempted",
+      "category": "onpage",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "keywords"
+    },
+    {
+      "id": "o26",
+      "title": "Search intent matched correctly",
+      "category": "onpage",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "keywords"
+    },
+    {
+      "id": "o27",
+      "title": "Content length appropriate for query type",
+      "category": "onpage",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "content"
+    },
+    {
+      "id": "o28",
+      "title": "Content is original (no duplicate or spun)",
+      "category": "onpage",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "content"
+    },
+    {
+      "id": "o29",
+      "title": "Content updated regularly (freshness)",
+      "category": "onpage",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "content"
+    },
+    {
+      "id": "o30",
+      "title": "Thin content pages improved or consolidated",
+      "category": "onpage",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "content"
+    },
+    {
+      "id": "o31",
+      "title": "Content uses data, stats, or original research",
+      "category": "onpage",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "content"
+    },
+    {
+      "id": "o32",
+      "title": "Content covers topic comprehensively (topical authority)",
+      "category": "onpage",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "content"
+    },
+    {
+      "id": "o33",
+      "title": "Readability score appropriate for audience",
+      "category": "onpage",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "content"
+    },
+    {
+      "id": "o35",
+      "title": "Content answers common user questions",
+      "category": "onpage",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "content"
+    },
+    {
+      "id": "o36",
+      "title": "No AI-generated content without human review",
+      "category": "onpage",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "content"
+    },
+    {
+      "id": "o37",
+      "title": "Internal linking strategy in place",
+      "category": "onpage",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "links"
+    },
+    {
+      "id": "o38",
+      "title": "Anchor text is descriptive (not \"click here\")",
+      "category": "onpage",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "links"
+    },
+    {
+      "id": "o39",
+      "title": "No broken internal links",
+      "category": "onpage",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "links"
+    },
+    {
+      "id": "o40",
+      "title": "Important pages linked from homepage",
+      "category": "onpage",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "links"
+    },
+    {
+      "id": "o41",
+      "title": "Content links to relevant internal resources",
+      "category": "onpage",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "links"
+    },
+    {
+      "id": "o43",
+      "title": "Navigation links consistent across site",
+      "category": "onpage",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "links"
+    },
+    {
+      "id": "o44",
+      "title": "External link targets and rel declarations",
+      "category": "onpage",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "links"
+    },
+    {
+      "id": "o45",
+      "title": "Author bios present on all blog/article content",
+      "category": "onpage",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "eeat"
+    },
+    {
+      "id": "o46",
+      "title": "About-page navigation candidates",
+      "category": "onpage",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "eeat"
+    },
+    {
+      "id": "o47",
+      "title": "Email and phone link declarations by page",
+      "category": "onpage",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "eeat"
+    },
+    {
+      "id": "o48",
+      "title": "Trust signals present (awards, press, clients)",
+      "category": "onpage",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "eeat"
+    },
+    {
+      "id": "o49",
+      "title": "Policy-page navigation candidates",
+      "category": "onpage",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "eeat"
+    },
+    {
+      "id": "o50",
+      "title": "External links point to authoritative sources",
+      "category": "onpage",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Diğer kontrol ve sitelere uygulanır; sonuçlar akış bağlamına göre yorumlanmalıdır.",
+      "section": "eeat"
+    },
+    {
+      "id": "u1",
+      "title": "H1: System status always visible (loading, progress)",
+      "category": "ux",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Teknik durum göstergeleri tüm sitelerde uygulanır.",
+      "section": "nielsen15"
+    },
+    {
+      "id": "u2",
+      "title": "H1: Forms show inline validation feedback",
+      "category": "ux",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Form/inceleme alanlarında inline validasyon varsa bu bir kalite denetimidir.",
+      "section": "nielsen15"
+    },
+    {
+      "id": "u3",
+      "title": "H1: Async operations show clear loading state",
+      "category": "ux",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Asenkron durum göstergesi etkileşim odaklı sayfalarda uygulanır.",
+      "section": "nielsen15"
+    },
+    {
+      "id": "u4",
+      "title": "H2: UI language matches user language (no jargon)",
+      "category": "ux",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Dil tutarlılığı kullanıcı deneyimi metin ağırlıklı her sayfada önemlidir.",
+      "section": "nielsen15"
+    },
+    {
+      "id": "u5",
+      "title": "H2: Icons have visible labels (no icon-only nav)",
+      "category": "ux",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "İkon etiket kontrolü gezinti yoğun sayfalarda uygulanır.",
+      "section": "nielsen15"
+    },
+    {
+      "id": "u6",
+      "title": "H3: Users can undo / go back from any action",
+      "category": "ux",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Undo/geri dönüş kontrolü çok adımlı akışlarda önemlidir.",
+      "section": "nielsen15"
+    },
+    {
+      "id": "u7",
+      "title": "H3: Browser back button works as expected",
+      "category": "ux",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Back-button davranışı genel olarak tüm uygulamalarda kontrol edilir.",
+      "section": "nielsen15"
+    },
+    {
+      "id": "u8",
+      "title": "H4: UI visually consistent across all pages",
+      "category": "ux",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Görsel tutarlılık çoklu sayfalı sitelerde uygulanır.",
+      "section": "nielsen15"
+    },
+    {
+      "id": "u9",
+      "title": "H4: Terminology consistent (same words for same things)",
+      "category": "ux",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Terminoloji tutarlılığı marka dili güçlü sitelerde uygulanır.",
+      "section": "nielsen15"
+    },
+    {
+      "id": "u10",
+      "title": "H4: Button styles consistent (primary/secondary/danger)",
+      "category": "ux",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Buton stilleri ürün ve form odaklı sitelerde daha belirleyicidir.",
+      "section": "nielsen15"
+    },
+    {
+      "id": "u11",
+      "title": "H5: Destructive actions require confirmation",
+      "category": "ux",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Kritik eylemler için onay ekranları güvenli ürün satış sitelerinde zorunludur.",
+      "section": "nielsen15"
+    },
+    {
+      "id": "u12",
+      "title": "H5: Forms have clear required field indicators",
+      "category": "ux",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Form işaretleme denetimi form toplama hedefi olan her sayfada uygulanır.",
+      "section": "nielsen15"
+    },
+    {
+      "id": "u13",
+      "title": "H5: Password show/hide toggle available",
+      "category": "ux",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Şifre göster/gizle denetimi auth akışı olan sayfalarda uygulanır.",
+      "section": "nielsen15"
+    },
+    {
+      "id": "u14",
+      "title": "H5: Input fields show expected format (date, phone)",
+      "category": "ux",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Format yönergesi etkileşim alanlarında form girişlerinde uygulanır.",
+      "section": "nielsen15"
+    },
+    {
+      "id": "u15",
+      "title": "H6: Navigation always visible (not hidden)",
+      "category": "ux",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Navigasyon görünürlüğü sitenin tüm ana akışlarında uygulanır.",
+      "section": "nielsen610"
+    },
+    {
+      "id": "u16",
+      "title": "H6: Search prominently placed and functional",
+      "category": "ux",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Arama fonksiyonu olan sitelerde aranabilirlik denetimi uygulanır.",
+      "section": "nielsen610"
+    },
+    {
+      "id": "u17",
+      "title": "H7: Keyboard shortcuts documented if present",
+      "category": "ux",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Klavye kısayol dokümantasyonu var ise yönlendiricili ürünlerde önemlidir.",
+      "section": "nielsen610"
+    },
+    {
+      "id": "u18",
+      "title": "H7: Complex tasks have help/tutorial available",
+      "category": "ux",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Yardım dokümantasyonu eğitim gerektiren karmaşık akışlarda uygulanır.",
+      "section": "nielsen610"
+    },
+    {
+      "id": "u19",
+      "title": "H8: Minimal design — no unnecessary elements",
+      "category": "ux",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Minimalist gereksinimi marka ve ürün hedefine göre değişken yorumlanır.",
+      "section": "nielsen610"
+    },
+    {
+      "id": "u20",
+      "title": "H8: Page has clear visual hierarchy",
+      "category": "ux",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Görsel hiyerarşi kullanıcı odaklı deneyimlerde uygulanır.",
+      "section": "nielsen610"
+    },
+    {
+      "id": "u21",
+      "title": "H9: Error messages explain what went wrong",
+      "category": "ux",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Hata mesajı kalitesi aksiyon odaklı arayüzlerde uygulanır.",
+      "section": "nielsen610"
+    },
+    {
+      "id": "u22",
+      "title": "H9: Error messages suggest how to fix the issue",
+      "category": "ux",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Hata iyileştirme yönlendirmeleri aksiyon odaklı akışlarda uygulanır.",
+      "section": "nielsen610"
+    },
+    {
+      "id": "u23",
+      "title": "H10: New users can complete core task without help",
+      "category": "ux",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Kullanıcı ilk turu tamamlaması için onboarding denetimi ürün eğitimli sitelerde uygulanır.",
+      "section": "nielsen610"
+    },
+    {
+      "id": "u24",
+      "title": "H10: Familiar UI patterns used where appropriate",
+      "category": "ux",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Kullanıcı dostu kalıplar karmaşık ürünlerde uygulanır.",
+      "section": "nielsen610"
+    },
+    {
+      "id": "u25",
+      "title": "Navigation labels are clear and unambiguous",
+      "category": "ux",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Net navigasyon etiketleri ürün ve içerik sitelerinde kritik.",
+      "section": "navigation"
+    },
+    {
+      "id": "u26",
+      "title": "Active navigation state clearly indicated",
+      "category": "ux",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Aktif nav durumu yönlendirme yoğun menülerde uygulanır.",
+      "section": "navigation"
+    },
+    {
+      "id": "u27",
+      "title": "Breadcrumbs present on inner pages",
+      "category": "ux",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Kenar menü/breadcrumb işlevi derin içerikte uygulanır.",
+      "section": "navigation"
+    },
+    {
+      "id": "u28",
+      "title": "Footer navigation is comprehensive and useful",
+      "category": "ux",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "Footer kullanım denetimi bilgilendirici sayfa yapılarında uygulanır.",
+      "section": "navigation"
+    },
+    {
+      "id": "u29",
+      "title": "Search results are relevant and well-formatted",
+      "category": "ux",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Arama sonuç kalitesi denetimi içerik/ürün keşif sayfalarında uygulanır.",
+      "section": "navigation"
+    },
+    {
+      "id": "u30",
+      "title": "404 page helps users recover",
+      "category": "ux",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "404 kurtarma deneyimi destek/kurumsal sitelerde kritik.",
+      "section": "navigation"
+    },
+    {
+      "id": "u31",
+      "title": "Mega menu / dropdown usable on touch devices",
+      "category": "ux",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Mobil menü kullanım denetimi ürün/hizmet akışı menülerinde uygulanır.",
+      "section": "navigation"
+    },
+    {
+      "id": "u32",
+      "title": "Information architecture tested with users",
+      "category": "ux",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Kullanıcı testleri kullanıcı bulgusu olan projelerde ayrı kanıtla uygulanır.",
+      "section": "navigation"
+    },
+    {
+      "id": "u33",
+      "title": "Tested text passes applicable WCAG contrast checks",
+      "category": "ux",
+      "status": "verified-bounded",
+      "measurement": "Axe text contrast checks on tested nodes",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "Kontrast denetimi tüm sayfalarda uygulanır.",
+      "section": "accessibility"
+    },
+    {
+      "id": "u34",
+      "title": "All images have descriptive alt text",
+      "category": "ux",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "Alt metin denetimi görsel içeriği olan her sayfada uygulanır.",
+      "section": "accessibility"
+    },
+    {
+      "id": "u35",
+      "title": "Site fully navigable by keyboard alone",
+      "category": "ux",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "Klavye navigasyonu etkileşimli akışlarda uygulanır.",
+      "section": "accessibility"
+    },
+    {
+      "id": "u36",
+      "title": "Focus indicators visible on all interactive elements",
+      "category": "ux",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "Odak belirginliği odaklı kullanılabilirlik standartlarında uygulanır.",
+      "section": "accessibility"
+    },
+    {
+      "id": "u37",
+      "title": "Tested controls have accessible names",
+      "category": "ux",
+      "status": "verified-bounded",
+      "measurement": "Axe accessible-name checks on tested nodes",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "Erişilebilir ad denetimi test edilen kontrol seti için geçerlidir.",
+      "section": "accessibility"
+    },
+    {
+      "id": "u38",
+      "title": "Mobile navigation is simple and thumb-friendly",
+      "category": "ux",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Mobil navigasyon denetimi mobil ürün/hizmet sitelerinde uygulanır.",
+      "section": "mobileux"
+    },
+    {
+      "id": "u39",
+      "title": "Forms are optimized for mobile input",
+      "category": "ux",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Only relevant controls/forms and their actual purpose; absence is not failure",
+      "siteTypeApplicability": "Mobil form uyumluluğu yalnızca form bulunan akışlarda uygulanır.",
+      "section": "mobileux"
+    },
+    {
+      "id": "u40",
+      "title": "Content priority preserved on mobile",
+      "category": "ux",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "İçerik önceliği içeriğin anlaşıldığı sayfalarda uygulanır",
+      "section": "mobileux"
+    },
+    {
+      "id": "c1",
+      "title": "Primary CTA visible above the fold",
+      "category": "cro",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "CTA görünürlük denetimi dönüşüm hedefi olan sayfalarda uygulanır.",
+      "section": "cta"
+    },
+    {
+      "id": "c2",
+      "title": "CTA copy is action-oriented and specific",
+      "category": "cro",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "CTA metni denetimi satış akış sayfalarında kritik.",
+      "section": "cta"
+    },
+    {
+      "id": "c3",
+      "title": "CTA button has strong visual contrast",
+      "category": "cro",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "CTA kontrast denetimi buton-dominant sayfalarda önemlidir.",
+      "section": "cta"
+    },
+    {
+      "id": "c4",
+      "title": "Single primary CTA per page section",
+      "category": "cro",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Tek CTA prensibi uzun satış akışlı sayfalarda özellikle önemlidir.",
+      "section": "cta"
+    },
+    {
+      "id": "c5",
+      "title": "CTA repeated strategically for long pages",
+      "category": "cro",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Tekrarlanan CTA denetimi uzun içerik akışlarında uygulanır.",
+      "section": "cta"
+    },
+    {
+      "id": "c6",
+      "title": "Hover/active states on all CTAs",
+      "category": "cro",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Hover/active durum denetimi interaktif butonlu ürün sayfalarında anlamlıdır.",
+      "section": "cta"
+    },
+    {
+      "id": "c7",
+      "title": "CTA above fold tested across device sizes",
+      "category": "cro",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "CTA görünürlüğü akış testi mobil/masaüstü dağılımı olan satış ve kayıt sayfalarında uygulanır.",
+      "section": "cta"
+    },
+    {
+      "id": "c8",
+      "title": "Sticky CTA or sticky header with CTA on mobile",
+      "category": "cro",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Sticky CTA denetimi mobil dönüşüm sayfaları için önemlidir.",
+      "section": "cta"
+    },
+    {
+      "id": "c9",
+      "title": "Customer testimonials present on key pages",
+      "category": "cro",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Müşteri referansları güven odaklı sayfalarda uygulanır.",
+      "section": "trust"
+    },
+    {
+      "id": "c10",
+      "title": "Social proof (customer count, logos, reviews)",
+      "category": "cro",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Sosyal kanıt denetimi hizmet ve ürün satış sitelerinde anlamlıdır.",
+      "section": "trust"
+    },
+    {
+      "id": "c11",
+      "title": "Trust badges (secure payment, guarantees)",
+      "category": "cro",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Güven rozetleri ödeme veya güvene dayalı dönüşüm sunan sitelerde uygulanır.",
+      "section": "trust"
+    },
+    {
+      "id": "c12",
+      "title": "Pricing is clear with no hidden fees",
+      "category": "cro",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Fiyat şeffaflığı ücretli ürün/satış sayfalarında uygulanır.",
+      "section": "trust"
+    },
+    {
+      "id": "c13",
+      "title": "Risk reversal offered (free trial, guarantee)",
+      "category": "cro",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Risk azaltıcı öğeler (garanti/deneme) abonelik ve satın alım sitelerinde uygulanır.",
+      "section": "trust"
+    },
+    {
+      "id": "c14",
+      "title": "Case studies or results data present",
+      "category": "cro",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Vaka çalışması denetimi danışmanlık ve B2B satış sitelerinde uygulanır.",
+      "section": "trust"
+    },
+    {
+      "id": "c15",
+      "title": "Third-party review integration (G2, Trustpilot)",
+      "category": "cro",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Üçüncü parti review entegrasyonu review varlığı olan sitelerde uygulanır.",
+      "section": "trust"
+    },
+    {
+      "id": "c16",
+      "title": "Contact info visible throughout conversion flow",
+      "category": "cro",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Sürekli temas numarası isteyen sitelerde uygulanır.",
+      "section": "trust"
+    },
+    {
+      "id": "c17",
+      "title": "Form fields and required declarations",
+      "category": "cro",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Only relevant controls/forms and their actual purpose; absence is not failure",
+      "siteTypeApplicability": "Form alan denetimi form barındıran sayfalarda uygulanır.",
+      "section": "forms"
+    },
+    {
+      "id": "c18",
+      "title": "Form progress shown for multi-step forms",
+      "category": "cro",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Çok adımlı form denetimi form akışı olan satış/hizmet sitelerinde uygulanır.",
+      "section": "forms"
+    },
+    {
+      "id": "c19",
+      "title": "Form autocomplete declarations",
+      "category": "cro",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Only relevant controls/forms and their actual purpose; absence is not failure",
+      "siteTypeApplicability": "Autofill denetimi form davranışını etkileyen sitelerde uygulanır.",
+      "section": "forms"
+    },
+    {
+      "id": "c20",
+      "title": "Form errors shown inline, not on submit",
+      "category": "cro",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Inline hata denetimi etkileşimli formlarda uygulanır.",
+      "section": "forms"
+    },
+    {
+      "id": "c21",
+      "title": "Thank you / confirmation page provides next step",
+      "category": "cro",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Onay sonrası yönlendirme denetimi dönüşüm tamamlayan akışlarda uygulanır.",
+      "section": "forms"
+    },
+    {
+      "id": "c22",
+      "title": "Guest checkout available (e-commerce)",
+      "category": "cro",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Guest checkout yalnızca e-ticaret akışlarında geçerli bir kontrol.",
+      "section": "forms"
+    },
+    {
+      "id": "c23",
+      "title": "Checkout steps minimized (< 3 steps)",
+      "category": "cro",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Checkout adım kontrolü ödeme yolculuğu bulunan siteler için anlamlıdır.",
+      "section": "forms"
+    },
+    {
+      "id": "c24",
+      "title": "Mobile checkout / conversion flow tested",
+      "category": "cro",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Mobil dönüşüm akışı denetimi satış/ürün/lead sitelerinde uygulanır.",
+      "section": "mobile_cro"
+    },
+    {
+      "id": "c25",
+      "title": "Apple Pay / Google Pay available on mobile",
+      "category": "cro",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Mobil ödeme yöntemi denetimi mobil ödeme sunan sitelerde uygulanır.",
+      "section": "mobile_cro"
+    },
+    {
+      "id": "c26",
+      "title": "Phone link declarations by page",
+      "category": "cro",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Only relevant controls/forms and their actual purpose; absence is not failure",
+      "siteTypeApplicability": "Telefon etiketleri hizmet odaklı ve acil iletişim sayfalarında uygulanır.",
+      "section": "mobile_cro"
+    },
+    {
+      "id": "c27",
+      "title": "Mobile popups do not obstruct conversion flow",
+      "category": "cro",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Mobil popup denetimi mobil dönüşüm odaklı sitelerde önemlidir.",
+      "section": "mobile_cro"
+    },
+    {
+      "id": "c28",
+      "title": "Mobile page load < 3s on 4G connection",
+      "category": "cro",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Mobil yüklenme denetimi yüksek trafiğe sahip ve satış odaklı sayfalarda uygulanır.",
+      "section": "mobile_cro"
+    },
+    {
+      "id": "c29",
+      "title": "Conversion tracking set up in GA4",
+      "category": "cro",
+      "status": "observation",
+      "measurement": "Recorded source/browser evidence; no validated score or semantic verdict",
+      "applicability": "Fetched/rendered sample only; missing/incomplete data remains unknown",
+      "siteTypeApplicability": "GA4 dönüşüm ölçüm altyapısı varsa uygulanır; yoksa eksik bir eksiklik olarak işaretlenir.",
+      "section": "analytics"
+    },
+    {
+      "id": "c30",
+      "title": "Heatmap / session recording tool in place",
+      "category": "cro",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Kullanıcı davranış kaydı araçları ölçüm altyapısı olan sitelerde anlamlıdır.",
+      "section": "analytics"
+    },
+    {
+      "id": "c31",
+      "title": "A/B testing program active",
+      "category": "cro",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "A/B test altyapısı bulunan sitelerde uygulanır.",
+      "section": "analytics"
+    },
+    {
+      "id": "c32",
+      "title": "Funnel drop-off points identified and addressed",
+      "category": "cro",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Funnel düşüş noktası analizi conversion takibi yapılan sitelerde uygulanır.",
+      "section": "analytics"
+    },
+    {
+      "id": "c33",
+      "title": "Hero section communicates value prop in < 5 secs",
+      "category": "cro",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Hero mesajı denetimi değer önerisi ön planda olan landing sayfalarda uygulanır.",
+      "section": "page"
+    },
+    {
+      "id": "c34",
+      "title": "Pricing page has comparison table",
+      "category": "cro",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Fiyatlandırma karşılaştırması ücretli/plan sunan sitelerde uygulanır.",
+      "section": "page"
+    },
+    {
+      "id": "c35",
+      "title": "Exit intent strategy in place",
+      "category": "cro",
+      "status": "external-evidence-required",
+      "measurement": "No implemented automatic measurement; do not imply completion",
+      "applicability": "Requires control-specific integration or expert evidence before judgement",
+      "siteTypeApplicability": "Exit-intent denetimi dönüşüm odaklı sitelerde uygulanır.",
+      "section": "page"
+    }
+  ]
+}

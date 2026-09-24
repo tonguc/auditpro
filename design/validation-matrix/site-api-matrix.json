@@ -1,0 +1,105 @@
+{
+  "scope": "Controlled API + real Chromium fixtures; not a field accuracy estimate",
+  "uncalibratedObservationCount": 35,
+  "runs": [
+    {
+      "kind": "clinic",
+      "siteType": "health|service",
+      "purpose": "local-service, contact-rich, trust-driven",
+      "keywords": [
+        "contact",
+        "service",
+        "about",
+        "privacy"
+      ],
+      "pages": 2,
+      "viewportRuns": 10,
+      "requests": 25,
+      "verifiedDecisions": 6,
+      "technicalEvidence": [
+        "bot-specific robots policy",
+        "page-specific noindex",
+        "canonical target state"
+      ],
+      "status": "passed"
+    },
+    {
+      "kind": "shop",
+      "siteType": "ecommerce",
+      "purpose": "catalog-and-checkout, purchase conversion",
+      "keywords": [
+        "product",
+        "cart",
+        "checkout"
+      ],
+      "pages": 2,
+      "viewportRuns": 10,
+      "requests": 24,
+      "verifiedDecisions": 6,
+      "technicalEvidence": [
+        "bot-specific robots policy",
+        "page-specific noindex",
+        "canonical target state"
+      ],
+      "status": "passed"
+    },
+    {
+      "kind": "software",
+      "siteType": "software",
+      "purpose": "saas feature pages and signup funnel",
+      "keywords": [
+        "signup",
+        "trial",
+        "pricing"
+      ],
+      "pages": 2,
+      "viewportRuns": 10,
+      "requests": 24,
+      "verifiedDecisions": 6,
+      "technicalEvidence": [
+        "bot-specific robots policy",
+        "page-specific noindex",
+        "canonical target state"
+      ],
+      "status": "passed"
+    },
+    {
+      "kind": "publication",
+      "siteType": "editorial",
+      "purpose": "article/blog publishing and topical depth",
+      "keywords": [
+        "article",
+        "blog",
+        "insight"
+      ],
+      "pages": 2,
+      "viewportRuns": 10,
+      "requests": 23,
+      "verifiedDecisions": 6,
+      "technicalEvidence": [
+        "bot-specific robots policy",
+        "page-specific noindex",
+        "canonical target state"
+      ],
+      "status": "passed"
+    },
+    {
+      "kind": "resource-failure",
+      "siteType": "control",
+      "purpose": "stability and error-state control profile",
+      "keywords": [
+        "fallback"
+      ],
+      "pages": 2,
+      "viewportRuns": 10,
+      "requests": 28,
+      "verifiedDecisions": 6,
+      "technicalEvidence": [
+        "bot-specific robots policy",
+        "page-specific noindex",
+        "canonical target state"
+      ],
+      "status": "passed"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+[
+  {
+    "path": "/gizlilik-politikasi",
+    "attempt": 1,
+    "status": 500,
+    "final": "https://tonguckaracay.com/en/gizlilik-politikasi",
+    "type": "text/html; charset=utf-8"
+  },
+  {
+    "path": "/gizlilik-politikasi",
+    "attempt": 2,
+    "status": 502,
+    "final": "https://tonguckaracay.com/en/gizlilik-politikasi",
+    "type": "text/html; charset=utf-8"
+  },
+  {
+    "path": "/kullanim-kosullari",
+    "attempt": 1,
+    "status": 500,
+    "final": "https://tonguckaracay.com/en/kullanim-kosullari",
+    "type": "text/html; charset=utf-8"
+  },
+  {
+    "path": "/kullanim-kosullari",
+    "attempt": 2,
+    "status": 502,
+    "final": "https://tonguckaracay.com/en/kullanim-kosullari",
+    "type": "text/html; charset=utf-8"
+  },
+  {
+    "path": "/e-ticaret-yerel-seo-rehberi",
+    "attempt": 1,
+    "status": 500,
+    "final": "https://tonguckaracay.com/en/e-ticaret-yerel-seo-rehberi",
+    "type": "text/html; charset=utf-8"
+  },
+  {
+    "path": "/e-ticaret-yerel-seo-rehberi",
+    "attempt": 2,
+    "status": 502,
+    "final": "https://tonguckaracay.com/en/e-ticaret-yerel-seo-rehberi",
+    "type": "text/html; charset=utf-8"
+  }
+]

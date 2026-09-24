@@ -1,0 +1,65 @@
+[
+  {
+    "requested": "https://tonguckaracay.com/en",
+    "url": "https://tonguckaracay.com/en",
+    "status": 200,
+    "file": "design\\validation-matrix\\real-snapshots\\0.html",
+    "sha256": "d5c738b992bba562c65807b082249b75bd6e71585d3e63526ae271e91e8398fe",
+    "titles": [
+      "SEO & Digital Marketing Consultant | Tonguç Karaçay"
+    ],
+    "descriptions": [
+      "Growing your business digitally with UI/UX Design, SEO, Online Advertising, and AI solutions. 25+ years of experience, 35+ brands including Turkish Airlines, BMW, Galatasaray."
+    ]
+  },
+  {
+    "requested": "https://tonguckaracay.com/about",
+    "url": "https://tonguckaracay.com/about",
+    "status": 200,
+    "file": "design\\validation-matrix\\real-snapshots\\1.html",
+    "sha256": "43128d4c125a78a0d38e4a9a360fd62e53e6351f29b09151d40657df79b96f0e",
+    "titles": [
+      "About | Tonguç Karaçay - AI-Driven UX & Growth Partner"
+    ],
+    "descriptions": [
+      "25+ years of experience in UI/UX design, SEO, and AI solutions. Serving 35+ brands including Turkish Airlines, BMW, Galatasaray. International consulting services."
+    ]
+  },
+  {
+    "requested": "https://tonguckaracay.com/contact",
+    "url": "https://tonguckaracay.com/contact",
+    "status": 200,
+    "file": "design\\validation-matrix\\real-snapshots\\2.html",
+    "sha256": "fd2462398cae0bac2775147dea887edbbc770ce8a8637625d5b8d5e950988630",
+    "titles": [
+      "Free SEO Consulting | Contact | Tonguç Karaçay"
+    ],
+    "descriptions": [
+      "Request a free consultation for your digital marketing, SEO, or UI/UX project. 25+ years of experience and measurable results. Get in touch today."
+    ]
+  },
+  {
+    "requested": "https://drkemaltuskan.com/",
+    "url": "https://drkemaltuskan.com/",
+    "status": 200,
+    "file": "design\\validation-matrix\\real-snapshots\\3.html",
+    "sha256": "c5c5d44a4e5f76f6a9c332fadcdf5eb37777c000f212f54f3f5f56f780dc2b1a",
+    "titles": [
+      "KBB Uzmanı, Burun Estetiği, Horlama ve Alerji Tedavisi| Dr. Kemal Tuskan"
+    ],
+    "descriptions": [
+      "KBB alanında uzman teşhis ve tedavi çözümleri! Burun tıkanıklığı, sinüzit, horlama, burun estetiği, dolgu, botoks ve alerji tedavilerinde modern yaklaşımlar."
+    ]
+  },
+  {
+    "requested": "https://drkemaltuskan.com/blog/burun-tikanikligi-nedenleri/",
+    "url": "https://drkemaltuskan.com/blog/burun-tikanikligi-nedenleri/",
+    "status": 200,
+    "file": "design\\validation-matrix\\real-snapshots\\4.html",
+    "sha256": "f2f93d9c6c85dcd94e28b5cb7a3f01fd8699409537ff04b1f61e472a67caaab3",
+    "titles": [
+      "Burun Tıkanıklığının Nedenleri, Belirtileri ve Tedavi Yöntemleri - Dr. Kemal Tuskan"
+    ],
+    "descriptions": []
+  }
+]

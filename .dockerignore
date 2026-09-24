@@ -1,0 +1,12 @@
+node_modules
+.next
+npm-debug.log
+.env*
+backups
+launch-readiness-reports
+legacy
+.release-snapshots
+.git
+deployment-artifacts
+qa-private
+source.tar.gz

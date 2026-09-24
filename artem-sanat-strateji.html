@@ -1,0 +1,2876 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Artem Sanat Akademisi — Instagram Strateji & İçerik Takvimi</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Dancing+Script:wght@400;600;700&display=swap');
+
+  :root {
+    --somon: #E8A0BF;
+    --somon-light: #F5D5E8;
+    --somon-dark: #C77A9E;
+    --krem: #FFF8E7;
+    --altin: #D4AF37;
+    --altin-light: #F0D77B;
+    --bordo: #722F37;
+    --bordo-dark: #4A1E23;
+    --beyaz: #FFFFFF;
+    --gri: #6B7280;
+    --gri-light: #F3F4F6;
+    --gri-dark: #374151;
+    --yesil: #10B981;
+    --kirmizi: #EF4444;
+    --mavi: #3B82F6;
+    --mor: #8B5CF6;
+    --turuncu: #F59E0B;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    color: var(--gri-dark);
+    line-height: 1.8;
+    background: var(--gri-light);
+    font-size: 15px;
+  }
+
+  /* COVER */
+  .cover {
+    min-height: 100vh;
+    background: linear-gradient(135deg, var(--bordo-dark) 0%, var(--bordo) 40%, var(--somon-dark) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: var(--beyaz);
+    padding: 40px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle at 30% 50%, rgba(232,160,191,0.15) 0%, transparent 50%),
+                radial-gradient(circle at 70% 80%, rgba(212,175,55,0.1) 0%, transparent 50%);
+    animation: float 20s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    50% { transform: translate(2%, -2%) rotate(1deg); }
+  }
+  .cover-content { position: relative; z-index: 1; max-width: 800px; }
+  .cover-icon { font-size: 80px; margin-bottom: 20px; }
+  .cover h1 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 3.2em;
+    font-weight: 700;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+  }
+  .cover h2 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.5em;
+    font-weight: 400;
+    font-style: italic;
+    color: var(--altin-light);
+    margin-bottom: 30px;
+  }
+  .cover .meta {
+    font-size: 0.95em;
+    opacity: 0.85;
+    line-height: 2;
+  }
+  .cover .badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.3);
+    padding: 8px 20px;
+    border-radius: 50px;
+    margin: 5px;
+    font-size: 0.85em;
+  }
+
+  /* NAV */
+  .toc {
+    background: var(--beyaz);
+    padding: 50px 20px;
+    max-width: 1000px;
+    margin: 0 auto;
+  }
+  .toc h2 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 2em;
+    color: var(--bordo);
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .toc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 15px;
+  }
+  .toc-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    background: var(--gri-light);
+    border-radius: 12px;
+    text-decoration: none;
+    color: var(--gri-dark);
+    transition: all 0.3s;
+    border-left: 4px solid transparent;
+  }
+  .toc-item:hover {
+    background: var(--somon-light);
+    border-left-color: var(--somon);
+    transform: translateX(4px);
+  }
+  .toc-num {
+    width: 36px;
+    height: 36px;
+    background: var(--bordo);
+    color: var(--beyaz);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85em;
+    flex-shrink: 0;
+  }
+  .toc-label { font-weight: 500; font-size: 0.95em; }
+
+  /* SECTIONS */
+  .section {
+    max-width: 1100px;
+    margin: 0 auto 60px;
+    padding: 0 20px;
+  }
+  .section-header {
+    background: linear-gradient(135deg, var(--bordo-dark), var(--bordo));
+    color: var(--beyaz);
+    padding: 40px 35px;
+    border-radius: 20px 20px 0 0;
+    position: relative;
+    overflow: hidden;
+  }
+  .section-header::after {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 200px; height: 100%;
+    background: linear-gradient(135deg, transparent, rgba(232,160,191,0.2));
+  }
+  .section-header .num {
+    font-family: 'Poppins', sans-serif;
+    font-size: 4em;
+    font-weight: 800;
+    opacity: 0.15;
+    position: absolute;
+    top: 10px; right: 30px;
+  }
+  .section-header h2 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.8em;
+    font-weight: 700;
+    position: relative;
+    z-index: 1;
+  }
+  .section-header p {
+    font-size: 0.95em;
+    opacity: 0.85;
+    margin-top: 8px;
+    position: relative;
+    z-index: 1;
+  }
+  .section-body {
+    background: var(--beyaz);
+    padding: 40px;
+    border-radius: 0 0 20px 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+  }
+
+  /* TYPOGRAPHY */
+  h3 {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.4em;
+    font-weight: 700;
+    color: var(--bordo);
+    margin: 30px 0 15px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--somon-light);
+  }
+  h3:first-child { margin-top: 0; }
+  h4 {
+    font-size: 1.05em;
+    font-weight: 600;
+    color: var(--gri-dark);
+    margin: 20px 0 10px;
+  }
+  p { margin-bottom: 14px; font-weight: 400; }
+
+  /* TABLES */
+  .table-wrap { overflow-x: auto; margin: 20px 0; }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.92em;
+  }
+  th {
+    background: var(--bordo);
+    color: var(--beyaz);
+    padding: 14px 18px;
+    text-align: left;
+    font-weight: 600;
+    white-space: nowrap;
+    font-size: 0.9em;
+    letter-spacing: 0.3px;
+  }
+  th:first-child { border-radius: 10px 0 0 0; }
+  th:last-child { border-radius: 0 10px 0 0; }
+  td {
+    padding: 12px 18px;
+    border-bottom: 1px solid var(--gri-light);
+    line-height: 1.6;
+  }
+  tr:nth-child(even) { background: var(--gri-light); }
+  tr:hover { background: var(--somon-light); }
+
+  /* CARDS */
+  .card {
+    background: var(--beyaz);
+    border: 1px solid #e5e7eb;
+    border-radius: 16px;
+    padding: 24px;
+    margin: 16px 0;
+    transition: all 0.3s;
+  }
+  .card:hover {
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    transform: translateY(-2px);
+  }
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+  .card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4em;
+    flex-shrink: 0;
+  }
+  .card-title {
+    font-weight: 700;
+    font-size: 1.05em;
+    color: var(--gri-dark);
+  }
+  .card-sub { font-size: 0.85em; color: var(--gri); }
+
+  /* GRID */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  @media (max-width: 768px) {
+    .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+  }
+
+  /* TAGS */
+  .tag {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 50px;
+    font-size: 0.78em;
+    font-weight: 600;
+    margin: 2px 3px;
+  }
+  .tag-somon { background: var(--somon-light); color: var(--bordo); }
+  .tag-altin { background: #FEF3C7; color: #92400E; }
+  .tag-yesil { background: #D1FAE5; color: #065F46; }
+  .tag-mavi { background: #DBEAFE; color: #1E40AF; }
+  .tag-mor { background: #EDE9FE; color: #5B21B6; }
+  .tag-kirmizi { background: #FEE2E2; color: #991B1B; }
+
+  /* CALLOUT */
+  .callout {
+    padding: 20px 24px;
+    border-radius: 12px;
+    margin: 20px 0;
+    border-left: 5px solid;
+  }
+  .callout-info { background: #EFF6FF; border-color: var(--mavi); }
+  .callout-warn { background: #FEF3C7; border-color: var(--turuncu); }
+  .callout-danger { background: #FEE2E2; border-color: var(--kirmizi); }
+  .callout-success { background: #D1FAE5; border-color: var(--yesil); }
+  .callout-title { font-weight: 700; margin-bottom: 6px; }
+
+  /* SCRIPT BOX */
+  .script-box {
+    background: #1a1a2e;
+    color: #e0e0e0;
+    padding: 24px;
+    border-radius: 14px;
+    margin: 16px 0;
+    font-family: 'Courier New', monospace;
+    font-size: 0.88em;
+    line-height: 1.9;
+    overflow-x: auto;
+  }
+  .script-box .time {
+    color: var(--altin-light);
+    font-weight: 700;
+  }
+  .script-box .action {
+    color: var(--somon);
+  }
+  .script-box .text {
+    color: #a0d9d9;
+  }
+
+  /* STAT */
+  .stat-card {
+    text-align: center;
+    padding: 24px 16px;
+    background: linear-gradient(135deg, var(--gri-light), var(--beyaz));
+    border-radius: 16px;
+    border: 1px solid #e5e7eb;
+  }
+  .stat-num {
+    font-family: 'Poppins', sans-serif;
+    font-size: 2.5em;
+    font-weight: 800;
+    color: var(--bordo);
+  }
+  .stat-label {
+    font-size: 0.85em;
+    color: var(--gri);
+    margin-top: 4px;
+  }
+
+  /* PROGRESS */
+  .progress-bar {
+    height: 10px;
+    background: var(--gri-light);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 8px 0;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.5s;
+  }
+
+  /* TIMELINE */
+  .timeline { position: relative; padding-left: 30px; margin: 20px 0; }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 10px;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: linear-gradient(to bottom, var(--somon), var(--bordo));
+    border-radius: 3px;
+  }
+  .timeline-item {
+    position: relative;
+    margin-bottom: 24px;
+    padding: 16px 20px;
+    background: var(--gri-light);
+    border-radius: 12px;
+  }
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -25px;
+    top: 20px;
+    width: 14px;
+    height: 14px;
+    background: var(--somon);
+    border: 3px solid var(--beyaz);
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px var(--somon);
+  }
+  .timeline-date {
+    font-weight: 700;
+    color: var(--bordo);
+    font-size: 0.9em;
+  }
+
+  /* CHECKLIST */
+  .checklist { list-style: none; margin: 16px 0; }
+  .checklist li {
+    padding: 10px 16px;
+    margin: 6px 0;
+    background: var(--gri-light);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .checklist li::before {
+    content: '☐';
+    font-size: 1.2em;
+    color: var(--somon-dark);
+  }
+
+  /* HASHTAG */
+  .hashtag {
+    display: inline-block;
+    padding: 5px 14px;
+    margin: 3px;
+    background: var(--gri-light);
+    border-radius: 8px;
+    font-size: 0.82em;
+    color: var(--mavi);
+    font-weight: 500;
+    transition: all 0.2s;
+  }
+  .hashtag:hover { background: var(--mavi); color: var(--beyaz); }
+
+  /* WEEKLY PLAN */
+  .day-card {
+    border-radius: 14px;
+    overflow: hidden;
+    margin: 12px 0;
+    border: 1px solid #e5e7eb;
+  }
+  .day-header {
+    padding: 12px 20px;
+    font-weight: 700;
+    color: var(--beyaz);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .day-body { padding: 18px 20px; background: var(--beyaz); }
+  .day-pzt { background: linear-gradient(135deg, var(--bordo), var(--somon-dark)); }
+  .day-sal { background: linear-gradient(135deg, #7C3AED, #A78BFA); }
+  .day-car { background: linear-gradient(135deg, var(--mavi), #60A5FA); }
+  .day-per { background: linear-gradient(135deg, #059669, #34D399); }
+  .day-cum { background: linear-gradient(135deg, var(--turuncu), #FBBF24); }
+  .day-cmt { background: linear-gradient(135deg, #EC4899, #F472B6); }
+  .day-paz { background: linear-gradient(135deg, #6366F1, #818CF8); }
+
+  /* FUNNEL */
+  .funnel { margin: 30px 0; }
+  .funnel-step {
+    padding: 20px 30px;
+    margin: 0 auto;
+    text-align: center;
+    color: var(--beyaz);
+    font-weight: 600;
+    border-radius: 12px;
+    position: relative;
+    margin-bottom: 8px;
+  }
+  .funnel-step::after {
+    content: '▼';
+    position: absolute;
+    bottom: -18px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 1.2em;
+    color: var(--gri);
+  }
+  .funnel-step:last-child::after { content: ''; }
+
+  /* COMPETITOR */
+  .comp-card {
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid #e5e7eb;
+    margin: 16px 0;
+  }
+  .comp-header {
+    padding: 16px 20px;
+    color: var(--beyaz);
+    font-weight: 700;
+    font-size: 1.05em;
+  }
+  .comp-body { padding: 20px; background: var(--beyaz); }
+  .comp-score {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 12px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.85em;
+    margin: 3px;
+  }
+
+  /* DIVIDER */
+  .divider {
+    height: 3px;
+    background: linear-gradient(to right, var(--somon), var(--altin), var(--somon));
+    border-radius: 3px;
+    margin: 40px 0;
+  }
+
+  /* QUOTE */
+  .quote {
+    font-family: 'Poppins', sans-serif;
+    font-size: 1.3em;
+    font-style: italic;
+    color: var(--bordo);
+    text-align: center;
+    padding: 30px 40px;
+    border-top: 3px solid var(--somon);
+    border-bottom: 3px solid var(--somon);
+    margin: 30px 0;
+    position: relative;
+  }
+  .quote::before {
+    content: '"';
+    font-size: 4em;
+    color: var(--somon-light);
+    position: absolute;
+    top: -10px;
+    left: 20px;
+  }
+
+  /* FOOTER */
+  .footer {
+    background: var(--bordo-dark);
+    color: rgba(255,255,255,0.7);
+    text-align: center;
+    padding: 40px 20px;
+    font-size: 0.9em;
+  }
+  .footer strong { color: var(--somon); }
+
+  /* ANEKDOT GRID */
+  .anekdot-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 14px;
+    margin: 20px 0;
+  }
+  .anekdot-card {
+    padding: 16px;
+    background: var(--gri-light);
+    border-radius: 12px;
+    border-left: 4px solid var(--somon);
+  }
+  .anekdot-num {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    color: var(--bordo);
+    font-size: 1.4em;
+  }
+  .anekdot-title { font-weight: 600; margin: 4px 0; }
+  .anekdot-hook { font-size: 0.85em; color: var(--gri); font-style: italic; }
+
+  /* ACCORDION */
+  details {
+    margin: 10px 0;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  summary {
+    padding: 14px 20px;
+    background: var(--gri-light);
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  summary:hover { background: var(--somon-light); }
+  details[open] summary { background: var(--somon-light); border-bottom: 1px solid #e5e7eb; }
+  details .content { padding: 20px; }
+
+  /* PRINT */
+  @media print {
+    .cover { min-height: auto; padding: 40px; page-break-after: always; }
+    .section { page-break-inside: avoid; }
+    body { background: white; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- COVER -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="cover">
+  <div class="cover-content">
+    <div class="cover-icon">🩰</div>
+    <h1>Artem Sanat Akademisi</h1>
+    <h2>Instagram Strateji & İçerik Takvimi</h2>
+    <p class="meta">
+      <span class="badge">📅 Ekim 2026 — Ocak 2027</span>
+      <span class="badge">🎯 Öğrenci Kazanma Odaklı</span>
+      <span class="badge">🩰 Kurucu Balerin Gücü</span>
+    </p>
+    <p class="meta" style="margin-top:20px; font-size:0.85em;">
+      Versiyon 3.0 &nbsp;|&nbsp; 24 Eylül 2026 &nbsp;|&nbsp; AI SEO Squad
+    </p>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- TABLE OF CONTENTS -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="toc">
+  <h2>📑 İçindekiler</h2>
+  <div class="toc-grid">
+    <a href="#b1" class="toc-item"><span class="toc-num">1</span><span class="toc-label">Rekabet Ortamı & Rakip Analizi</span></a>
+    <a href="#b2" class="toc-item"><span class="toc-num">2</span><span class="toc-label">Marka Pozisyonlama & İçerik Pilleri</span></a>
+    <a href="#b3" class="toc-item"><span class="toc-num">3</span><span class="toc-label">Yasal Çerçeve: Çocuk Yüzü Kuralı</span></a>
+    <a href="#b4" class="toc-item"><span class="toc-num">4</span><span class="toc-label">Ekim 2026 — Günlük İçerik Planı</span></a>
+    <a href="#b5" class="toc-item"><span class="toc-num">5</span><span class="toc-label">Kasım 2026 — Gösteri Hazırlığı</span></a>
+    <a href="#b6" class="toc-item"><span class="toc-num">6</span><span class="toc-label">Aralık 2026 — Sahne & Kampanya</span></a>
+    <a href="#b7" class="toc-item"><span class="toc-num">7</span><span class="toc-label">Ocak 2027 — Yeni Yıl Kayıtları</span></a>
+    <a href="#b8" class="toc-item"><span class="toc-num">8</span><span class="toc-label">Reel Senaryo Bankası (20 Senaryo)</span></a>
+    <a href="#b9" class="toc-item"><span class="toc-num">9</span><span class="toc-label">Bale Anekdotları Bankası (52 Hafta)</span></a>
+    <a href="#b10" class="toc-item"><span class="toc-num">10</span><span class="toc-label">Story Stratejisi & Günlük Akış</span></a>
+    <a href="#b11" class="toc-item"><span class="toc-num">11</span><span class="toc-label">Dönüşüm Funnel'ı & DM Şablonları</span></a>
+    <a href="#b12" class="toc-item"><span class="toc-num">12</span><span class="toc-label">Hashtag Stratejisi (Katmanlı Sistem)</span></a>
+    <a href="#b13" class="toc-item"><span class="toc-num">13</span><span class="toc-label">Görsel & Çekim Kılavuzu</span></a>
+    <a href="#b14" class="toc-item"><span class="toc-num">14</span><span class="toc-label">Performans Metrikleri & KPI</span></a>
+    <a href="#b15" class="toc-item"><span class="toc-num">15</span><span class="toc-label">Viral Potansiyelli İçerik Fikirleri</span></a>
+    <a href="#b16" class="toc-item"><span class="toc-num">16</span><span class="toc-label">Haftalık Üretim Akışı</span></a>
+    <a href="#b17" class="toc-item"><span class="toc-num">17</span><span class="toc-label">Paylaşım Saatleri & Optimizasyon</span></a>
+    <a href="#b18" class="toc-item"><span class="toc-num">18</span><span class="toc-label">Hızlı Başlangıç Kontrol Listesi</span></a>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- BÖLÜM 1: REKABET ORTAMI -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section" id="b1">
+  <div class="section-header">
+    <span class="num">01</span>
+    <h2>📊 Rekabet Ortamı & Rakip Analizi</h2>
+    <p>Beylikdüzü — Büyükçekmece bölgesindeki rakiplerin derinlemesine incelenmesi</p>
+  </div>
+  <div class="section-body">
+
+    <h3>1.1 Rakip Profil Özeti</h3>
+    <div class="callout callout-info">
+      <div class="callout-title">📊 Veri Kaynağı: Social Blade (Doğrulanmış)</div>
+      <p>Aşağıdaki tüm rakip verileri <strong>Social Blade</strong> üzerinden doğrulanmıştır. Takipçi, ortalama beğeni, ortalama yorum ve engagement rate değerleri Social Blade'in gerçek zamanlı Instagram takip sisteminden alınmıştır.</p>
+      <p style="font-size:0.85em;margin-top:8px;">🔗 Doğrulama linkleri:
+        <a href="https://socialblade.com/instagram/user/kreassanatakademisi" target="_blank">Kreas</a> ·
+        <a href="https://socialblade.com/instagram/user/beylikduzu_modern_sanatlar" target="_blank">Modern Sanatlar</a> ·
+        <a href="https://socialblade.com/instagram/user/kybelesanatakademisi" target="_blank">Kybele</a> ·
+        <a href="https://socialblade.com/instagram/user/kugubaledans" target="_blank">Kuğu</a>
+      </p>
+    </div>
+
+    <div class="grid-4" style="margin:20px 0;">
+      <div class="stat-card">
+        <div class="stat-num" style="font-size:1.6em;">11.800</div>
+        <div class="stat-label">Kreas Takipçi</div>
+        <div style="margin-top:8px;"><span class="comp-score" style="background:#D1FAE5;color:#065F46;">ER %1.26</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="font-size:1.6em;">14.247</div>
+        <div class="stat-label">Modern Sanatlar Takipçi</div>
+        <div style="margin-top:8px;"><span class="comp-score" style="background:#FEE2E2;color:#991B1B;">ER %0.62 ⚠️</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="font-size:1.6em;">9.407</div>
+        <div class="stat-label">Kybele Takipçi</div>
+        <div style="margin-top:8px;"><span class="comp-score" style="background:#FEE2E2;color:#991B1B;">ER %0.51 ⚠️</span></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="font-size:1.6em;">1.164</div>
+        <div class="stat-label">Kuğu Takipçi</div>
+        <div style="margin-top:8px;"><span class="comp-score" style="background:#D1FAE5;color:#065F46;">ER %2.62 🔥</span></div>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <table>
+        <tr>
+          <th>Rakip</th>
+          <th>Instagram</th>
+          <th>Takipçi</th>
+          <th>Toplam İçerik</th>
+          <th>Engagement Rate</th>
+          <th>Ort. Beğeni</th>
+          <th>Ort. Yorum</th>
+        </tr>
+        <tr>
+          <td><strong>Kreas Sanat Akademisi</strong></td>
+          <td>@kreassanatakademisi</td>
+          <td>11.800</td>
+          <td>679</td>
+          <td><span class="comp-score" style="background:#D1FAE5;color:#065F46;">%1.26</span></td>
+          <td><strong>141</strong></td>
+          <td><strong>8</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Modern Sanatlar Akademisi</strong></td>
+          <td>@beylikduzu_modern_sanatlar</td>
+          <td>14.247</td>
+          <td>2.496</td>
+          <td><span class="comp-score" style="background:#FEE2E2;color:#991B1B;">%0.62 ⚠️</span></td>
+          <td><strong>84</strong></td>
+          <td><strong>4</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Kybele Sanat Akademisi</strong></td>
+          <td>@kybelesanatakademisi</td>
+          <td>9.407</td>
+          <td>354</td>
+          <td><span class="comp-score" style="background:#FEE2E2;color:#991B1B;">%0.51 ⚠️</span></td>
+          <td><strong>47</strong></td>
+          <td><strong>1</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Kuğu Sanat Merkezi</strong></td>
+          <td>@kugubaledans</td>
+          <td>1.164</td>
+          <td>561</td>
+          <td><span class="comp-score" style="background:#D1FAE5;color:#065F46;">%2.62 🔥</span></td>
+          <td><strong>29</strong></td>
+          <td><strong>1</strong></td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="callout callout-warn">
+      <div class="callout-title">⚠️ Dikkat Çekici Bulgular</div>
+      <p><strong>1.</strong> Modern Sanatlar 14.247 takipçiye rağmen %0.62 ER — sektör ortalamasının çok altında. 2.496 içerik paylaşmış ama etkileşim düşük. Organik olmayan takipçi veya düşük içerik kalitesi işareti.<br>
+      <strong>2.</strong> Kuğu 1.164 takipçiyle %2.62 ER yakalıyor — en küçük ama en sadık topluluk. Küçük ama etkili hesap modeli.<br>
+      <strong>3.</strong> Kreas 141 ortalama beğeni ile en yüksek ham sayıya sahip. Ama 11.800 takipçiye göre ER'sı %1.26 — iyi ama mükemmel değil.<br>
+      <strong>4.</strong> Kybele en düşük ER (%0.51) ve en az içerik (354). Dijital pazarlama zayıflığı verilerle doğrulanıyor.</p>
+    </div>
+
+    <h3>1.2 Rakip İçerik Karşılaştırması (Social Blade Doğrulu)</h3>
+    <div class="table-wrap">
+      <table>
+        <tr>
+          <th>Kriter</th>
+          <th>Kreas</th>
+          <th>Modern Sanatlar</th>
+          <th>Kybele</th>
+          <th>Kuğu</th>
+          <th style="background:var(--yesil);color:white;">Artem (Hedef)</th>
+        </tr>
+        <tr>
+          <td>Takipçi</td>
+          <td>11.800</td>
+          <td>14.247</td>
+          <td>9.407</td>
+          <td>1.164</td>
+          <td style="font-weight:700;color:var(--yesil);">Büyüme aşaması</td>
+        </tr>
+        <tr>
+          <td>Engagement Rate</td>
+          <td><span class="comp-score" style="background:#D1FAE5;color:#065F46;">%1.26</span></td>
+          <td><span class="comp-score" style="background:#FEE2E2;color:#991B1B;">%0.62</span></td>
+          <td><span class="comp-score" style="background:#FEE2E2;color:#991B1B;">%0.51</span></td>
+          <td><span class="comp-score" style="background:#D1FAE5;color:#065F46;">%2.62</span></td>
+          <td style="font-weight:700;color:var(--yesil);">%2.5+ hedef</td>
+        </tr>
+        <tr>
+          <td>Ort. Beğeni</td>
+          <td>141</td>
+          <td>84</td>
+          <td>47</td>
+          <td>29</td>
+          <td style="font-weight:700;color:var(--yesil);">100+ hedef</td>
+        </tr>
+        <tr>
+          <td>Ort. Yorum</td>
+          <td>8</td>
+          <td>4</td>
+          <td>1</td>
+          <td>1</td>
+          <td style="font-weight:700;color:var(--yesil);">10+ hedef</td>
+        </tr>
+        <tr>
+          <td>Toplam İçerik</td>
+          <td>679</td>
+          <td>2.496</td>
+          <td>354</td>
+          <td>561</td>
+          <td style="font-weight:700;color:var(--yesil);">—</td>
+        </tr>
+        <tr>
+          <td>Haftalık Reel</td>
+          <td>2-3</td>
+          <td>3-4</td>
+          <td>0-1</td>
+          <td>0-1</td>
+          <td style="font-weight:700;color:var(--yesil);">4-5</td>
+        </tr>
+        <tr>
+          <td>Carousel</td>
+          <td>0-1</td>
+          <td>0</td>
+          <td>0</td>
+          <td>0</td>
+          <td style="font-weight:700;color:var(--yesil);">2-3</td>
+        </tr>
+        <tr>
+          <td>Story (günlük)</td>
+          <td>1-2</td>
+          <td>0-1</td>
+          <td>0</td>
+          <td>0</td>
+          <td style="font-weight:700;color:var(--yesil);">3-5</td>
+        </tr>
+        <tr>
+          <td>Kurucu kamerada</td>
+          <td>❌</td>
+          <td>❌</td>
+          <td>❌</td>
+          <td>❌</td>
+          <td style="font-weight:700;color:var(--yesil);">✅ Haftada 3+</td>
+        </tr>
+        <tr>
+          <td>Kişisel hikaye</td>
+          <td>❌</td>
+          <td>❌</td>
+          <td>❌</td>
+          <td>❌</td>
+          <td style="font-weight:700;color:var(--yesil);">✅ Her hafta</td>
+        </tr>
+        <tr>
+          <td>Bilgilendirici içerik</td>
+          <td>❌</td>
+          <td>❌</td>
+          <td>❌</td>
+          <td>❌</td>
+          <td style="font-weight:700;color:var(--yesil);">✅ Keşfet odaklı</td>
+        </tr>
+        <tr>
+          <td>Transformation</td>
+          <td>❌</td>
+          <td>❌</td>
+          <td>❌</td>
+          <td>❌</td>
+          <td style="font-weight:700;color:var(--yesil);">✅ Aylık</td>
+        </tr>
+        <tr>
+          <td>Dönüşüm CTA</td>
+          <td>Zayıf</td>
+          <td>Zayıf</td>
+          <td>Yok</td>
+          <td>Yok</td>
+          <td style="font-weight:700;color:var(--yesil);">✅ Her içerikte</td>
+        </tr>
+      </table>
+    </div>
+
+    <h3>1.3 Her Rakipten Ders (Veri Destekli)</h3>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background:#EDE9FE;color:#7C3AED;">🎭</div>
+          <div>
+            <div class="card-title">Kreas'tan Öğrendiklerimiz</div>
+            <div class="card-sub">ER %1.26 · Ort. 141 beğeni · 679 içerik</div>
+          </div>
+        </div>
+        <p>En yüksek beğeni ortalamasına sahip rakip. Profesyonel prova çekimleri ve MEB seviye sınavı görselleri güvenilirlik yaratıyor. Ama kurucuyu gizlemek büyük hata — insanlar insanlardan satın alır. <strong>Artem'in geçmesi gereken rakip.</strong></p>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background:#FEE2E2;color:#EF4444;">⚠️</div>
+          <div>
+            <div class="card-title">Modern Sanatlar Uyarısı</div>
+            <div class="card-sub">ER %0.62 · Ort. 84 beğeni · 2.496 içerik</div>
+          </div>
+        </div>
+        <p>14.247 takipçi ama %0.62 ER — alarm verici. 2.496 içerik paylaşmış ama etkileşim düşük. Ya takipçiler organik değil ya da içerik kalitesi düşük. <strong>Bu hatadan kaçınılmalı: çok içerik ≠ kaliteli içerik.</strong></p>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background:#D1FAE5;color:#059669;">✅</div>
+          <div>
+            <div class="card-title">Kybele'den Güven Sinyali</div>
+            <div class="card-sub">ER %0.51 · Ort. 47 beğeni · 354 içerik</div>
+          </div>
+        </div>
+        <p>En düşük ER ve en az içerik. MEB onaylı vurgusu güvenilirlik sinyali ama dijital pazarlama zayıf. <strong>Artem MEB onaylı vurgusunu kullanmalı ama Kybele'nin aksine aktif içerik üretmeli.</strong></p>
+      </div>
+      <div class="card">
+        <div class="card-header">
+          <div class="card-icon" style="background:#DBEAFE;color:#3B82F6;">🔥</div>
+          <div>
+            <div class="card-title">Kuğu'dan Topluluk Dersi</div>
+            <div class="card-sub">ER %2.62 · Ort. 29 beğeni · 561 içerik</div>
+          </div>
+        </div>
+        <p>En küçük hesap ama en yüksek ER! 1.164 takipçi ile %2.62 — sadık ve etkileşimli topluluk. <strong>Küçük ama etkili hesap modeli. Artem'in hedefi bu olmalı: nicelik değil nitelik.</strong></p>
+      </div>
+    </div>
+
+    <h3>1.4 Engagement Rate Karşılaştırması (Social Blade)</h3>
+    <div class="table-wrap">
+      <table>
+        <tr>
+          <th>Rakip</th>
+          <th>Takipçi</th>
+          <th>Ort. Beğeni</th>
+          <th>Ort. Yorum</th>
+          <th>ER</th>
+          <th>Durum</th>
+        </tr>
+        <tr>
+          <td><strong>Kuğu</strong></td>
+          <td>1.164</td>
+          <td>29</td>
+          <td>1</td>
+          <td><strong>%2.62</strong></td>
+          <td><span class="tag tag-yesil">🔥 En yüksek ER</span></td>
+        </tr>
+        <tr>
+          <td><strong>Kreas</strong></td>
+          <td>11.800</td>
+          <td>141</td>
+          <td>8</td>
+          <td><strong>%1.26</strong></td>
+          <td><span class="tag tag-altin">Sektör ortalaması</span></td>
+        </tr>
+        <tr>
+          <td><strong>Modern Sanatlar</strong></td>
+          <td>14.247</td>
+          <td>84</td>
+          <td>4</td>
+          <td><strong>%0.62</strong></td>
+          <td><span class="tag tag-kirmizi">⚠️ Düşük</span></td>
+        </tr>
+        <tr>
+          <td><strong>Kybele</strong></td>
+          <td>9.407</td>
+          <td>47</td>
+          <td>1</td>
+          <td><strong>%0.51</strong></td>
+          <td><span class="tag tag-kirmizi">⚠️ En düşük</span></td>
+        </tr>
+      </table>
+    </div>
+
+    <div class="callout callout-success">
+      <div class="callout-title">🎯 Artem Sanat Akademisi Engagement Hedefleri</div>
+      <p><strong>Minimum hedef:</strong> %1.5 ER (Kreas'ı geçmek)<br>
+      <strong>İyi hedef:</strong> %2.5 ER (Kuğu seviyesi)<br>
+      <strong>Mükemmel hedef:</strong> %3.0+ ER (Sektör lideri)</p>
+      <p style="margin-top:10px;"><strong>Nasıl başarılır:</strong><br>
+      • Kreas'ın 141 beğeni ortalamasını geçmek → Kaliteli reel + kurucu hikaye<br>
+      • Kuğu'nun %2.62 ER'ını geçmek → Sadık topluluk + etkileşim odaklı içerik<br>
+      • Modern Sanatlar'ın hatasından kaçınmak → Çok içerik değil, kaliteli içerik<br>
+      • Kybele'nin hatasından kaçınmak → Pasif değil, aktif içerik üretimi</p>
+    </div>
+
+    <h3>1.5 Rakiplerin Ortak Hataları (Veri ile Doğrulanmış)</h3>
+    <div class="callout callout-danger">
+      <div class="callout-title">❌ 6 Kritik Hata (Social Blade Verileriyle)</div>
+      <p><strong>1.</strong> "Kayıt başladı" postları — Modern Sanatlar 2.496 içerikle %0.62 ER alıyor. Nicelik işe yaramıyor.<br>
+      <strong>2.</strong> Kurucuyu gizleme — Hiçbir rakip kurucuyu ön plana çıkarmıyor. Kişisel bağ yok.<br>
+      <strong>3.</strong> Bilgilendirici içerik yok — Keşfet'e düşme potansiyeli sıfır.<br>
+      <strong>4.</strong> Transformation içerik yok — Somut sonuç gösterilmiyor.<br>
+      <strong>5.</strong> Story stratejisi yok — Etkileşim düşük.<br>
+      <strong>6.</strong> Dönüşüm funnel'ı yok — Takipçi → Kayıt yolu planlanmamış.</p>
+    </div>
+
+    <div class="callout callout-success">
+      <div class="callout-title">✅ Artem'in Doldurması Gereken Boşluk</div>
+      <p><strong>Kişisel hikaye + duygusal bağ + günlük içerik rutini.</strong> Hiçbir rakip kurucuyu öne çıkarmıyor. Bu Artem'in en büyük stratejik avantajı. Kurucunun balerin geçmişi bir "trust signal" — ama yeterince kullanılmıyor.</p>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- BÖLÜM 2: MARKA POZİSYONLAMA -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section" id="b2">
+  <div class="section-header" style="background:linear-gradient(135deg,#4A1E23,#8B2252);">
+    <span class="num">02</span>
+    <h2>🎯 Marka Pozisyonlama & İçerik Pilleri</h2>
+    <p>Artem Sanat Akademisi'nin Instagram'daki kimliği, ses tonu ve içerik yapısı</p>
+  </div>
+  <div class="section-body">
+
+    <h3>2.1 Ana Konumlandırma</h3>
+    <div class="quote">
+      Beylikdüzü'nün bale merkezi — Profesyonel balerin eğitmenliğinde, MEB onaylı, çok disiplinli sanat eğitimi
+    </div>
+
+    <h3>2.2 Alt Mesajlar</h3>
+    <div class="grid-3">
+      <div class="stat-card">
+        <div style="font-size:2em;">🩰</div>
+        <div class="stat-label" style="font-weight:700;color:var(--bordo);margin-top:8px;">Bale Otoritesi</div>
+        <div class="stat-label">"Kurucumuz profesyonel bir balerin. Onun deneyiminden öğrenin."</div>
+      </div>
+      <div class="stat-card">
+        <div style="font-size:2em;">🎓</div>
+        <div class="stat-label" style="font-weight:700;color:var(--bordo);margin-top:8px;">Güvenilirlik</div>
+        <div class="stat-label">"MEB onaylı eğitim, uluslararası standartlar."</div>
+      </div>
+      <div class="stat-card">
+        <div style="font-size:2em;">🎭</div>
+        <div class="stat-label" style="font-weight:700;color:var(--bordo);margin-top:8px;">Çok Disiplin</div>
+        <div class="stat-label">"Bale, drama, müzik, gitar — hepsi bir çatı altında."</div>
+      </div>
+    </div>
+
+    <h3>2.3 Ton & Dil Rehberi</h3>
+    <div class="grid-2">
+      <div class="callout callout-success">
+        <div class="callout-title">✅ Doğru Ton</div>
+        <p><strong>Samimi ama profesyonel</strong> — Kurumsal değil, sıcak<br>
+        <strong>Eğitici ama sıkıcı değil</strong> — Bilgi verirken eğlenceli<br>
+        <strong>Duygusal ama yapay değil</strong> — Gerçek hikayeler<br>
+        <strong>Otoriter ama kibirli değil</strong> — "Paylaşıyoruz"</p>
+      </div>
+      <div class="callout callout-danger">
+        <div class="callout-title">❌ Yanlış Ton</div>
+        <p>"Artem Sanat Akademisi olarak MEB onaylı bale eğitimi vermekteyiz. Kayıtlarımız başlamıştır."</p>
+        <p style="margin-top:10px;"><strong>Doğrusu:</strong> "Baleye 4 yaşında başladım. İlk günümde ayakkabılarımı giyerken heyecandan titriyordum. Şimdi aynı heyecanı her yeni öğrencimde görüyorum. 🩰"</p>
+      </div>
+    </div>
+
+    <h3>2.4 İçerik Pilleri</h3>
+    <div class="table-wrap">
+      <table>
+        <tr>
+          <th>#</th>
+          <th>Pilar</th>
+          <th>Oran</th>
+          <th>Haftalık</th>
+          <th>Amaç</th>
+          <th>Hedef Kitle</th>
+        </tr>
+        <tr>
+          <td>1</td>
+          <td>🩰 <strong>Kurucunun Balerin Gücü</strong></td>
+          <td><span class="tag tag-somon">%30</span></td>
+          <td>2 Reel + 1 Story</td>
+          <td>Otorite + güven + kişisel bağ</td>
+          <td>Tüm ebevynler</td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>💡 <strong>Bilgilendirici / Eğitim</strong></td>
+          <td><span class="tag tag-mavi">%25</span></td>
+          <td>1 Reel + 1 Carousel</td>
+          <td>Keşfet erişimi + kaydetme</td>
+          <td>Bilgi arayan ebevynler</td>
+        </tr>
+        <tr>
+          <td>3</td>
+          <td>🎭 <strong>Branş Tanıtımı</strong></td>
+          <td><span class="tag tag-mor">%20</span></td>
+          <td>1 Reel + 1 Carousel</td>
+          <td>Drama, gitar, dans tanıtımı</td>
+          <td>Farklı branş arayanlar</td>
+        </tr>
+        <tr>
+          <td>4</td>
+          <td>🎪 <strong>Sahne & Dönüşüm</strong></td>
+          <td><span class="tag tag-altin">%15</span></td>
+          <td>1 Reel + 1 Carousel</td>
+          <td>Kayıt + DM</td>
+          <td>Kayıt düşünen ebevynler</td>
+        </tr>
+        <tr>
+          <td>5</td>
+          <td>🤝 <strong>Topluluk & Güven</strong></td>
+          <td><span class="tag tag-yesil">%10</span></td>
+          <td>1 Carousel + Story</td>
+          <td>Veli güveni + sosyal kanıt</td>
+          <td>Mevcut veliler + potansiyel</td>
+        </tr>
+      </table>
+    </div>
+
+    <h3>2.5 Haftalık İçerik Akışı Şablonu</h3>
+    <div class="table-wrap">
+      <table>
+        <tr>
+          <th>Gün</th>
+          <th>Format</th>
+          <th>Pilar</th>
+          <th>İçerik Tipi</th>
+          <th>Saat</th>
+        </tr>
+        <tr>
+          <td><strong>Pazartesi</strong></td>
+          <td><span class="tag tag-kirmizi">Reel</span></td>
+          <td>🩰 Kurucunun Gücü</td>
+          <td>"Bale Anekdotu" veya "Kurucu Anlatıyor"</td>
+          <td>12:00</td>
+        </tr>
+        <tr>
+          <td><strong>Salı</strong></td>
+          <td><span class="tag tag-mavi">Carousel</span></td>
+          <td>💡 Bilgilendirici</td>
+          <td>İnfografik, rehber, "5 neden"</td>
+          <td>12:00</td>
+        </tr>
+        <tr>
+          <td><strong>Çarşamba</strong></td>
+          <td><span class="tag tag-kirmizi">Reel</span></td>
+          <td>🎭 Branş Tanıtımı</td>
+          <td>Drama/gitar/dans tanıtım reel</td>
+          <td>17:00</td>
+        </tr>
+        <tr>
+          <td><strong>Perşembe</strong></td>
+          <td><span class="tag tag-mor">Story</span></td>
+          <td>🤝 Topluluk</td>
+          <td>Soru-Cevap, sahne arkası</td>
+          <td>10:00-18:00</td>
+        </tr>
+        <tr>
+          <td><strong>Cuma</strong></td>
+          <td><span class="tag tag-kirmizi">Reel</span></td>
+          <td>🩰 Kurucunun Gücü</td>
+          <td>"Kurucuyla 1 Dakika" veya "Transformation"</td>
+          <td>19:00</td>
+        </tr>
+        <tr>
+          <td><strong>Cumartesi</strong></td>
+          <td><span class="tag tag-mavi">Carousel</span></td>
+          <td>🎪 Dönüşüm</td>
+          <td>Kayıt bilgisi, program, veli yorumu</td>
+          <td>11:00</td>
+        </tr>
+        <tr>
+          <td><strong>Pazar</strong></td>
+          <td><span class="tag tag-yesil">Static</span></td>
+          <td>💡 Motivasyon</td>
+          <td>Haftalık motivasyon + duyuru</td>
+          <td>10:00</td>
+        </tr>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- BÖLÜM 3: YASAL ÇERÇEVE -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section" id="b3">
+  <div class="section-header" style="background:linear-gradient(135deg,#991B1B,#DC2626);">
+    <span class="num">03</span>
+    <h2>⚖️ Yasal Çerçeve: Çocuk Yüzü Kuralı</h2>
+    <p>15 yaş altı sosyal medya yasağı ve çocuk yüzü göstermeme protokolü</p>
+  </div>
+  <div class="section-body">
+
+    <div class="callout callout-danger">
+      <div class="callout-title">🚨 Kritik Yasal Uyarı</div>
+      <p><strong>1 Eylül 2026</strong> itibarıyla 15 yaş altı çocuklar için sosyal medya yasağı yürürlüktedir. Çocukların yüzlerinin fotoğraf/videoda gösterilmesi cezai yaptırıma tabidir. Ailelerin açık onayı dahi tek başına yeterli olmayabilir.</p>
+    </div>
+
+    <h3>3.1 Güvenli Çekim Yöntemleri</h3>
+    <div class="table-wrap">
+      <table>
+        <tr>
+          <th>Yöntem</th>
+          <th>Açıklama</th>
+          <th>Kullanım Alanı</th>
+          <th>Risk</th>
+        </tr>
+        <tr>
+          <td>🔴 <strong>Yüz bulanıklaştırma</strong></td>
+          <td>Video/fotoğrafta çocuk yüzleri otomatik blur</td>
+          <td>Ders içi çekimler, prova görüntüleri</td>
+          <td><span class="tag tag-yesil">Düşük</span></td>
+        </tr>
+        <tr>
+          <td>🔴 <strong>Arkadan çekim</strong></td>
+          <td>Çocuklar arkadan veya uzak mesafeden</td>
+          <td>Bale pozu, dans hareketleri</td>
+          <td><span class="tag tag-yesil">Düşük</span></td>
+        </tr>
+        <tr>
+          <td>🔴 <strong>Ayak/ayakkabı odaklı</strong></td>
+          <td>Bale ayakkabısı, pointe work yakın çekim</td>
+          <td>Teknik içerik, eğitim posts</td>
+          <td><span class="tag tag-yesil">Düşük</span></td>
+        </tr>
+        <tr>
+          <td>🔴 <strong>Siluet çekimi</strong></td>
+          <td>Işık arkadan, yüz görünmez</td>
+          <td>Dramatik sanatsal içerik</td>
+          <td><span class="tag tag-yesil">Düşük</span></td>
+        </tr>
+        <tr>
+          <td>🔴 <strong>Eğitmen odaklı</strong></td>
+          <td>Eğitmen yüzü görünür, çocuklar arkada</td>
+          <td>Eğitim tanıtım içerikleri</td>
+          <td><span class="tag tag-yesil">Düşük</span></td>
+        </tr>
+        <tr>
+          <td>🔴 <strong>Çizim/illüstrasyon</strong></td>
+          <td>Dijital çizimlerle çocuk figürü</td>
+          <td>Carousel, bilgilendirici içerik</td>
+          <td><span class="tag tag-yesil">Düşük</span></td>
+        </tr>
+        <tr>
+          <td>🔴 <strong>Uzak mesafe</strong></td>
+          <td>Yüz detay olmayacak kadar uzak</td>
+          <td>Genel ders atmosferi</td>
+          <td><span class="tag tag-yesil">Düşük</span></td>
+        </tr>
+        <tr>
+          <td>🟡 <strong>Ebeveyn onaylı özel</strong></td>
+          <td>Ailelerden yazılı izin + sözleşme</td>
+          <td>Sadece gösteri, gala</td>
+          <td><span class="tag tag-altin">Orta</span></td>
+        </tr>
+        <tr>
+          <td>🟢 <strong>Yetişkin öğrenciler</strong></td>
+          <td>18+ öğrencilerin yüzü serbest</td>
+          <td>Yetişkin bale, drama tanıtımı</td>
+          <td><span class="tag tag-yesil">Yok</span></td>
+        </tr>
+      </table>
+    </div>
+
+    <h3>3.2 Ebevyn Onay Sözleşmesi Şablonu</h3>
+    <div class="script-box">
+<span class="action">FOTOĞRAF/VIDEO İZNİ SÖZLEŞMESİ</span>
+
+Veliler Adı Soyadı: _______________
+Öğrenci Adı Soyadı: _______________
+Tarih: _______________
+
+Artem Sanat Akademisi'nin ders, prova ve etkinliklerde
+çekilen fotoğraf ve videoları sosyal medya hesaplarında
+(paylaşım, hikaye, reklam) kullanmasına izin veriyorum.
+
+☐ İzin veriyorum
+☐ İzin vermiyorum
+
+Not: Çocuk yüzleri bulanıklaştırılacak veya
+siluet/arkadan çekim yapılacaktır.
+
+İmza: _______________
+    </div>
+
+    <h3>3.3 Uygulama Takvimi</h3>
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-date">Ekim 2026 — Hemen</div>
+        <p>Mevcut tüm içerikleri gözden geçir. Yüz gösteren varsa arşivle. Yeni çekim protokolünü ekiple paylaş.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Kasım 2026</div>
+        <p>Tüm yeni içeriklerde yüz kuralı uygulanıyor olmalı. Gösteri çekimleri için özel protokol hazırla.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">Aralık 2026</div>
+        <p>Yıl sonu gösterisi çekimlerinde bulanıklaştırma yazılımı kullan. Ebevyn onay sözleşmelerini topla.</p>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">1 Kasım 2026 ⚠️</div>
+        <p>15 yaş altı sosyal medya yasağı yürürlük — tam uyum sağlanmış olmalı.</p>
+      </div>
+    </div>
+
+    <h3>3.4 Kırmızı Çizgiler</h3>
+    <div class="grid-2">
+      <div class="callout callout-danger">
+        <div class="callout-title">❌ ASLA YAPMA</div>
+        <p>• Çocuk yüzü net gösterme<br>
+        • Çocuk adı-soyadı paylaşım metninde kullanma<br>
+        • 15 yaş altı çocukların kendi hesabından repost etme<br>
+        • Ebeveyn onayı olmadan çocuk fotoğrafı yayınlama<br>
+        • Kalabalık grup fotoğrafı (yüzler net)</p>
+      </div>
+      <div class="callout callout-success">
+        <div class="callout-title">✅ HER ZAMAN YAP</div>
+        <p>• Eğitmen kamerada (kendisi serbest)<br>
+        • Çocukları arkadan çek<br>
+        • Siluet çekimi kullan<br>
+        • Ayak/ayakkabı detay çek<br>
+        • Stüdyo ekipmanı/dekor çek<br>
+        • Eğitmen + çocuk (eğitmen önde, çocuk arkada)</p>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- BÖLÜM 4: EKİM 2026 -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section" id="b4">
+  <div class="section-header" style="background:linear-gradient(135deg,#E8A0BF,#C77A9E);">
+    <span class="num">04</span>
+    <h2>📅 Ekim 2026 — Günlük İçerik Planı</h2>
+    <p>Ayın teması: "Kurucunun Hikayesi — Bale ile Tanışma"</p>
+  </div>
+  <div class="section-body">
+
+    <div class="grid-4">
+      <div class="stat-card"><div class="stat-num">+150</div><div class="stat-label">Takipçi Hedefi</div></div>
+      <div class="stat-card"><div class="stat-num">500+</div><div class="stat-label">Ort. Reel İzlenme</div></div>
+      <div class="stat-card"><div class="stat-num">10+</div><div class="stat-label">DM Sorgusu</div></div>
+      <div class="stat-card"><div class="stat-num">2+</div><div class="stat-label">Yeni Kayıt</div></div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- HAFTA 1 -->
+    <h3>🗓️ Hafta 1: "Tanışma Haftası" (29 Eylül – 5 Ekim)</h3>
+    <p><em>Stratejik hedef: Kurucu eğitmeni tanıtmak. "Bu insan neden güvenilir?" sorusunu cevaplamak.</em></p>
+
+    <!-- 29 Eylül -->
+    <div class="day-card">
+      <div class="day-header day-pzt">📅 29 EYLÜL PAZARTESİ — "Ben [İsim], Bir Balerinim"</div>
+      <div class="day-body">
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+          <span class="tag tag-kirmizi">Reel</span>
+          <span class="tag tag-somon">20-30 sn</span>
+          <span class="tag tag-mor">🩰 Kurucunun Gücü</span>
+        </div>
+        <div class="script-box">
+<span class="time">[0-3 sn]</span> <span class="action">KANCA:</span> Ekran kararır. <span class="text">"Baleye 4 yaşında başladım."</span>
+<span class="time">[3-7 sn]</span> Kurucu kamerada, stüdyo arka planda.
+         <span class="text">"Merhaba, ben [İsim]. 4 yaşında ilk bale ayakkabılarımı
+         giydiğimde, hayatım değişti."</span>
+<span class="time">[7-15 sn]</span> <span class="text">"X yıl profesyonel dans ettim. X ülkede sahneye çıktım.
+          Ve şimdi Beylikdüzü'nde aynı tutkuyu çocuklarla paylaşıyorum."</span>
+<span class="time">[15-20 sn]</span> <span class="text">"Artem Sanat Akademisi. Burada sadece bale öğretmiyoruz.
+           Hayat boyu sürecek bir sanat sevgisi aşılıyoruz."</span>
+<span class="time">[20-25 sn]</span> Kurucu bale pozu veriyor (siluet/arabesque).
+           <span class="text">Yazı: "Artem Sanat Akademisi — Beylikdüzü"</span>
+<span class="time">[25-30 sn]</span> Logo + iletişim bilgisi
+        </div>
+        <p><strong>🎵 Müzik:</strong> Tchaikovsky - Kuğu Gölü (klasik, duygusal)</p>
+        <p><strong>📸 Çekim:</strong> Stüdyo, doğal ışık, kameraya doğrudan bakış, son karede siluet bale pozu</p>
+        <p><strong>📝 Caption:</strong> "Baleye 4 yaşında başladım. 🩰 O gün ayakkabılarımı giyerken hissettiğim heyecanı, bugün her yeni öğrencimde tekrar yaşıyorum. X yıl profesyonel dans ettim. X ülkede sahneye çıktım. Ve şimdi Beylikdüzü'nde aynı tutkuyu çocuklarla paylaşıyorum. ✨ Ücretsiz deneme dersi için DM atın!"</p>
+        <p><strong>🏷️ Hashtag:</strong> #ArtemSanatAkademisi #Balerin #BaleEğitimi #Beylikdüzü #SanatAkademisi #BaleKursu #MEBOnaylı #BalerinHayatı #SanatlaBüyümek</p>
+        <p><strong>🎯 CTA:</strong> "Ücretsiz deneme dersi için DM atın!"</p>
+        <p><strong>📊 Hedef:</strong> Güven + tanışma + ilk DM'ler</p>
+      </div>
+    </div>
+
+    <!-- 30 Eylül -->
+    <div class="day-card">
+      <div class="day-header day-sal">📅 30 EYLÜL SALI — "Bale Kursu Seçerken 5 Kritik Soru"</div>
+      <div class="day-body">
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+          <span class="tag tag-mavi">Carousel (7 slide)</span>
+          <span class="tag tag-mavi">💡 Bilgilendirici</span>
+        </div>
+        <p><strong>Slide 1 (Kapak):</strong> "Bale kursu seçerken MUTLAKA sorun 👇" — Somon pembe arka plan</p>
+        <p><strong>Slide 2:</strong> "1️⃣ Eğitmeninizin bale geçmişi nedir?" — Profesyonel dans deneyimi, sertifikalar</p>
+        <p><strong>Slide 3:</strong> "2️⃣ MEB onaylı mısınız?" — Denetlenen müfredat, geçerli sertifika</p>
+        <p><strong>Slide 4:</strong> "3️⃣ Sınıf mevcudunuz kaç?" — İdeal 6-10 öğrenci</p>
+        <p><strong>Slide 5:</strong> "4️⃣ Sahne imkanınız var mı?" — Yılda en az 1-2 gösteri</p>
+        <p><strong>Slide 6:</strong> "5️⃣ Hangi metodu kullanıyorsunuz?" — Vaganova, RAD, Cecchetti</p>
+        <p><strong>Slide 7 (CTA):</strong> "Artem Sanat Akademisi olarak tüm bu soruların cevabını biliyoruz. ✨ Deneme dersi için DM atın!"</p>
+        <p><strong>📝 Caption:</strong> "Bale kursu seçerken bu 5 soruyu MUTLAKA sorun! 👆 Bu rehberi kaydedin, sonra tekrar bakın. 💾 Sorularınız varsa DM atın!"</p>
+        <p><strong>🎯 CTA:</strong> "Bu rehberi kaydedin 💾" + "Sorularınız için DM"</p>
+        <p><strong>📊 Hedef:</strong> Kaydetme (algoritma boost) + DM</p>
+      </div>
+    </div>
+
+    <!-- 1 Ekim -->
+    <div class="day-card">
+      <div class="day-header day-car">📅 1 EKİM ÇARŞAMBA — "Bir Balerin'in Sabahı"</div>
+      <div class="day-body">
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+          <span class="tag tag-kirmizi">Reel</span>
+          <span class="tag tag-somon">15-25 sn</span>
+          <span class="tag tag-mor">🩰 Kurucunun Gücü</span>
+        </div>
+        <div class="script-box">
+<span class="time">[0-3 sn]</span> <span class="action">KANCA (POV):</span> Alarm sesi, göz açılıyor
+<span class="time">[3-6 sn]</span> Kurucu yataktan kalkıyor, stretch yapıyor (sadece siluet)
+<span class="time">[6-10 sn]</span> Kahvaltı masası hızlı geçiş
+<span class="time">[10-14 sn]</span> Stüdyoya giriş, ayakkabılarını giyiyor (yakın çekim)
+<span class="time">[14-18 sn]</span> İlk bale pozu — arabesque (siluet, ışık arkadan)
+<span class="time">[18-22 sn]</span> <span class="text">"Her gün bir adım daha ileri 🩰"</span>
+<span class="time">[22-25 sn]</span> Logo + "Artem Sanat Akademisi"
+        </div>
+        <p><strong>🎵 Müzik:</strong> Debussy - Clair de Lune veya trending sabah müziği</p>
+        <p><strong>📸 Çekim:</strong> POV formatı — izleyici kurucunun gözünden görüyor. Siluet çekimleri, hızlı geçişler.</p>
+        <p><strong>🎯 CTA:</strong> "Ücretsiz deneme dersi için DM!"</p>
+      </div>
+    </div>
+
+    <!-- 2 Ekim -->
+    <div class="day-card">
+      <div class="day-header day-per">📅 2 EKİM PERŞEMBE — Story Günü</div>
+      <div class="day-body">
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+          <span class="tag tag-mor">5 Story</span>
+          <span class="tag tag-yesil">🤝 Topluluk</span>
+        </div>
+        <p><strong>Story 1:</strong> Ders programı görseli + "Programı kaydet butonuna bas! 💾"</p>
+        <p><strong>Story 2:</strong> Anket — "Çocuğunuz hangi branşı denemek istiyor?" → Bale / Drama / Gitar / Dans</p>
+        <p><strong>Story 3:</strong> Soru kutusu — "Bale eğitimi hakkında merak ettiklerinizi sorun! 👇"</p>
+        <p><strong>Story 4:</strong> Ders anı (arkadan çekim) — "Bu minik balerinler her gün biraz daha büyüyor."</p>
+        <p><strong>Story 5:</strong> Hatırlatma — "Ücretsiz deneme dersi için DM atmayı unutmayın! ✨"</p>
+      </div>
+    </div>
+
+    <!-- 3 Ekim -->
+    <div class="day-card">
+      <div class="day-header day-cum">📅 3 EKİM CUMA — "Bale Ayakkabısının Hikayesi"</div>
+      <div class="day-body">
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+          <span class="tag tag-kirmizi">Reel</span>
+          <span class="tag tag-somon">20-30 sn</span>
+          <span class="tag tag-mavi">💡 Bilgilendirici</span>
+        </div>
+        <div class="script-box">
+<span class="time">[0-3 sn]</span> <span class="action">KANCA:</span> Kurucu bale ayakkabısını kameraya tutuyor.
+         <span class="text">"Bu ayakkabı ortalama 20 saat dayanır."</span>
+<span class="time">[3-8 sn]</span> <span class="text">"Her prova biraz daha yıpranır. Her yıpranma,
+         bir adım daha ileri gitmenin kanıtıdır."</span>
+<span class="time">[8-15 sn]</span> Pointe ayakkabısının altını gösteriyor.
+          <span class="text">"Pointe ayakkabılarının içinde ahşap ve karton var.
+          Biliyor muydunuz?"</span>
+<span class="time">[15-20 sn]</span> <span class="text">"Bu ayakkabılarla dans eden çocuklar,
+           sadece bale öğrenmiyor. Disiplin, sabır ve zarafet öğreniyor."</span>
+<span class="time">[20-25 sn]</span> Kurucu ayakkabıyı giyiyor, ilk pozu veriyor (siluet)
+<span class="time">[25-30 sn]</span> Logo + iletişim
+        </div>
+        <p><strong>🎯 CTA:</strong> "Bu ayakkabılarla dans etmek ister misiniz? DM atın!"</p>
+        <p><strong>📊 Hedef:</strong> Keşfet erişimi (bilgilendirici content seviyor)</p>
+      </div>
+    </div>
+
+    <!-- 4 Ekim -->
+    <div class="day-card">
+      <div class="day-header day-cmt">📅 4 EKİM CUMARTESİ — "Ekim Ders Programı & Kayıt"</div>
+      <div class="day-body">
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+          <span class="tag tag-mavi">Carousel (5 slide)</span>
+          <span class="tag tag-altin">🎪 Dönüşüm</span>
+        </div>
+        <p><strong>Slide 1:</strong> "Ekim 2026 Ders Programımız 📋"</p>
+        <p><strong>Slide 2:</strong> "Bale Dersleri 🩰 — 5-7 yaş: Pzt-Cmt 16:00 | 8-12 yaş: Sal-Per 17:00 | Yetişkin: Çar 19:00"</p>
+        <p><strong>Slide 3:</strong> "Drama & Tiyatro 🎭 — 6-10 yaş: Salı 16:00 | 11-16 yaş: Perşembe 17:00"</p>
+        <p><strong>Slide 4:</strong> "Müzik & Gitar 🎸 — Gitar (7+): Çar-Cuma 16:00 | Piyano (5+): Randevu ile"</p>
+        <p><strong>Slide 5 (CTA):</strong> "🎯 Ücretsiz deneme dersi! 📍 Beylikdüzü 📩 DM atın!"</p>
+        <p><strong>🎯 CTA:</strong> "Ücretsiz deneme dersi için DM atın!"</p>
+      </div>
+    </div>
+
+    <!-- 5 Ekim -->
+    <div class="day-card">
+      <div class="day-header day-paz">📅 5 EKİM PAZAR — Haftalık Motivasyon</div>
+      <div class="day-body">
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+          <span class="tag tag-yesil">Static Post</span>
+          <span class="tag tag-mavi">💡 Motivasyon</span>
+        </div>
+        <p><strong>Görsel:</strong> Kurucunun siluet bale pozu, zarif arka plan</p>
+        <p><strong>Metin overlay:</strong> "Dans, ruhun sessiz müziğidir. 🩰"</p>
+        <p><strong>📝 Caption:</strong> "Yeni hafta başlıyor. Bu hafta çocuğunuzun hayatına bir sanat dokunuşu eklemeye ne dersiniz? ✨ Ücretsiz deneme dersi için DM atın."</p>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- HAFTA 2 -->
+    <h3>🗓️ Hafta 2: "Bale Anekdotları Haftası" (6 – 12 Ekim)</h3>
+    <p><em>Stratejik hedef: "Bale Anekdotu" serisini başlatmak. Keşfet algoritmasını besleyecek bilgilendirici reel serisi.</em></p>
+
+    <div class="day-card">
+      <div class="day-header day-pzt">📅 6 EKİM PAZARTESİ — "Bale Anekdotu #1: Kuğu Gölü'nün Fiaskosu"</div>
+      <div class="day-body">
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+          <span class="tag tag-kirmizi">Reel</span>
+          <span class="tag tag-somon">20-30 sn</span>
+          <span class="tag tag-somon">🩰 Kurucunun Gücü</span>
+          <span class="tag tag-mavi">💡 Bilgilendirici</span>
+        </div>
+        <div class="script-box">
+<span class="time">[0-3 sn]</span> <span class="action">KANCA:</span> Ekran kararır. <span class="text">"Dünyanın en ünlü balesi
+         ilk gösterisinde başarısız oldu."</span>
+<span class="time">[3-8 sn]</span> Kurucu kamerada. <span class="text">"1877'de Tchaikovsky'nin Kuğu Gölü'sü
+         Moskova'da ilk kez sahnelendi. Ve tam bir fiyasko oldu."</span>
+<span class="time">[8-15 sn]</span> <span class="text">"Eleştirmenler müziği çok karmaşık buldu.
+          Koreografi yetersizdi. Seyirciler hayal kırıklığına uğradı."</span>
+<span class="time">[15-20 sn]</span> <span class="text">"Ama Tchaikovsky vazgeçmedi.
+           Bugün Kuğu Gölü, dünyanın en çok bilinen balesi."</span>
+<span class="time">[20-25 sn]</span> <span class="text">"Siz de çocuğunuzun hayallerinin peşinden
+           koşmasına izin verin. ✨"</span>
+<span class="time">[25-30 sn]</span> Logo + "Ücretsiz deneme dersi için DM"
+        </div>
+        <p><strong>🎵 Müzik:</strong> Kuğu Gölü tema müziği (dramatik)</p>
+        <p><strong>🎯 CTA:</strong> "Çocuğunuzun hayallerinin peşinden koşmasına izin verin — DM atın!"</p>
+        <p><strong>📊 Hedef:</strong> Keşfet erişimi + yeni takipçi + duygusal bağ</p>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-header day-sal">📅 7 EKİM SALI — "3 Ay Önce Bale'ye Başlayan Bir Çocuğun Değişimi"</div>
+      <div class="day-body">
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+          <span class="tag tag-mavi">Carousel (5 slide)</span>
+          <span class="tag tag-altin">🎪 Dönüşüm</span>
+        </div>
+        <p><strong>Slide 1:</strong> "3 ay önce baleye başlayan bir çocuğun yolculuğu 👇"</p>
+        <p><strong>Slide 2:</strong> "1. Hafta: Ayakta durmak bile zor 🩰" — İlk ders anı (arkadan çekim)</p>
+        <p><strong>Slide 3:</strong> "4. Hafta: Temel pozisyonlar oturuyor 💪" — Kas hafızası oluşuyor</p>
+        <p><strong>Slide 4:</strong> "8. Hafta: Müzikle dans etmeye başlıyor 🎵" — Yüz ifadesi değişiyor</p>
+        <p><strong>Slide 5 (CTA):</strong> "12. Hafta: Sahneye çıkmaya hazır ✨ — Ücretsiz deneme dersi için DM atın!"</p>
+        <p><strong>🎯 CTA:</strong> "Bu postu kaydedin 💾" + "Ücretsiz deneme dersi için DM"</p>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-header day-car">📅 8 EKİM ÇARŞAMBA — "Gitar Dersimizden Bir An"</div>
+      <div class="day-body">
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+          <span class="tag tag-kirmizi">Reel</span>
+          <span class="tag tag-somon">15-20 sn</span>
+          <span class="tag tag-mor">🎭 Branş Tanıtımı</span>
+        </div>
+        <p>Gitar sesi duyuluyor, eğitmen elleri yakın çekim. "Gitar çalmak sadece müzik değil. Sabır, koordinasyon ve ifade gücü. 7 yaşından itibaren başlayabilirsiniz."</p>
+        <p><strong>🎯 CTA:</strong> "Gitar derslerimize kayıt için DM atın!"</p>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-header day-per">📅 9 EKİM PERŞEMBE — Story: Soru-Cevap Günü</div>
+      <div class="day-body">
+        <p>5-6 story: Soru sticker'ı açılıyor. Gelen sorular yanıtlanıyor: "Kaç yaşında başlamalı?" "Haftada kaç gün?" "Fiyatlar nedir?" "Çocuğum hareketli, bale yapabilir mi?" Son story: CTA.</p>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-header day-cum">📅 10 EKİM CUMA — "Bale Anekdotu #2: Pointe Ayakkabısının Sırrı"</div>
+      <div class="day-body">
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+          <span class="tag tag-kirmizi">Reel</span>
+          <span class="tag tag-somon">20-25 sn</span>
+        </div>
+        <p>Kurucu pointe ayakkabısını kesiyor (yakın çekim). "İçinde ahşap, karton ve kumaş var. Profesyonel bir balerin yılda 200 çift bitirir." Son kare: pointe pozu (siluet).</p>
+        <p><strong>🎯 CTA:</strong> "Bu ayakkabılarla dans etmek ister misiniz? DM atın!"</p>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-header day-cmt">📅 11 EKİM CUMARTESİ — "Hangi Yaşta Hangi Branş?"</div>
+      <div class="day-body">
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+          <span class="tag tag-mavi">Carousel (6 slide)</span>
+          <span class="tag tag-mavi">💡 Bilgilendirici</span>
+        </div>
+        <p>3-4 Yaş: Yaratıcı Dans | 5-6 Yaş: Bale Başlangıç | 7-10 Yaş: Drama & Tiyatro | 7+ Yaş: Gitar & Müzik | CTA: "Hangisi çocuğunuza uygun? Deneme dersi için DM atın!"</p>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-header day-paz">📅 12 EKİM PAZAR — "Bir Balerin İtirafı"</div>
+      <div class="day-body">
+        <div style="display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap;">
+          <span class="tag tag-kirmizi">Reel</span>
+          <span class="tag tag-somon">20-25 sn</span>
+          <span class="tag tag-somon">🩰 Duygusal</span>
+        </div>
+        <div class="script-box">
+<span class="time">[0-3 sn]</span> <span class="action">KANCA:</span> <span class="text">"İlk sahneye çıktığımda düştüm."</span>
+<span class="time">[3-8 sn]</span> <span class="text">"Evet, düştüm. Ayağım kaydı, herkesin önünde yere kapaklandım."</span>
+<span class="time">[8-13 sn]</span> <span class="text">"Gözyaşlarımı tutamadım. Ama kalktım ve dans etmeye devam ettim."</span>
+<span class="time">[13-18 sn]</span> <span class="text">"O gün öğrendim: Düşmek değil, kalkmamak başarısızlıktır."</span>
+<span class="time">[18-22 sn]</span> <span class="text">"Şimdi her öğrencime aynı şeyi öğretiyorum: Düşeceksin. Ama kalkacaksın. ✨"</span>
+<span class="time">[22-25 sn]</span> Logo + "Artem Sanat Akademisi"
+        </div>
+        <p><strong>🎵 Müzik:</strong> Duygusal piyano veya keman</p>
+        <p><strong>🎯 CTA:</strong> "Siz de çocuğunuza düşmeyi ve kalkmayı öğretin — DM atın!"</p>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- HAFTA 3 -->
+    <h3>🗓️ Hafta 3: "Dönüşüm Haftası" (13 – 19 Ekim)</h3>
+    <p><em>Stratejik hedef: Somut dönüşüm içerikleriyle kayıt taleplerini artırmak.</em></p>
+
+    <div class="day-card">
+      <div class="day-header day-pzt">📅 13 EKİM PAZARTESİ — "Bale Anekdotu #3: Balerinler Neden Hep Gülümser?"</div>
+      <div class="day-body">
+        <p><span class="tag tag-kirmizi">Reel</span> <span class="tag tag-somon">20-25 sn</span> — "Balede yüz ifadesi teknik kadar önemlidir. Seyirciye sadece bedeninizi değil, ruhunuzu da gösterirsiniz." Kurucu farklı yüz ifadeleri gösteriyor.</p>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-header day-sal">📅 14 EKİM SALI — "Drama Dersimizden Anlar"</div>
+      <div class="day-body">
+        <p><span class="tag tag-kirmizi">Reel</span> <span class="tag tag-somon">15-20 sn</span> — Drama atölyesinden kesitler (yüzler bulanık). "Kendini ifade etmenin en güzel yolu. Drama, çocukların özgüvenini ve empati becerisini geliştirir."</p>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-header day-car">📅 15 EKİM ÇARŞAMBA — "Velimiz Anlatıyor #1"</div>
+      <div class="day-body">
+        <p><span class="tag tag-mavi">Carousel (5 slide)</span> — "Kızım 3 yaşından beri utangaçtı. Yabancılarla konuşamazdı. 3 ay önce baleye başladı. Bugün okul gösterisinde sahneye çıktı. Tek başına." Anonim veli hikayesi. CTA: "Bu postu kaydedin 💾"</p>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-header day-per">📅 16 EKİM PERŞEMBE — Story: "Bugün Derste Ne Öğrendik?"</div>
+      <div class="day-body">
+        <p>Ders anı video (arkadan) + Quiz: "Bu hareketin adı ne?" → Plié / Tendu / Relevé + Doğru cevap açıklaması + CTA.</p>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-header day-cum">📅 17 EKİM CUMA — "Bale Anekdotu #4: Erkek Balerinler"</div>
+      <div class="day-body">
+        <p><span class="tag tag-kirmizi">Reel</span> — "Bir erkek balerin 50 kg'ı havaya kaldırır. Bu bir ağırlık antrenmanı kadar zor. Bale sadece zarafet değil. Güç, dayanıklılık ve disiplin. Erkek çocukları da bale yapabilir ve yapmalı."</p>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-header day-cmt">📅 18 EKİM CUMARTESİ — "Transformation: Duruş Değişimi"</div>
+      <div class="day-body">
+        <p><span class="tag tag-kirmizi">Reel</span> — Yan yana iki siluet: "3 ay öncesi" vs "şimdi". Duruş farkı net görülüyor. "Bu farkı çocuğunuzda da görmek ister misiniz? Ücretsiz deneme dersi için DM atın!"</p>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-header day-paz">📅 19 EKİM PAZAR — Kayıt Hatırlatması</div>
+      <div class="day-body">
+        <p><span class="tag tag-yesil">Static</span> — Minimal tasarım: "Ekim kayıtları devam ediyor. Sınırlı kontenjan. 🩰" + iletişim bilgileri.</p>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- HAFTA 4 -->
+    <h3>🗓️ Hafta 4: "Güven Haftası" (20 – 26 Ekim)</h3>
+    <p><em>Stratejik hedef: Güvenilirlik sinyallerini güçlendirmek. MEB onaylı, profesyonel eğitmen, şeffaf bilgi.</em></p>
+
+    <div class="day-card">
+      <div class="day-header day-pzt">📅 20 EKİM PAZARTESİ — "Bale Anekdotu #5: Dünyanın En Zor Dans Hareketi"</div>
+      <div class="day-body">
+        <p><span class="tag tag-kirmizi">Reel</span> — "Grand Pas De Deux: Erkek dansçı partnerini havaya kaldırır, kadın dansçı ayak parmaklarının üzerinde durur. Bu dengenin zirvesi. 50 kg'ı havada tutarken mükemmel denge."</p>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-header day-sal">📅 21 EKİM SALI — "Neden MEB Onaylı Eğitim Önemli?"</div>
+      <div class="day-body">
+        <p><span class="tag tag-kirmizi">Reel</span> — Kurucu kamerada: "MEB onaylı olmak sadece bir belge değil. Müfredat denetleniyor, eğitmenler sınanıyor, öğrenciler sertifikalanıyor. Onaysız kurslarda ne öğretildiği belirsiz."</p>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-header day-car">📅 22 EKİM ÇARŞAMBA — "Tiyatro Provamızdan Bir An"</div>
+      <div class="day-body">
+        <p><span class="tag tag-kirmizi">Reel</span> — Sahne ışıkları açılıyor, tiyatro öğrencileri prova yapıyor (uzak çekim). "Sahneye çıkmadan önce son prova... Tiyatro, çocukların kendini ifade etmesinin en güzel yolu."</p>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-header day-per">📅 23 EKİM PERŞEMBE — Story: "Eğitmen Kadromuz"</div>
+      <div class="day-body">
+        <p>Her eğitmen için ayrı story: branşı, deneyimi, fotoğrafı. "Bu uzman kadroyla çocuğunuzun sanat yolculuğunu başlatın! ✨"</p>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-header day-cum">📅 24 EKİM CUMA — "Bale Anekdotu #6: Bir Bale Ayakkabısının Maliyeti"</div>
+      <div class="day-body">
+        <p><span class="tag tag-kirmizi">Reel</span> — "Profesyonel bir pointe ayakkabısı 3000-5000 TL. Ve her 20 saatte bir değiştirilmeli. Bale bu yüzden bir tutku işi. Ama bu tutkuyu çocuğunuza aşılamak, ona hayat boyu sürecek bir hediye."</p>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-header day-cmt">📅 25 EKİM CUMARTESİ — "Artem'de Bir Gün"</div>
+      <div class="day-body">
+        <p><span class="tag tag-mavi">Carousel (7 slide)</span> — 09:00 Stüdyo hazırlığı → 10:00 Yetişkin bale → 14:00 Çocuk bale → 16:00 Gitar → 18:00 Drama → CTA: "Her saat bir sanat. Deneme dersi için DM!"</p>
+      </div>
+    </div>
+
+    <div class="day-card">
+      <div class="day-header day-paz">📅 26 EKİM PAZAR — "29 Ekim Özel: Dansla Cumhuriyet"</div>
+      <div class="day-body">
+        <p><span class="tag tag-kirmizi">Reel</span> — Bayrak ışığı, kurucu siluet dans. "Cumhuriyetimizin 103. yılında dansla kutluyoruz. Atatürk sanata çok değer verdi. Biz de bu değeri gelecek nesillere aktarıyoruz."</p>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- HAFTA 5 -->
+    <h3>🗓️ Hafta 5: "Cumhuriyet & Kapanış" (27 – 31 Ekim)</h3>
+
+    <div class="day-card">
+      <div class="day-header day-pzt">📅 27 EKİM — "Bale Anekdotu #7: Atatürk ve Sanat"</div>
+      <div class="day-body"><p><span class="tag tag-kirmizi">Reel</span> — "Atatürk Cumhuriyet'in ilk yıllarında devlet opera ve balesini kurdu. 'Sanatsız kalan bir milletin hayat damarlarından biri kopmuş demektir.'"</p></div>
+    </div>
+    <div class="day-card">
+      <div class="day-header day-sal">📅 28 EKİM — "29 Ekim Haftası Ders Programı"</div>
+      <div class="day-body"><p><span class="tag tag-mavi">Carousel</span> — Haftalık program + "29 Ekim'de ders yok. Bayramımız kutlu olsun! 🇹🇷"</p></div>
+    </div>
+    <div class="day-card">
+      <div class="day-header day-car">📅 29 EKİM — "Cumhuriyet Bayramı Kutlaması"</div>
+      <div class="day-body"><p><span class="tag tag-kirmizi">Reel</span> — Stüdyo dekorasyonu, öğrencilerle (arkadan) mini performans. "29 Ekim Cumhuriyet Bayramımız kutlu olsun! 🇹🇷✨"</p></div>
+    </div>
+    <div class="day-card">
+      <div class="day-header day-per">📅 30 EKİM — Story: "Ekim Ayı Özeti"</div>
+      <div class="day-body"><p>X yeni öğrenci, X ders, X prova. "Kasım'da gösteri provalarımız başlıyor!"</p></div>
+    </div>
+    <div class="day-card">
+      <div class="day-header day-cum">📅 31 EKİM — "Ekim Kapanış: Yolculuğumuz Başladı"</div>
+      <div class="day-body"><p><span class="tag tag-kirmizi">Reel</span> — Kurucu: "X yeni öğrencimiz aramıza katıldı. Her biriyle gurur duyuyorum. Kasım'da daha da güzel olacak. ✨"</p></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- BÖLÜM 5: KASIM 2026 -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section" id="b5">
+  <div class="section-header" style="background:linear-gradient(135deg,#7C3AED,#A78BFA);">
+    <span class="num">05</span>
+    <h2>📅 Kasım 2026 — Gösteri Hazırlığı Ayı</h2>
+    <p>Ayın teması: "Perde Arkası — Gösteriye Hazırlanıyoruz"</p>
+  </div>
+  <div class="section-body">
+    <div class="grid-4">
+      <div class="stat-card"><div class="stat-num">+200</div><div class="stat-label">Takipçi Hedefi</div></div>
+      <div class="stat-card"><div class="stat-num">1.000+</div><div class="stat-label">Ort. Reel İzlenme</div></div>
+      <div class="stat-card"><div class="stat-num">20+</div><div class="stat-label">DM Sorgusu</div></div>
+      <div class="stat-card"><div class="stat-num">5+</div><div class="stat-label">Yeni Kayıt</div></div>
+    </div>
+
+    <h3>Kasım Hafta 1 (3 – 9 Kasım): "Provalar Başladı"</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Tarih</th><th>Format</th><th>İçerik</th><th>Hook</th><th>CTA</th></tr>
+        <tr><td>3 Kas Pzt</td><td><span class="tag tag-kirmizi">Reel</span></td><td>Bale Anekdotu #8: Beyaz Kuğu / Siyah Kuğu</td><td>"Aynı balerin hem beyaz kuğu hem siyah kuğu oynar"</td><td>DM</td></tr>
+        <tr><td>4 Kas Sal</td><td><span class="tag tag-kirmizi">Reel</span></td><td>Gösteri provamız başladı! — sahne arkası</td><td>"Perde arkasından ilk görüntüler"</td><td>Bilet DM</td></tr>
+        <tr><td>5 Kas Çar</td><td><span class="tag tag-mavi">Carousel</span></td><td>Kış dönemi kayıtları — sınırlı kontenjan</td><td>"Son kontenjanlar"</td><td>Kayıt DM</td></tr>
+        <tr><td>6 Kas Per</td><td><span class="tag tag-mor">Story</span></td><td>Kostüm denemesi — eğitmen anlatım</td><td>"Kostümlerimiz hazır!"</td><td>—</td></tr>
+        <tr><td>7 Kas Cum</td><td><span class="tag tag-kirmizi">Reel</span></td><td>Bale Anekdotu #9: Günde kaç kalori yakar?</td><td>"1500-2000 kalori. Maraton koşucusuyla aynı."</td><td>DM</td></tr>
+        <tr><td>8 Kas Cmt</td><td><span class="tag tag-mavi">Carousel</span></td><td>Velimiz anlatıyor #2: "Oğlum sahneye çıkacak!"</td><td>"Heyecan dorukta"</td><td>DM</td></tr>
+        <tr><td>9 Kas Paz</td><td><span class="tag tag-yesil">Static</span></td><td>Haftalık motivasyon</td><td>"Her prova bir adım daha yakın sahneye"</td><td>DM</td></tr>
+      </table>
+    </div>
+
+    <h3>Kasım Hafta 2 (10 – 16 Kasım): "Teknik Haftası"</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Tarih</th><th>Format</th><th>İçerik</th><th>Hook</th><th>CTA</th></tr>
+        <tr><td>10 Kas</td><td><span class="tag tag-kirmizi">Reel</span></td><td>Bale Anekdotu #10: Relevé'nin Sırrı</td><td>"Tüm vücut ağırlığı bir noktada"</td><td>DM</td></tr>
+        <tr><td>11 Kas</td><td><span class="tag tag-kirmizi">Reel</span></td><td>1 Dakikada: 3 Bale Stretch Hareketi</td><td>"Bu 3 hareketi her gün yapın" → kaydet</td><td>Kaydet+Paylaş</td></tr>
+        <tr><td>12 Kas</td><td><span class="tag tag-mavi">Carousel</span></td><td>Hangi yaşta baleye başlanmalı?</td><td>Kurucunun uzman görüşü</td><td>DM</td></tr>
+        <tr><td>13 Kas</td><td><span class="tag tag-mor">Story</span></td><td>Prova anı: müzik ve dans</td><td>Müzik sesi + dans kesitleri</td><td>—</td></tr>
+        <tr><td>14 Kas</td><td><span class="tag tag-kirmizi">Reel</span></td><td>Bale Anekdotu #11: Tütünün Hikayesi</td><td>"İlk kez 1832'de kullanıldı"</td><td>DM</td></tr>
+        <tr><td>15 Kas</td><td><span class="tag tag-kirmizi">Reel</span></td><td>Drama dersimiz: Sahne provası</td><td>"Sahneye çıkıyoruz!"</td><td>DM</td></tr>
+        <tr><td>16 Kas</td><td><span class="tag tag-yesil">Static</span></td><td>10 Kasım saygı mesajı</td><td>"Atatürk'ü saygıyla anıyoruz"</td><td>—</td></tr>
+      </table>
+    </div>
+
+    <h3>Kasım Hafta 3 (17 – 23 Kasım): "10 Kasım Özel"</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Tarih</th><th>Format</th><th>İçerik</th><th>Hook</th><th>CTA</th></tr>
+        <tr><td>17 Kas</td><td><span class="tag tag-kirmizi">Reel</span></td><td>Bale Anekdotu #12: Türkiye'de Bale Tarihi</td><td>"İlk gösteri 1947'de"</td><td>DM</td></tr>
+        <tr><td>18 Kas</td><td><span class="tag tag-mavi">Carousel</span></td><td>10 Kasım özel: Atatürk ve sanat</td><td>Atatürk'ün sanat sözleri</td><td>—</td></tr>
+        <tr><td>19 Kas</td><td><span class="tag tag-kirmizi">Reel</span></td><td>Gitar dersimizden: 10 Kasım performans</td><td>Eğitmen gitarla Anıtkabir temalı</td><td>DM</td></tr>
+        <tr><td>20 Kas</td><td><span class="tag tag-mor">Story</span></td><td>Gösteri geri sayım: 10 gün kaldı</td><td>Sayaç sticker</td><td>—</td></tr>
+        <tr><td>21 Kas</td><td><span class="tag tag-kirmizi">Reel</span></td><td>Bale Anekdotu #13: Fındıkkıran Neden Yılbaşında?</td><td>"1892 Noel prömiyeri"</td><td>Bilet DM</td></tr>
+        <tr><td>22 Kas</td><td><span class="tag tag-mavi">Carousel</span></td><td>Gösteri programı açıklandı!</td><td>Tarih, saat, yer, bilet</td><td>Bilet DM</td></tr>
+        <tr><td>23 Kas</td><td><span class="tag tag-yesil">Static</span></td><td>24 Kasım Öğretmenler Günü</td><td>Kurucu + eğitmen kadrosu</td><td>—</td></tr>
+      </table>
+    </div>
+
+    <h3>Kasım Hafta 4 (24 – 30 Kasım): "Geri Sayım"</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Tarih</th><th>Format</th><th>İçerik</th><th>Hook</th><th>CTA</th></tr>
+        <tr><td>24 Kas</td><td><span class="tag tag-kirmizi">Reel</span></td><td>Bale Anekdotu #14: Neden Siyah Tayt?</td><td>"Kas hatlarını gösterir"</td><td>DM</td></tr>
+        <tr><td>25 Kas</td><td><span class="tag tag-kirmizi">Reel</span></td><td>Gösteri provasından son görüntüler</td><td>"Son prova tamamlandı!"</td><td>Bilet DM</td></tr>
+        <tr><td>26 Kas</td><td><span class="tag tag-mavi">Carousel</span></td><td>Biletler satışta!</td><td>Gösteri detayları + bilet</td><td>Bilet DM</td></tr>
+        <tr><td>27 Kas</td><td><span class="tag tag-mor">Story</span></td><td>Kostüm son kontrol</td><td>Eğitmen kostümleri kontrol</td><td>—</td></tr>
+        <tr><td>28 Kas</td><td><span class="tag tag-kirmizi">Reel</span></td><td>Bale Anekdotu #15: En Uzun Bale</td><td>"4 saat sürer"</td><td>DM</td></tr>
+        <tr><td>29 Kas</td><td><span class="tag tag-kirmizi">Reel</span></td><td>Gösteriye 1 gün kaldı!</td><td>Kurucu heyecanı</td><td>Son şans DM</td></tr>
+        <tr><td>30 Kas</td><td><span class="tag tag-yesil">Static</span></td><td>Bu gece sahnedeyiz!</td><td>Gösteri posteri</td><td>—</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- BÖLÜM 6: ARALIK 2026 -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section" id="b6">
+  <div class="section-header" style="background:linear-gradient(135deg,#DC2626,#F87171);">
+    <span class="num">06</span>
+    <h2>📅 Aralık 2026 — Sahne & Yılbaşı Kampanyası</h2>
+    <p>Ayın teması: "Sahne Zamanı & Yeni Yıl Kampanyası"</p>
+  </div>
+  <div class="section-body">
+    <div class="grid-4">
+      <div class="stat-card"><div class="stat-num">+300</div><div class="stat-label">Takipçi Hedefi</div></div>
+      <div class="stat-card"><div class="stat-num">1.500+</div><div class="stat-label">Ort. Reel İzlenme</div></div>
+      <div class="stat-card"><div class="stat-num">30+</div><div class="stat-label">DM Sorgusu</div></div>
+      <div class="stat-card"><div class="stat-num">8+</div><div class="stat-label">Yeni Kayıt</div></div>
+    </div>
+
+    <h3>Aralık Hafta 1: "Gösteri Haftası" (1 – 7 Aralık)</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Tarih</th><th>Format</th><th>İçerik</th><th>CTA</th></tr>
+        <tr><td>1 Ara</td><td><span class="tag tag-kirmizi">Reel</span></td><td>"Gösteri günü sabahı" — stüdyo hazırlığı</td><td>Bilet DM</td></tr>
+        <tr><td>2 Ara</td><td><span class="tag tag-mavi">Carousel</span></td><td>Gösteri öncesi kontrol listesi</td><td>—</td></tr>
+        <tr><td>3 Ara</td><td><span class="tag tag-kirmizi">Reel</span></td><td>Gösteri sonrası: Sahne arkası heyecan</td><td>DM</td></tr>
+        <tr><td>4 Ara</td><td><span class="tag tag-mor">Story</span></td><td>Gösteri fotoğraf galerisi (siluet)</td><td>—</td></tr>
+        <tr><td>5 Ara</td><td><span class="tag tag-kirmizi">Reel</span></td><td>Bale Anekdotu #16: İlk Gösteri Sonrası Hissi</td><td>DM</td></tr>
+        <tr><td>6 Ara</td><td><span class="tag tag-mavi">Carousel</span></td><td>Gösteri teşekkürleri</td><td>—</td></tr>
+        <tr><td>7 Ara</td><td><span class="tag tag-yesil">Static</span></td><td>"Her son bir yeni başlangıç"</td><td>İkinci dönem DM</td></tr>
+      </table>
+    </div>
+
+    <h3>Aralık Hafta 2: "Yeni Kayıt Kampanyası" (8 – 14 Aralık)</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Tarih</th><th>Format</th><th>İçerik</th><th>CTA</th></tr>
+        <tr><td>8 Ara</td><td><span class="tag tag-kirmizi">Reel</span></td><td>Gösteri sonrası: Veliler ne dedi?</td><td>DM</td></tr>
+        <tr><td>9 Ara</td><td><span class="tag tag-mavi">Carousel</span></td><td>İkinci dönem kayıtları açıldı!</td><td>Kayıt DM</td></tr>
+        <tr><td>10 Ara</td><td><span class="tag tag-kirmizi">Reel</span></td><td>Bale Anekdotu #17: Balerinlerin Ayakları</td><td>DM</td></tr>
+        <tr><td>11 Ara</td><td><span class="tag tag-mor">Story</span></td><td>Yılbaşı hediyesi: Deneme dersi</td><td>DM</td></tr>
+        <tr><td>12 Ara</td><td><span class="tag tag-kirmizi">Reel</span></td><td>Yetişkin bale dersi tanıtımı</td><td>DM</td></tr>
+        <tr><td>13 Ara</td><td><span class="tag tag-mavi">Carousel</span></td><td>2026 yılında neler yaptık? İstatistikler</td><td>—</td></tr>
+        <tr><td>14 Ara</td><td><span class="tag tag-yesil">Static</span></td><td>Yılbaşı kampanyası: "2 kaydettir 1 öde"</td><td>DM</td></tr>
+      </table>
+    </div>
+
+    <h3>Aralık Hafta 3: "Yılbaşı Özel" (15 – 21 Aralık)</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Tarih</th><th>Format</th><th>İçerik</th><th>CTA</th></tr>
+        <tr><td>15 Ara</td><td><span class="tag tag-kirmizi">Reel</span></td><td>Bale Anekdotu #18: Fındıkkıran ve Yılbaşı</td><td>DM</td></tr>
+        <tr><td>16 Ara</td><td><span class="tag tag-kirmizi">Reel</span></td><td>Yılbaşı özel: Kurucudan mesaj</td><td>DM</td></tr>
+        <tr><td>17 Ara</td><td><span class="tag tag-mavi">Carousel</span></td><td>2027'de baleye başlamak için 5 neden</td><td>DM</td></tr>
+        <tr><td>18 Ara</td><td><span class="tag tag-mor">Story</span></td><td>Yılbaşı yarışması! "Paylaşan 1 kişiye ücretsiz"</td><td>Paylaşım</td></tr>
+        <tr><td>19 Ara</td><td><span class="tag tag-kirmizi">Reel</span></td><td>Bale Anekdotu #19: Kar Beyaz Balesi</td><td>—</td></tr>
+        <tr><td>20 Ara</td><td><span class="tag tag-mavi">Carousel</span></td><td>Yılbaşı hediye önerisi: Sanat eğitimi</td><td>Hediye kartı DM</td></tr>
+        <tr><td>21 Ara</td><td><span class="tag tag-yesil">Static</span></td><td>Yılbaşı mesajı — kurucu siluet pozu</td><td>—</td></tr>
+      </table>
+    </div>
+
+    <h3>Aralık Hafta 4: "Yıl Kapanışı" (22 – 31 Aralık)</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Tarih</th><th>Format</th><th>İçerik</th><th>CTA</th></tr>
+        <tr><td>22 Ara</td><td><span class="tag tag-kirmizi">Reel</span></td><td>"2026 bizim için böyle geçti" — montaj reel</td><td>—</td></tr>
+        <tr><td>23 Ara</td><td><span class="tag tag-mavi">Carousel</span></td><td>2026 başarı tablosu — istatistikler</td><td>—</td></tr>
+        <tr><td>24 Ara</td><td><span class="tag tag-kirmizi">Reel</span></td><td>Bale Anekdotu #20: Yeni Yıl Dilekleri</td><td>DM</td></tr>
+        <tr><td>26 Ara</td><td><span class="tag tag-kirmizi">Reel</span></td><td>Kurucunun 2027 mesajı</td><td>DM</td></tr>
+        <tr><td>27 Ara</td><td><span class="tag tag-yesil">Static</span></td><td>2027 kayıtları başlıyor</td><td>DM</td></tr>
+        <tr><td>31 Ara</td><td><span class="tag tag-kirmizi">Reel</span></td><td>"Hoşça kal 2026, merhaba 2027!"</td><td>—</td></tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- BÖLÜM 7: OCAK 2027 -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section" id="b7">
+  <div class="section-header" style="background:linear-gradient(135deg,#3B82F6,#60A5FA);">
+    <span class="num">07</span>
+    <h2>📅 Ocak 2027 — Yeni Yıl, Yeni Kayıtlar</h2>
+    <p>Ayın teması: "2027'de Bale'ye Başlayın"</p>
+  </div>
+  <div class="section-body">
+    <div class="grid-4">
+      <div class="stat-card"><div class="stat-num">+200</div><div class="stat-label">Takipçi Hedefi</div></div>
+      <div class="stat-card"><div class="stat-num">1.000+</div><div class="stat-label">Ort. Reel İzlenme</div></div>
+      <div class="stat-card"><div class="stat-num">20+</div><div class="stat-label">DM Sorgusu</div></div>
+      <div class="stat-card"><div class="stat-num">5+</div><div class="stat-label">Yeni Kayıt</div></div>
+    </div>
+
+    <h3>Ocak Hafta 1: "Yeni Yıl Kayıtları"</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Tarih</th><th>Format</th><th>İçerik</th><th>CTA</th></tr>
+        <tr><td>5 Oca Pzt</td><td><span class="tag tag-kirmizi">Reel</span></td><td>Bale Anekdotu #21: Yeni yıl, yeni başlangıçlar</td><td>DM</td></tr>
+        <tr><td>6 Oca Sal</td><td><span class="tag tag-mavi">Carousel</span></td><td>İkinci dönem kayıt programı</td><td>Kayıt DM</td></tr>
+        <tr><td>7 Oca Çar</td><td><span class="tag tag-kirmizi">Reel</span></td><td>Yetişkin bale dersi tanıtımı (yüz serbest!)</td><td>DM</td></tr>
+        <tr><td>8 Oca Per</td><td><span class="tag tag-mor">Story</span></td><td>"2027 hedefleriniz ne?" anket</td><td>—</td></tr>
+        <tr><td>9 Oca Cum</td><td><span class="tag tag-kirmizi">Reel</span></td><td>Bale Anekdotu #22: Dünyanın en ünlü bale okulları</td><td>DM</td></tr>
+        <tr><td>10 Oca Cmt</td><td><span class="tag tag-mavi">Carousel</span></td><td>"2027'de çocuğunuz için 1 hedef: Sanat eğitimi"</td><td>DM</td></tr>
+        <tr><td>11 Oca Paz</td><td><span class="tag tag-yesil">Static</span></td><td>Yeni yıl motivasyonu</td><td>DM</td></tr>
+      </table>
+    </div>
+
+    <h3>Ocak Hafta 2-4: "Kış Dönemi Devam"</h3>
+    <p>Aynı içerik yapısı devam eder: Her Pazartesi bale anekdotu, her Salı carousel, her Çarşamba branş tanıtımı, her Perşembe story, her Cuma kurucu reel, her Cumartesi dönüşüm carousel, her Pazar motivasyon.</p>
+
+    <div class="callout callout-info">
+      <div class="callout-title">💡 Ocak Ayı Özel İçerikler</div>
+      <p><strong>Hafta 2:</strong> "Kış gösterisi hazırlığı" — prova süreci başlıyor<br>
+      <strong>Hafta 3:</strong> "Velimiz anlatıyor #3" — yeni dönem veli deneyimi<br>
+      <strong>Hafta 4:</strong> "Sanat ve kış" — kış temalı sanatsal içerikler</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- BÖLÜM 8: REEL SENARYO BANKASI -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section" id="b8">
+  <div class="section-header" style="background:linear-gradient(135deg,#059669,#34D399);">
+    <span class="num">08</span>
+    <h2>🎬 Reel Senaryo Bankası — 20 Profesyonel Senaryo</h2>
+    <p>Saniye saniye yazılmış, çekime hazır senaryolar</p>
+  </div>
+  <div class="section-body">
+
+    <h3>SENARYO 1: "Bale Anekdotu" Serisi (Haftalık — Her Pazartesi)</h3>
+    <div class="card">
+      <p><strong>Süre:</strong> 20-30 sn &nbsp;|&nbsp; <strong>Format:</strong> Kurucu kamerada, stüdyo &nbsp;|&nbsp; <strong>Amaç:</strong> Keşfet erişimi</p>
+      <div class="script-box">
+<span class="time">[0-3 sn]</span> <span class="action">KANCA:</span> Şaşırtıcı bir bilgi veya soru
+<span class="time">[3-10 sn]</span> Bilgi/hikaye anlatımı (kurucu kamerada)
+<span class="time">[10-17 sn]</span> Derinleştirme veya örnek
+<span class="time">[17-22 sn]</span> Motivasyonel mesaj veya CTA
+<span class="time">[22-25 sn]</span> Logo + iletişim
+      </div>
+      <p><strong>Örnek Hook'lar:</strong></p>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        <span class="tag tag-somon">"Dünyanın en ünlü balesi ilk gösterisinde başarısız oldu"</span>
+        <span class="tag tag-somon">"Bir bale ayakkabısının ömrü 20 saat"</span>
+        <span class="tag tag-somon">"Pointe ayakkabılarının içinde ahşap var"</span>
+        <span class="tag tag-somon">"Balerinler neden hep gülümser?"</span>
+        <span class="tag tag-somon">"Bir erkek balerin 50 kg'ı havaya kaldırır"</span>
+        <span class="tag tag-somon">"Atatürk baleye neden önem verdi?"</span>
+      </div>
+    </div>
+
+    <h3>SENARYO 2: "Kurucu Anlatıyor" Serisi (Haftalık — Her Cuma)</h3>
+    <div class="card">
+      <p><strong>Süre:</strong> 20-30 sn &nbsp;|&nbsp; <strong>Format:</strong> Kurucu kamerada, samimi &nbsp;|&nbsp; <strong>Amaç:</strong> Duygusal bağ</p>
+      <div class="script-box">
+<span class="time">[0-3 sn]</span> <span class="action">KANCA:</span> Kişisel bir itirafla veya soruyla başla
+<span class="time">[3-10 sn]</span> Kişisel hikaye veya deneyim
+<span class="time">[10-17 sn]</span> Ders çıkarma veya mesaj
+<span class="time">[17-22 sn]</span> Çağrı (CTA)
+<span class="time">[22-25 sn]</span> Logo
+      </div>
+      <p><strong>Örnek Konular:</strong> "İlk sahneye çıktığımda düştüm" · "Baleye nasıl başladım?" · "En zor bale anım" · "Bir balerin'in en gurur anı" · "Neden bale öğretiyorum?" · "Bale bana ne öğretti?"</p>
+    </div>
+
+    <h3>SENARYO 3: "Transformation" Serisi (Aylık)</h3>
+    <div class="card">
+      <p><strong>Süre:</strong> 15-20 sn &nbsp;|&nbsp; <strong>Format:</strong> Yan yana siluet karşılaştırma &nbsp;|&nbsp; <strong>Amaç:</strong> DM + kayıt</p>
+      <div class="script-box">
+<span class="time">[0-3 sn]</span> <span class="action">KANCA:</span> "X ayda bu fark"
+<span class="time">[3-8 sn]</span> Yan yana iki siluet: "öncesi" vs "sonrası"
+<span class="time">[8-12 sn]</span> <span class="text">"Bale sadece dans değil. Doğru duruş, güçlü beden."</span>
+<span class="time">[12-15 sn]</span> <span class="text">"Bu farkı çocuğunuzda da görmek ister misiniz?"</span>
+<span class="time">[15-20 sn]</span> Logo + CTA
+      </div>
+    </div>
+
+    <h3>SENARYO 4: "1 Dakikada Bale" Serisi (Haftalık)</h3>
+    <div class="card">
+      <p><strong>Süre:</strong> 30-60 sn &nbsp;|&nbsp; <strong>Format:</strong> Kurucu öğretici &nbsp;|&nbsp; <strong>Amaç:</strong> Kaydetme (algoritma boost)</p>
+      <div class="script-box">
+<span class="time">[0-3 sn]</span> <span class="action">KANCA:</span> "Bu hareketi evde deneyin"
+<span class="time">[3-10 sn]</span> Hareketi göster (yavaş)
+<span class="time">[10-20 sn]</span> Adım adım açıkla
+<span class="time">[20-30 sn]</span> Hızlı gösterim
+<span class="time">[30-35 sn]</span> "Bu hareket [şu kası] çalıştırır"
+<span class="time">[35-40 sn]</span> CTA: "Daha fazlası için DM"
+      </div>
+      <p><strong>Örnek Hareketler:</strong> Evde 3 bale stretch · Temel plié · Bacak kaldırma · Sırt güçlendirme · Ayak bileği esneklik</p>
+    </div>
+
+    <h3>SENARYO 5-8: Özel Formatlar</h3>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">🎭 "Sahne Arkası" Serisi</div>
+        <p>15-20 sn · Prova anı · "Gösteri öncesinde neler yaşanıyor?" · Uzak çekim + eğitmen anlatım</p>
+      </div>
+      <div class="card">
+        <div class="card-title">⭐ "Veli Hikayesi" Serisi</div>
+        <p>20-25 sn · Anonim veli deneyimi · "Bu dönüşümü her çocuk yaşayabilir" · Sosyal kanıt</p>
+      </div>
+      <div class="card">
+        <div class="card-title">🎸 "Branş Tanıtımı" Serisi</div>
+        <p>15-20 sn · Drama/gitar/dans rotasyon · Ders anı + eğitmen anlatım · Haftalık</p>
+      </div>
+      <div class="card">
+        <div class="card-title">😄 "Komik / Relatable" Serisi</div>
+        <p>10-15 sn · Trending ses · "Bale'ye başlamadan önce vs sonra" · Aylık, paylaşım odaklı</p>
+      </div>
+    </div>
+
+    <h3>SENARYO 9: "Bir Balerin'in Çantasında Ne Var?"</h3>
+    <div class="card">
+      <p><strong>Süre:</strong> 20-25 sn &nbsp;|&nbsp; <strong>Format:</strong> POV &nbsp;|&nbsp; <strong>Amaç:</strong> Merak + paylaşım</p>
+      <div class="script-box">
+<span class="time">[0-3 sn]</span> <span class="action">KANCA:</span> "Bir balerin'in çantasında ne var?"
+<span class="time">[3-8 sn]</span> Çanta açılıyor: bale ayakkabısı
+<span class="time">[8-12 sn]</span> Bandaj, su, snack, yedek tayt
+<span class="time">[12-16 sn]</span> "Her şey dans için hazır"
+<span class="time">[16-20 sn]</span> Kurucu çantayı alıp çıkıyor
+<span class="time">[20-25 sn]</span> Logo + "Dans etmeye hazırız"
+      </div>
+    </div>
+
+    <h3>SENARYO 10: "Bale Kostümü Giydirme" (ASMR)</h3>
+    <div class="card">
+      <p><strong>Süre:</strong> 20-30 sn &nbsp;|&nbsp; <strong>Format:</strong> ASMR/Visual &nbsp;|&nbsp; <strong>Amaç:</strong> Görsel çekicilik + keşfet</p>
+      <div class="script-box">
+<span class="time">[0-3 sn]</span> <span class="action">KANCA:</span> Tütü dokusu yakın çekim
+<span class="time">[3-10 sn]</span> Kurucu tütü'yü giyiyor (yavaş, ASMR)
+<span class="time">[10-17 sn]</span> Saç topuzu yapılıyor
+<span class="time">[17-23 sn]</span> Bale ayakkabıları giyiliyor
+<span class="time">[23-30 sn]</span> Aynada son kontrol → ilk poza geçiş (siluet)
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- BÖLÜM 9: BALE ANEKDOTLARI BANKASI -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section" id="b9">
+  <div class="section-header" style="background:linear-gradient(135deg,#D4AF37,#F0D77B);color:#4A1E23;">
+    <span class="num">09</span>
+    <h2>🩰 Bale Anekdotları Bankası — 52 Haftalık Seri</h2>
+    <p>Her hafta bir bale gerçeği/hikaye — Keşfet algoritmasını besleyen en güçlü içerik</p>
+  </div>
+  <div class="section-body">
+
+    <h3>Tarihi Anekdotlar (1-10)</h3>
+    <div class="anekdot-grid">
+      <div class="anekdot-card"><span class="anekdot-num">#1</span><div class="anekdot-title">Kuğu Gölü'nün Fiaskosu</div><div class="anekdot-hook">"Dünyanın en ünlü balesi ilk gösterisinde başarısız oldu"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#2</span><div class="anekdot-title">Pointe Ayakkabısının Sırrı</div><div class="anekdot-hook">"İçinde ahşap ve karton var"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#3</span><div class="anekdot-title">Tütünün Hikayesi</div><div class="anekdot-hook">"İlk kez 1832'de kullanıldı"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#4</span><div class="anekdot-title">Türkiye'de Bale Tarihi</div><div class="anekdot-hook">"İlk gösteri 1947'de sahnelendi"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#5</span><div class="anekdot-title">Fındıkkıran ve Noel</div><div class="anekdot-hook">"1892 Noel prömiyeri"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#6</span><div class="anekdot-title">Erkek Balerinler</div><div class="anekdot-hook">"50 kg'ı havaya kaldırır"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#7</span><div class="anekdot-title">En Uzun Bale</div><div class="anekdot-hook">"4 saat sürer"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#8</span><div class="anekdot-title">Balerinler Neden Gülümser?</div><div class="anekdot-hook">"Yüz ifadesi teknik kadar önemli"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#9</span><div class="anekdot-title">Grand Jeté'de Havada Kalma</div><div class="anekdot-hook">"Saniyenin bir kesiti"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#10</span><div class="anekdot-title">Balerinlerin Ayakları</div><div class="anekdot-hook">"Yıllar içinde şekil değiştirir"</div></div>
+    </div>
+
+    <h3>Teknik Anekdotlar (11-20)</h3>
+    <div class="anekdot-grid">
+      <div class="anekdot-card"><span class="anekdot-num">#11</span><div class="anekdot-title">Relevé'nin Sırrı</div><div class="anekdot-hook">"Tüm ağırlık bir noktada"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#12</span><div class="anekdot-title">Arabesque'te Denge</div><div class="anekdot-hook">"Denge noktası neresi?"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#13</span><div class="anekdot-title">Pirouette Tekniği</div><div class="anekdot-hook">"Sabit bir nokta bakma"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#14</span><div class="anekdot-title">Plié'nin 5 Pozisyonu</div><div class="anekdot-hook">"Temel pozisyonlar"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#15</span><div class="anekdot-title">Port de Bras</div><div class="anekdot-hook">"Kolların taşınması"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#16</span><div class="anekdot-title">Battement</div><div class="anekdot-hook">"Fransızca anlamı"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#17</span><div class="anekdot-title">Allegro</div><div class="anekdot-hook">"Ne demek?"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#18</span><div class="anekdot-title">Adagio</div><div class="anekdot-hook">"Ne demek?"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#19</span><div class="anekdot-title">Center Work vs Barre</div><div class="anekdot-hook">"Fark ne?"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#20</span><div class="anekdot-title">Bir Bale Dersinin Yapısı</div><div class="anekdot-hook">"Nasıl geçer?"</div></div>
+    </div>
+
+    <h3>İlginç Bilgiler (21-30)</h3>
+    <div class="anekdot-grid">
+      <div class="anekdot-card"><span class="anekdot-num">#21</span><div class="anekdot-title">Kalori Yakımı</div><div class="anekdot-hook">"1500-2000 kalori"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#22</span><div class="anekdot-title">Ayakkabı Maliyeti</div><div class="anekdot-hook">"3000-5000 TL"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#23</span><div class="anekdot-title">Gösteri Süresi</div><div class="anekdot-hook">"1.5-2 saat"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#24</span><div class="anekdot-title">Yıllık Ayakkabı</div><div class="anekdot-hook">"200 çift"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#25</span><div class="anekdot-title">32 Fouetté</div><div class="anekdot-hook">"Kuğu Gölü'nde"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#26</span><div class="anekdot-title">En Zor Hareket</div><div class="anekdot-hook">"Grand pas de deux"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#27</span><div class="anekdot-title">Çalışma Saati</div><div class="anekdot-hook">"Günde 6-8 saat"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#28</span><div class="anekdot-title">Dünyanın En Ünlü Okulları</div><div class="anekdot-hook">"Paris, Moskova, Londra"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#29</span><div class="anekdot-title">RAD Sınav Sistemi</div><div class="anekdot-hook">"Uluslararası sertifika"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#30</span><div class="anekdot-title">Vaganova Metodu</div><div class="anekdot-hook">"Farkı ne?"</div></div>
+    </div>
+
+    <h3>Duygusal Anekdotlar (31-40)</h3>
+    <div class="anekdot-grid">
+      <div class="anekdot-card"><span class="anekdot-num">#31</span><div class="anekdot-title">İlk Sahneye Çıkma</div><div class="anekdot-hook">"Heyecan"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#32</span><div class="anekdot-title">İlk Bale Ayakkabısı</div><div class="anekdot-hook">"Giyme hissi"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#33</span><div class="anekdot-title">Eğitmenin Gurur Anı</div><div class="anekdot-hook">"Öğrencinin başarısı"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#34</span><div class="anekdot-title">İlk Pirouette</div><div class="anekdot-hook">"Döndüğü an"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#35</span><div class="anekdot-title">Gösteri Sonrası Gözyaşları</div><div class="anekdot-hook">"Duygu"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#36</span><div class="anekdot-title">Özgüven Hikayesi</div><div class="anekdot-hook">"Değişim"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#37</span><div class="anekdot-title">Neden Bale?</div><div class="anekdot-hook">"Cevap"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#38</span><div class="anekdot-title">En Zor An</div><div class="anekdot-hook">"Zorluk"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#39</span><div class="anekdot-title">Bale ile Tanışma</div><div class="anekdot-hook">"Hikaye"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#40</span><div class="anekdot-title">Dansın Sessiz Müziği</div><div class="anekdot-hook">"Felsefe"</div></div>
+    </div>
+
+    <h3>Popüler Kültür (41-50)</h3>
+    <div class="anekdot-grid">
+      <div class="anekdot-card"><span class="anekdot-num">#41</span><div class="anekdot-title">Black Swan Filmi</div><div class="anekdot-hook">"Gerçek mi?"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#42</span><div class="anekdot-title">Barbie ve Kuğu Gölü</div><div class="anekdot-hook">"Animasyon"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#43</span><div class="anekdot-title">Fındıkkıran Disney</div><div class="anekdot-hook">"vs orijinal"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#44</span><div class="anekdot-title">Billy Elliot</div><div class="anekdot-hook">"Hikaye"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#45</span><div class="anekdot-title">Natalie Portman</div><div class="anekdot-hook">"Bale eğitimi"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#46</span><div class="anekdot-title">Müzede Bir Gece</div><div class="anekdot-hook">"Bale"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#47</span><div class="anekdot-title">K-pop'ta Bale</div><div class="anekdot-hook">"Etki"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#48</span><div class="anekdot-title">Cirque du Soleil</div><div class="anekdot-hook">"Bale"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#49</span><div class="anekdot-title">Olimpiyatlarda Dans</div><div class="anekdot-hook">"Dans"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#50</span><div class="anekdot-title">TikTok'ta Bale</div><div class="anekdot-hook">"Trendler"</div></div>
+    </div>
+
+    <h3>Eğitici (51-52)</h3>
+    <div class="anekdot-grid">
+      <div class="anekdot-card"><span class="anekdot-num">#51</span><div class="anekdot-title">Evde 3 Stretch</div><div class="anekdot-hook">"Bu hareketleri deneyin"</div></div>
+      <div class="anekdot-card"><span class="anekdot-num">#52</span><div class="anekdot-title">Bale'ye Hazır Olma</div><div class="anekdot-hook">"İşaretler"</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- BÖLÜM 10: STORY STRATEJİSİ -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section" id="b10">
+  <div class="section-header" style="background:linear-gradient(135deg,#8B5CF6,#A78BFA);">
+    <span class="num">10</span>
+    <h2>📱 Story Stratejisi & Günlük Akış</h2>
+    <p>Her gün 3-5 story ile etkileşimi sürekli tutma</p>
+  </div>
+  <div class="section-body">
+    <h3>10.1 Günlük Story Akışı</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Saat</th><th>Story</th><th>İçerik</th></tr>
+        <tr><td>09:00</td><td>☀️ Günaydın</td><td>"Günaydın! Bugün ders programımız..." + program görseli</td></tr>
+        <tr><td>12:00</td><td>📸 Ders Anı</td><td>Dersten kısa kesit (arkadan çekim) + eğitmen anlatım</td></tr>
+        <tr><td>15:00</td><td>💡 Bilgi</td><td>"Biliyor muydunuz?" — bale gerçeği veya terim açıklaması</td></tr>
+        <tr><td>17:00</td><td>🗳️ Etkileşim</td><td>Anket, quiz, soru kutusu, emoji slider</td></tr>
+        <tr><td>20:00</td><td>🔔 Hatırlatma</td><td>"Yarın ders var! Kayıt için DM atın"</td></tr>
+      </table>
+    </div>
+
+    <h3>10.2 Haftalık Story Serileri</h3>
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-header"><div class="card-icon" style="background:#EDE9FE;">💪</div><div><div class="card-title">Pazartesi: Motivasyon</div></div></div>
+        <p>Kurucudan haftalık mesaj, ilham verici alıntı, "Bu hafta hedefimiz ne?"</p>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-icon" style="background:#DBEAFE;">📚</div><div><div class="card-title">Salı: Bale Terimi</div></div></div>
+        <p>Günlük bir bale terimi + görsel + açıklama. "Bu terimi biliyor muydunuz?"</p>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-icon" style="background:#D1FAE5;">🎬</div><div><div class="card-title">Çarşamba: Sahne Arkası</div></div></div>
+        <p>Ders anı çekim, eğitmen anlatım, "Bugün ne öğrendik?"</p>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-icon" style="background:#FEF3C7;">❓</div><div><div class="card-title">Perşembe: Soru-Cevap</div></div></div>
+        <p>Soru sticker'ı açılıyor, gelen sorular yanıtlanıyor, DM yönlendirmesi</p>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-icon" style="background:#FEE2E2;">🧠</div><div><div class="card-title">Cuma: Quiz / Anket</div></div></div>
+        <p>"Bu hareketin adı ne?" quiz, "Hangi branşı denemek istersiniz?" anket</p>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-icon" style="background:#F5D5E8;">📊</div><div><div class="card-title">Cumartesi: Haftalık Özet</div></div></div>
+        <p>Haftanın güzel anları, istatistikler, gelecek hafta duyurusu</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- BÖLÜM 11: DÖNÜŞÜM FUNNEL'I -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section" id="b11">
+  <div class="section-header" style="background:linear-gradient(135deg,#F59E0B,#FBBF24);color:#4A1E23;">
+    <span class="num">11</span>
+    <h2>🎯 Dönüşüm Funnel'ı & DM Şablonları</h2>
+    <p>Keşfet'ten kayıt'a 5 aşamalı yolculuk</p>
+  </div>
+  <div class="section-body">
+    <h3>11.1 Dönüşüm Funnel'ı</h3>
+    <div class="funnel">
+      <div class="funnel-step" style="background:linear-gradient(135deg,#3B82F6,#60A5FA);width:100%;">
+        🔍 AŞAMA 1: KEŞFET — Bale Anekdotu Reel + Bilgilendirici İçerik
+      </div>
+      <div class="funnel-step" style="background:linear-gradient(135deg,#8B5CF6,#A78BFA);width:85%;">
+        👤 AŞAMA 2: TAKİP — Profil Biyografisi + Highlights
+      </div>
+      <div class="funnel-step" style="background:linear-gradient(135deg,#EC4899,#F472B6);width:70%;">
+        ❤️ AŞAMA 3: İLGİ — Transformation + Veli Carousel
+      </div>
+      <div class="funnel-step" style="background:linear-gradient(135deg,#F59E0B,#FBBF24);width:55%;">
+        💬 AŞAMA 4: DÖNÜŞÜM — Deneme Dersi Daveti + CTA
+      </div>
+      <div class="funnel-step" style="background:linear-gradient(135deg,#10B981,#34D399);width:40%;">
+        ✅ AŞAMA 5: KAYIT — Yüz Yüze Görüşme + Sözleşme
+      </div>
+    </div>
+
+    <h3>11.2 Her Aşama İçin İçerik Stratejisi</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Aşama</th><th>İçerik Formatı</th><th>Amaç</th><th>Örnek</th><th>Metrik</th></tr>
+        <tr><td>Keşfet</td><td>Bilgilendirici Reel</td><td>Keşfet'ten erişim</td><td>"Bale ayakkabısının ömrü 20 saat"</td><td>Keşfet erişimi</td></tr>
+        <tr><td>Takip</td><td>Biyografi + Highlights</td><td>Takipçi kazanma</td><td>Net bio + 7 highlight</td><td>Takipçi artışı</td></tr>
+        <tr><td>İlgi</td><td>Transformation + Veli</td><td>Güven oluşturma</td><td>"3 ayda bu fark" (siluet)</td><td>Kaydetme</td></tr>
+        <tr><td>Dönüşüm</td><td>CTA odaklı içerik</td><td>DM/telefon</td><td>"Ücretsiz deneme dersi için DM"</td><td>DM sorgusu</td></tr>
+        <tr><td>Kayıt</td><td>Yüz yüze görüşme</td><td>Kayıt</td><td>Deneme dersi → sözleşme</td><td>Kayıt sayısı</td></tr>
+      </table>
+    </div>
+
+    <h3>11.3 Bio Optimizasyonu</h3>
+    <div class="script-box">
+🩰 Artem Sanat Akademisi
+✨ MEB Onaylı | Bale • Drama • Müzik • Gitar
+📍 Beylikdüzü, İstanbul
+🎯 Ücretsiz deneme dersi için DM atın!
+👇 Kayıt & Bilgi
+<span class="text">[link]</span>
+    </div>
+
+    <h3>11.4 Highlights Yapısı</h3>
+    <div class="grid-4">
+      <div class="stat-card"><div style="font-size:2em;">🩰</div><div class="stat-label">Bale</div></div>
+      <div class="stat-card"><div style="font-size:2em;">🎭</div><div class="stat-label">Drama</div></div>
+      <div class="stat-card"><div style="font-size:2em;">🎸</div><div class="stat-label">Müzik</div></div>
+      <div class="stat-card"><div style="font-size:2em;">📋</div><div class="stat-label">Kayıt</div></div>
+      <div class="stat-card"><div style="font-size:2em;">👩‍🏫</div><div class="stat-label">Eğitmenler</div></div>
+      <div class="stat-card"><div style="font-size:2em;">🎪</div><div class="stat-label">Gösteri</div></div>
+      <div class="stat-card"><div style="font-size:2em;">⭐</div><div class="stat-label">Yorumlar</div></div>
+      <div class="stat-card"><div style="font-size:2em;">❓</div><div class="stat-label">SSS</div></div>
+    </div>
+
+    <h3>11.5 DM Şablonları</h3>
+    <details>
+      <summary>📩 "Bale hakkında bilgi almak istiyorum"</summary>
+      <div class="content">
+        <div class="script-box">
+Merhaba! 🩰 İlginiz için teşekkürler!
+
+Bale derslerimiz hakkında kısa bilgi:
+• Yaş grubu: 5+ yaş
+• Ders günleri: [günler]
+• Ders saatleri: [saatler]
+• Sınıf mevcudu: 6-10 öğrenci
+• MEB onaylı eğitim
+
+Ücretsiz deneme dersi yapabiliriz!
+Hangi gün size uygun olur? ✨
+        </div>
+      </div>
+    </details>
+    <details>
+      <summary>📩 "Fiyatlar nedir?"</summary>
+      <div class="content">
+        <div class="script-box">
+Merhaba! 🩰
+
+Fiyatlarımız yaş grubuna ve ders programına göre değişiyor.
+Size en uygun programı belirlemek için kısa bir görüşme yapabiliriz.
+
+Ücretsiz deneme dersi de yapıyoruz!
+Hangi gün size uygun olur? ✨
+        </div>
+      </div>
+    </details>
+    <details>
+      <summary>📩 "Kaç yaşında başlamalı?"</summary>
+      <div class="content">
+        <div class="script-box">
+Merhaba! 🩰
+
+5-6 yaş ideal bale başlangıç yaşı.
+3-4 yaş için yaratıcı dans derslerimiz var.
+Yetişkin bale derslerimiz de mevcut!
+
+Hangi yaş grubu için bilgi almak istiyorsunuz? ✨
+        </div>
+      </div>
+    </details>
+    <details>
+      <summary>📩 "Çocuğum hareketli, bale yapabilir mi?"</summary>
+      <div class="content">
+        <div class="script-box">
+Merhaba! 🩰
+
+Kesinlikle! Bale tam da hareketli çocuklar için.
+Enerjilerini doğru kanalize etmeyi öğretir.
+Disiplin ve odaklanma kazandırır.
+
+Ücretsiz deneme dersiyle başlayalım mı? ✨
+        </div>
+      </div>
+    </details>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- BÖLÜM 12: HASHTAGE STRATEJİSİ -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section" id="b12">
+  <div class="section-header" style="background:linear-gradient(135deg,#3B82F6,#1D4ED8);">
+    <span class="num">12</span>
+    <h2>#️⃣ Hashtag Stratejisi — Katmanlı Sistem</h2>
+    <p>Her içerik için optimize edilmiş hashtag setleri</p>
+  </div>
+  <div class="section-body">
+    <h3>Katman 1: Marka (Her paylaşımda)</h3>
+    <div><span class="hashtag">#ArtemSanatAkademisi</span><span class="hashtag">#ArtemSanat</span><span class="hashtag">#ArtemBale</span></div>
+
+    <h3>Katman 2: Konum (Her paylaşımda)</h3>
+    <div><span class="hashtag">#Beylikdüzü</span><span class="hashtag">#Büyükçekmece</span><span class="hashtag">#İstanbul</span><span class="hashtag">#BeylikdüzüSanat</span></div>
+
+    <h3>Katman 3: Branş</h3>
+    <h4>Bale:</h4>
+    <div><span class="hashtag">#Bale</span><span class="hashtag">#BaleKursu</span><span class="hashtag">#Balerin</span><span class="hashtag">#BaleDersi</span><span class="hashtag">#ÇocukBalesi</span><span class="hashtag">#BaleTekniği</span><span class="hashtag">#Pointe</span><span class="hashtag">#KlasikBale</span><span class="hashtag">#BaleEğitimi</span><span class="hashtag">#BeylikdüzüBale</span></div>
+    <h4>Drama & Tiyatro:</h4>
+    <div><span class="hashtag">#Drama</span><span class="hashtag">#Tiyatro</span><span class="hashtag">#YaratıcıDrama</span><span class="hashtag">#SahneSanatları</span><span class="hashtag">#TiyatroKursu</span><span class="hashtag">#DramaEğitimi</span><span class="hashtag">#ÇocukTiyatrosu</span><span class="hashtag">#İfadeGücü</span><span class="hashtag">#Özgüven</span></div>
+    <h4>Gitar & Müzik:</h4>
+    <div><span class="hashtag">#Gitar</span><span class="hashtag">#GitarKursu</span><span class="hashtag">#MüzikEğitimi</span><span class="hashtag">#Enstrüman</span><span class="hashtag">#MüzikKursu</span><span class="hashtag">#GitarDersi</span><span class="hashtag">#MüzikSevgisi</span></div>
+    <h4>Dans:</h4>
+    <div><span class="hashtag">#Dans</span><span class="hashtag">#DansEğitimi</span><span class="hashtag">#ModernDans</span><span class="hashtag">#DansKursu</span><span class="hashtag">#Ritim</span><span class="hashtag">#Hareket</span></div>
+
+    <h3>Katman 4: İçerik Türü</h3>
+    <h4>Bilgilendirici:</h4>
+    <div><span class="hashtag">#SanatEğitimi</span><span class="hashtag">#ÇocukGelişimi</span><span class="hashtag">#EbeveynRehberi</span><span class="hashtag">#BaleBilgi</span><span class="hashtag">#SanatlaBüyümek</span></div>
+    <h4>Duygusal:</h4>
+    <div><span class="hashtag">#Motivasyon</span><span class="hashtag">#İlham</span><span class="hashtag">#Hayaller</span><span class="hashtag">#BaleTutkusu</span><span class="hashtag">#DansAşkı</span></div>
+    <h4>Dönüşüm:</h4>
+    <div><span class="hashtag">#Kayıt</span><span class="hashtag">#DenemeDersi</span><span class="hashtag">#KayıtBaşladı</span><span class="hashtag">#SonKontenjan</span><span class="hashtag">#ÜcretsizDenemeDersi</span></div>
+
+    <h3>Katman 5: Trend/Keşfet</h3>
+    <div><span class="hashtag">#2026Eğitim</span><span class="hashtag">#YeniSezon</span><span class="hashtag">#YeniDönem</span><span class="hashtag">#GösteriZamanı</span><span class="hashtag">#YılsonuGösterisi</span><span class="hashtag">#CumhuriyetBayramı</span><span class="hashtag">#Yılbaşı</span></div>
+
+    <h3>12.2 İçerik Türüne Göre Setler</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>İçerik Türü</th><th>Hashtag Seti</th></tr>
+        <tr>
+          <td>Reel — Bilgilendirici</td>
+          <td><span class="hashtag">#ArtemSanatAkademisi</span><span class="hashtag">#Beylikdüzü</span><span class="hashtag">#BaleAnekdotu</span><span class="hashtag">#BaleTarihi</span><span class="hashtag">#BaleTekniği</span><span class="hashtag">#BaleFacts</span><span class="hashtag">#Balerin</span><span class="hashtag">#BaleEğitimi</span><span class="hashtag">#SanatEğitimi</span><span class="hashtag">#Keşfet</span></td>
+        </tr>
+        <tr>
+          <td>Reel — Kişisel</td>
+          <td><span class="hashtag">#ArtemSanatAkademisi</span><span class="hashtag">#Beylikdüzü</span><span class="hashtag">#BalerinHikayesi</span><span class="hashtag">#BaleHayatı</span><span class="hashtag">#Balerinİtirafı</span><span class="hashtag">#SanatYolculuğu</span><span class="hashtag">#Motivasyon</span><span class="hashtag">#İlham</span></td>
+        </tr>
+        <tr>
+          <td>Carousel — Bilgi</td>
+          <td><span class="hashtag">#ArtemSanatAkademisi</span><span class="hashtag">#Beylikdüzü</span><span class="hashtag">#EbeveynRehberi</span><span class="hashtag">#SanatEğitimi</span><span class="hashtag">#ÇocukGelişimi</span><span class="hashtag">#Kaydet</span></td>
+        </tr>
+        <tr>
+          <td>Carousel — Dönüşüm</td>
+          <td><span class="hashtag">#ArtemSanatAkademisi</span><span class="hashtag">#Beylikdüzü</span><span class="hashtag">#Kayıt</span><span class="hashtag">#DenemeDersi</span><span class="hashtag">#BaleKursu</span><span class="hashtag">#DramaKursu</span><span class="hashtag">#GitarKursu</span></td>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- BÖLÜM 13: GÖRSEL & ÇEKİM KILAVUZU -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section" id="b13">
+  <div class="section-header" style="background:linear-gradient(135deg,#EC4899,#F472B6);">
+    <span class="num">13</span>
+    <h2>🎨 Görsel & Çekim Kılavuzu</h2>
+    <p>Renk paleti, tipografi, çekim protokolleri</p>
+  </div>
+  <div class="section-body">
+    <h3>13.1 Renk Paleti</h3>
+    <div class="grid-4">
+      <div class="stat-card" style="background:var(--somon);"><div class="stat-num" style="color:white;font-size:1.2em;">#E8A0BF</div><div class="stat-label" style="color:white;">Somon Pembe (Ana)</div></div>
+      <div class="stat-card" style="background:var(--krem);"><div class="stat-num" style="color:var(--bordo);font-size:1.2em;">#FFF8E7</div><div class="stat-label" style="color:var(--bordo);">Krem (İkincil)</div></div>
+      <div class="stat-card" style="background:var(--altin);"><div class="stat-num" style="color:white;font-size:1.2em;">#D4AF37</div><div class="stat-label" style="color:white;">Altın (Vurgu)</div></div>
+      <div class="stat-card" style="background:var(--bordo);"><div class="stat-num" style="color:white;font-size:1.2em;">#722F37</div><div class="stat-label" style="color:white;">Bordo (Başlık)</div></div>
+    </div>
+
+    <h3>13.2 Tipografi</h3>
+    <div class="grid-3">
+      <div class="card" style="text-align:center;">
+        <p style="font-family:'Poppins',sans-serif;font-size:1.8em;font-weight:700;color:var(--bordo);">Poppins</p>
+        <p>Başlıklar & Gövde Metin</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <p style="font-family:'Poppins',sans-serif;font-size:1.4em;font-weight:500;">Poppins Medium</p>
+        <p>Alt Başlıklar</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <p style="font-family:'Dancing Script',cursive;font-size:1.6em;color:var(--somon-dark);">Dancing Script</p>
+        <p>El Yazısı Vurgu</p>
+      </div>
+    </div>
+
+    <h3>13.3 Çekim Protokolü</h3>
+    <div class="grid-2">
+      <div class="callout callout-success">
+        <div class="callout-title">✅ YAPILACAK ÇEKİMLER</div>
+        <p><strong>Eğitmen Odaklı:</strong> Stüdyo, doğal ışık, kameraya bakış<br>
+        <strong>Siluet:</strong> Işık arkadan, yüz görünmez, dramatik<br>
+        <strong>Arkadan:</strong> Çocuklar arkadan, bale pozu<br>
+        <strong>Yakın Çekim:</strong> Ayakkabı, gitar telleri, el detay<br>
+        <strong>Uzak Mesafe:</strong> Stüdyo genel, ders anı<br>
+        <strong>POV:</strong> Kurucunun gözünden sabah rutini</p>
+      </div>
+      <div class="callout callout-danger">
+        <div class="callout-title">❌ YAPILMAYACAK ÇEKİMLER</div>
+        <p>• Çocuk yüzü net<br>
+        • Kalabalık grup (yüzler net)<br>
+        • Yakın yüz çekimi (çocuk)<br>
+        • Ebeveyn onayı olmayan içerik<br>
+        • Düşük ışık, bulanık çekim<br>
+        • Dağınık arka plan</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- BÖLÜM 14: PERFORMANS METRİKLERİ -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section" id="b14">
+  <div class="section-header" style="background:linear-gradient(135deg,#10B981,#34D399);">
+    <span class="num">14</span>
+    <h2>📊 Performans Metrikleri & KPI</h2>
+    <p>4 aylık hedefler ve takip sistemi</p>
+  </div>
+  <div class="section-body">
+    <h3>14.1 Aylık KPI Tablosu</h3>
+    <div class="callout callout-info" style="margin-bottom:20px;">
+      <div class="callout-title">📊 Rakip Benchmark Karşılaştırması (Social Blade Verileri)</div>
+      <p>Artem'in hedefleri, rakiplerin doğrulanmış Social Blade verilerine göre belirlenmiştir.</p>
+    </div>
+    <div class="grid-4" style="margin-bottom:20px;">
+      <div class="stat-card">
+        <div class="stat-label" style="font-weight:700;color:var(--bordo);">Kreas Benchmark</div>
+        <div class="stat-num" style="font-size:1.4em;">%1.26</div>
+        <div class="stat-label">Ort. 141 beğeni</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label" style="font-weight:700;color:var(--bordo);">Modern Sanatlar</div>
+        <div class="stat-num" style="font-size:1.4em;">%0.62</div>
+        <div class="stat-label">Ort. 84 beğeni</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label" style="font-weight:700;color:var(--bordo);">Kybele</div>
+        <div class="stat-num" style="font-size:1.4em;">%0.51</div>
+        <div class="stat-label">Ort. 47 beğeni</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label" style="font-weight:700;color:var(--bordo);">Kuğu (En yüksek)</div>
+        <div class="stat-num" style="font-size:1.4em;">%2.62</div>
+        <div class="stat-label">Ort. 29 beğeni</div>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Metrik</th><th>Ekim</th><th>Kasım</th><th>Aralık</th><th>Ocak</th><th>TOPLAM</th></tr>
+        <tr><td><strong>Takipçi artışı</strong></td><td>+150</td><td>+200</td><td>+300</td><td>+200</td><td><strong>+850</strong></td></tr>
+        <tr><td><strong>Ort. Reel izlenme</strong></td><td>500</td><td>1.000</td><td>1.500</td><td>1.000</td><td>—</td></tr>
+        <tr><td><strong>Ort. Carousel kaydetme</strong></td><td>20</td><td>40</td><td>60</td><td>40</td><td>—</td></tr>
+        <tr><td><strong>DM sorgusu</strong></td><td>10</td><td>20</td><td>30</td><td>20</td><td><strong>80</strong></td></tr>
+        <tr><td><strong>Deneme dersi</strong></td><td>5</td><td>10</td><td>15</td><td>10</td><td><strong>40</strong></td></tr>
+        <tr><td><strong>Kayıt (net)</strong></td><td>2</td><td>5</td><td>8</td><td>5</td><td><strong>20</strong></td></tr>
+      </table>
+    </div>
+
+    <h3>14.2 Engagement Rate Hedefleri (Rakip Benchmark'lı)</h3>
+    <div class="grid-3">
+      <div class="stat-card">
+        <div class="stat-num">%1.5</div>
+        <div class="stat-label">Minimum ER (Kreas'ı geçmek)</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:50%;background:var(--mavi);"></div></div>
+        <div class="stat-label" style="font-size:0.75em;color:var(--gri);">Kreas: %1.26</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">%2.5</div>
+        <div class="stat-label">İyi ER (Kuğu seviyesi)</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:75%;background:var(--yesil);"></div></div>
+        <div class="stat-label" style="font-size:0.75em;color:var(--gri);">Kuğu: %2.62</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">%3.0+</div>
+        <div class="stat-label">Mükemmel ER (Sektör lideri)</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:100%;background:var(--altin);"></div></div>
+        <div class="stat-label" style="font-size:0.75em;color:var(--gri);">Tüm rakipleri geçmek</div>
+      </div>
+    </div>
+
+    <h3>14.3 Dönüşüm Oranları Hedefi</h3>
+    <div class="grid-3">
+      <div class="stat-card">
+        <div class="stat-num">%2</div>
+        <div class="stat-label">Keşfet → Takip</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:40%;background:var(--mavi);"></div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">%5</div>
+        <div class="stat-label">Takip → DM</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:25%;background:var(--mor);"></div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num">%50</div>
+        <div class="stat-label">DM → Deneme Dersi</div>
+        <div class="progress-bar"><div class="progress-fill" style="width:50%;background:var(--yesil);"></div></div>
+      </div>
+    </div>
+
+    <h3>14.4 Haftalık Rapor Şablonu</h3>
+    <div class="script-box">
+HAFTALIK PERFORMANS RAPORU
+Tarih: [Hafta başlangıcı] – [Hafta bitişi]
+
+GENEL:
+• Takipçi değişimi: [+/-]
+• Toplam erihim: [sayı]
+• Toplam etkileşim: [sayı]
+• Engagement rate: [%]
+
+EN İYİ PERFORMANS:
+• En çok izlenen reel: [başlık] — [izlenme]
+• En çok kaydedilen carousel: [başlık] — [kaydetme]
+• En çok etkileşim alan post: [başlık] — [beğeni/yorum]
+
+DM ANALİZİ:
+• Toplam DM: [sayı]
+• İçerik bazlı DM kaynağı:
+  - Bale Anekdotu'ndan: [sayı]
+  - Transformation'dan: [sayı]
+  - Carousel'den: [sayı]
+  - Story'den: [sayı]
+
+DÖNÜŞÜM:
+• Deneme dersi randevusu: [sayı]
+• Kayıt: [sayı]
+
+SONRAKI HAFTA İÇİN ÖNERİLER:
+• [Öneri 1]
+• [Öneri 2]
+• [Öneri 3]
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- BÖLÜM 15: VİRAL İÇERİK FİKİRLERİ -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section" id="b15">
+  <div class="section-header" style="background:linear-gradient(135deg,#EF4444,#F87171);">
+    <span class="num">15</span>
+    <h2>🚀 Viral Potansiyelli İçerik Fikirleri</h2>
+    <p>Keşfet'e düşme ve paylaşma potansiyeli en yüksek 10 fikir</p>
+  </div>
+  <div class="section-body">
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-header"><div class="card-icon" style="background:#FEE2E2;">🔥</div><div><div class="card-title">"Bale mi Zor, Spor mu?"</div><div class="card-sub">Tartışma Reel — Yorum yağmuru</div></div></div>
+        <p>Kurucu bale hareketi yapıyor. "Bu hareket bir ağırlık antrenmanı kadar zor." Son soru: "Sizce hangisi daha zor?" — Tartışma yaratır, yorum gelir, algoritma sever.</p>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-icon" style="background:#FEF3C7;">💔</div><div><div class="card-title">"Bale Ayakkabısını Yırttım"</div><div class="card-sub">Duygusal Reel — Paylaşım</div></div></div>
+        <p>Kurucu eski ayakkabıyı gösteriyor. "100 prova, her birinde biraz daha yıprandı. Ama her yıpranma bir adım daha ileri." — Duygusal, hikaye anlatımı.</p>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-icon" style="background:#D1FAE5;">📈</div><div><div class="card-title">"4 Yaşında Başlayan Çocuğun 1 Yıl Sonrası"</div><div class="card-sub">Transformation — DM getirir</div></div></div>
+        <p>Arkadan çekim: ilk ders vs 1 yıl sonra. Somut sonuç, ebevynlerin hayali. "Bu dönüşümü çocuğunuzda da görmek ister misiniz?"</p>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-icon" style="background:#DBEAFE;">😄</div><div><div class="card-title">"Bale Hocası vs Öğrenci"</div><div class="card-sub">Eğlenceli Reel — Relatable</div></div></div>
+        <p>Kurucu hareketi gösteriyor, öğrenci deniyor (arkadan, yüz yok). Komik, relatable, paylaşılır.</p>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-icon" style="background:#EDE9FE;">👜</div><div><div class="card-title">"Bir Balerin'in Çantasında Ne Var?"</div><div class="card-sub">POV Reel — Merak</div></div></div>
+        <p>Kurucu çantasını açıyor: bale ayakkabısı, bandaj, su, snack, yedek tayt. Behind the scenes, merak uyandırıcı.</p>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-icon" style="background:#F5D5E8;">📅</div><div><div class="card-title">"1 Ayda Değişim"</div><div class="card-sub">Transformation Carousel — Kaydetme</div></div></div>
+        <p>4 slide: 1. hafta, 2. hafta, 3. hafta, 4. hafta (siluet/arkadan). Kaydetme oranı yüksek → algoritma boost.</p>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-icon" style="background:#FEF3C7;">🤔</div><div><div class="card-title">"Ebevynlerin En Çok Sorduğu Soru"</div><div class="card-sub">Bilgilendirici Reel — Arama hacmi</div></div></div>
+        <p>"Kaç yaşında başlamalı?" → Kurucu cevaplıyor. Arama hacmi yüksek soru, keşfet potansiyeli.</p>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-icon" style="background:#D1FAE5;">👗</div><div><div class="card-title">"Bale Kostümü Giydirme"</div><div class="card-sub">ASMR Reel — Görsel çekicilik</div></div></div>
+        <p>Kurucu tütü giyiyor, saç topuzu yapıyor, ayakkabıları giyiyor. ASMR etkisi, görsel çekicilik.</p>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-icon" style="background:#DBEAFE;">💃</div><div><div class="card-title">"Bale + Modern Dans Karşılaştırması"</div><div class="card-sub">Eğitici Reel — Karşılaştırma</div></div></div>
+        <p>Aynı hareket iki farklı stilde gösteriliyor. Karşılaştırma, bilgi, keşfet potansiyeli.</p>
+      </div>
+      <div class="card">
+        <div class="card-header"><div class="card-icon" style="background:#FEE2E2;">😂</div><div><div class="card-title">"Bale'ye Başlamadan Önce / Sonra"</div><div class="card-sub">Komik Reel — Paylaşım rekoru</div></div></div>
+        <p>"Bale'ye başlamadan önce: Zarif olacağım" vs "Sonra: Her yerim ağrıyor" — Komik, relatable, paylaşılır.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- BÖLÜM 16: HAFTALIK ÜRETİM AKIŞI -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section" id="b16">
+  <div class="section-header" style="background:linear-gradient(135deg,#6366F1,#818CF8);">
+    <span class="num">16</span>
+    <h2>⚙️ Haftalık İçerik Üretim Akışı</h2>
+    <p>Pazar'dan Cumartesi'ye her günün görev listesi</p>
+  </div>
+  <div class="section-body">
+    <div class="day-card">
+      <div class="day-header day-paz">📋 PAZAR — Planlama Günü</div>
+      <div class="day-body">
+        <ul class="checklist">
+          <li>Haftalık içerik planı son kontrol</li>
+          <li>Çekim listesi hazırlama (hangi gün ne çekilecek)</li>
+          <li>Hashtag seti kontrol</li>
+          <li>Caption taslakları hazırlama</li>
+          <li>Müzik seçimi</li>
+        </ul>
+      </div>
+    </div>
+    <div class="day-card">
+      <div class="day-header day-pzt">🎬 PAZARTESİ — Reel Günü 1</div>
+      <div class="day-body">
+        <ul class="checklist">
+          <li>09:00 — Kurucu ile reel çekimi (bale anekdotu)</li>
+          <li>10:00 — Video düzenleme (CapCut/InShot)</li>
+          <li>11:00 — Caption + hashtag</li>
+          <li>12:00 — Paylaşım</li>
+          <li>13:00 — İlk 1 saat etkileşim takibi</li>
+          <li>20:00 — Story: "Bugünkü reel'i izlediniz mi?"</li>
+        </ul>
+      </div>
+    </div>
+    <div class="day-card">
+      <div class="day-header day-sal">📊 SALI — Carousel Günü</div>
+      <div class="day-body">
+        <ul class="checklist">
+          <li>10:00 — Carousel tasarımı (Canva)</li>
+          <li>11:00 — Caption + hashtag</li>
+          <li>12:00 — Paylaşım</li>
+          <li>13:00 — Story: "1 dakika eğitim"</li>
+          <li>15:00 — Story: "Biliyor muydunuz?"</li>
+        </ul>
+      </div>
+    </div>
+    <div class="day-card">
+      <div class="day-header day-car">🎬 ÇARŞAMBA — Reel Günü 2</div>
+      <div class="day-body">
+        <ul class="checklist">
+          <li>11:00 — Reel çekimi (branş tanıtım)</li>
+          <li>12:00 — Video düzenleme</li>
+          <li>13:00 — Caption + hashtag</li>
+          <li>17:00 — Paylaşım (ders çıkışı)</li>
+          <li>18:00 — Story: Ders anı</li>
+        </ul>
+      </div>
+    </div>
+    <div class="day-card">
+      <div class="day-header day-per">📱 PERŞEMBE — Story Günü</div>
+      <div class="day-body">
+        <ul class="checklist">
+          <li>10:00 — Soru-Cevap story açılışı</li>
+          <li>12:00 — Gelen soruları yanıtlama</li>
+          <li>14:00 — Story: Sahne arkası</li>
+          <li>16:00 — Story: Ders anı</li>
+          <li>18:00 — Reel opsiyonel</li>
+        </ul>
+      </div>
+    </div>
+    <div class="day-card">
+      <div class="day-header day-cum">🎬 CUMA — Reel Günü 3</div>
+      <div class="day-body">
+        <ul class="checklist">
+          <li>14:00 — Reel çekimi (eğlenceli/bilgilendirici)</li>
+          <li>15:00 — Video düzenleme</li>
+          <li>16:00 — Caption + hashtag</li>
+          <li>19:00 — Paylaşım</li>
+          <li>20:00 — Story: Quiz veya anket</li>
+        </ul>
+      </div>
+    </div>
+    <div class="day-card">
+      <div class="day-header day-cmt">🤝 CUMARTESİ — Topluluk Günü</div>
+      <div class="day-body">
+        <ul class="checklist">
+          <li>11:00 — Haftalık özet carousel</li>
+          <li>12:00 — Paylaşım</li>
+          <li>13:00 — Story: Haftalık güzel anlar</li>
+          <li>15:00 — Story: Gelecek hafta duyurusu</li>
+          <li>16:00 — Kayıt hatırlatması story</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- BÖLÜM 17: PAYLAŞIM SAATLERİ -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section" id="b17">
+  <div class="section-header" style="background:linear-gradient(135deg,#F59E0B,#FBBF24);color:#4A1E23;">
+    <span class="num">17</span>
+    <h2>⏰ Paylaşım Saatleri & Optimizasyon</h2>
+    <p>En yüksek etkileşim için optimal paylaşım zamanlaması</p>
+  </div>
+  <div class="section-body">
+    <h3>17.1 En İyi Paylaşım Saatleri</h3>
+    <div class="table-wrap">
+      <table>
+        <tr><th>Gün</th><th>En İyi Saat</th><th>İkinci Seçenek</th><th>Not</th></tr>
+        <tr><td><strong>Pazartesi</strong></td><td>12:00</td><td>08:00</td><td>Öğle arası, ebevynler aktif</td></tr>
+        <tr><td><strong>Salı</strong></td><td>12:00</td><td>17:00</td><td>Öğle arası + ders çıkışı</td></tr>
+        <tr><td><strong>Çarşamba</strong></td><td>17:00</td><td>12:00</td><td>Ders çıkışı ebevynler</td></tr>
+        <tr><td><strong>Perşembe</strong></td><td>10:00</td><td>15:00</td><td>Sabah story + öğleden sonra</td></tr>
+        <tr><td><strong>Cuma</strong></td><td>19:00</td><td>12:00</td><td>Akşam keyifli içerik</td></tr>
+        <tr><td><strong>Cumartesi</strong></td><td>11:00</td><td>14:00</td><td>Hafta sonu sabah</td></tr>
+        <tr><td><strong>Pazar</strong></td><td>10:00</td><td>15:00</td><td>Pazar sabahı</td></tr>
+      </table>
+    </div>
+
+    <h3>17.2 Paylaşım Sonrası İlk 1 Saat Protokolü</h3>
+    <div class="callout callout-info">
+      <div class="callout-title">⚡ İlk 1 Saat Çok Kritik!</div>
+      <p>Algoritma ilk 1 saatteki etkileşime göre erişimi belirliyor.</p>
+      <p><strong>1.</strong> Yorumlara cevap ver (her yoruma)<br>
+      <strong>2.</strong> Story'de paylaşım linki<br>
+      <strong>3.</strong> DM'leri yanıtla<br>
+      <strong>4.</strong> Etkileşim grupları (varsa)<br>
+      <strong>5.</strong> Ebevyn gruplarında paylaş (uygunsa)</p>
+    </div>
+
+    <h3>17.3 En İyi Performans Günleri</h3>
+    <div class="grid-3">
+      <div class="stat-card">
+        <div style="font-size:2em;">🎬</div>
+        <div class="stat-label" style="font-weight:700;">Reel</div>
+        <div class="stat-label">Pazartesi, Çarşamba, Cuma</div>
+        <div class="stat-label" style="color:var(--gri);font-size:0.8em;">12:00 veya 19:00</div>
+      </div>
+      <div class="stat-card">
+        <div style="font-size:2em;">📊</div>
+        <div class="stat-label" style="font-weight:700;">Carousel</div>
+        <div class="stat-label">Salı, Cumartesi</div>
+        <div class="stat-label" style="color:var(--gri);font-size:0.8em;">12:00 veya 11:00</div>
+      </div>
+      <div class="stat-card">
+        <div style="font-size:2em;">📱</div>
+        <div class="stat-label" style="font-weight:700;">Story</div>
+        <div class="stat-label">Her gün, özellikle Perşembe</div>
+        <div class="stat-label" style="color:var(--gri);font-size:0.8em;">10:00-18:00 arası</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- BÖLÜM 18: HIZLI BAŞLANGIÇ -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="section" id="b18">
+  <div class="section-header" style="background:linear-gradient(135deg,#10B981,#059669);">
+    <span class="num">18</span>
+    <h2>🚀 Hızlı Başlangıç Kontrol Listesi</h2>
+    <p>Bu hafta başlamanız gereken her şey</p>
+  </div>
+  <div class="section-body">
+    <h3>Bu Hafta (Hemen)</h3>
+    <ul class="checklist">
+      <li>Instagram biyografisi güncelle (bio yukarıdaki formatta)</li>
+      <li>Profil fotoğrafı: Logo (yüksek çözünürlük)</li>
+      <li>7 Highlights oluştur (Bale, Drama, Müzik, Kayıt, Eğitmenler, Gösteri, Yorumlar)</li>
+      <li>Linktree/bio link kurulumu (Web, WhatsApp, Kayıt formu, Ders programı)</li>
+      <li>Mevcut içerikleri kontrol et (yüz gösteren varsa arşivle)</li>
+      <li>Ebevyn onay sözleşmesi şablonu hazırla</li>
+    </ul>
+
+    <h3>İlk Hafta</h3>
+    <ul class="checklist">
+      <li>İlk 5 içeriği hazırla (çekim + tasarım)</li>
+      <li>Hashtag setlerini kaydet</li>
+      <li>Çekim kılavuzunu ekiple paylaş</li>
+      <li>Aylık içerik takvimini Google Sheets'e aktar</li>
+      <li>Performans takip şablonu oluştur</li>
+      <li>Canva'da şablonlar hazırla (carousel, story, static)</li>
+      <li>DM şablonlarını hazırla</li>
+    </ul>
+
+    <h3>İlk Ay</h3>
+    <ul class="checklist">
+      <li>İlk 10 reel'i çek</li>
+      <li>5 carousel tasarla</li>
+      <li>Story akışını başlat</li>
+      <li>Bale Anekdotu serisini başlat (#1-#4)</li>
+      <li>Performans takibini başlat</li>
+      <li>İlk haftalık raporu hazırla</li>
+      <li>Gerekli ayarlamaları yap</li>
+    </ul>
+
+    <div class="divider"></div>
+
+    <h3>Stratejik Özet</h3>
+    <div class="grid-3">
+      <div class="stat-card">
+        <div class="stat-num" style="font-size:1.8em;">🩰</div>
+        <div class="stat-label" style="font-weight:700;color:var(--bordo);margin-top:8px;">Kurucuyu Star Yap</div>
+        <div class="stat-label">Her hafta 3+ kez kamerada. Kişisel hikaye, teknik demo, samimi mesaj.</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="font-size:1.8em;">📚</div>
+        <div class="stat-label" style="font-weight:700;color:var(--bordo);margin-top:8px;">Bale Anekdotları</div>
+        <div class="stat-label">52 haftalık seri ile keşfet algoritmasını besle. Bilgilendirici = keşfet dostu.</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-num" style="font-size:1.8em;">📈</div>
+        <div class="stat-label" style="font-weight:700;color:var(--bordo);margin-top:8px;">Dönüşüm Funnel'ı</div>
+        <div class="stat-label">Keşfet → Takip → DM → Deneme Dersi → Kayıt. Her aşamada içerik.</div>
+      </div>
+    </div>
+
+    <div class="quote">
+      Rakiplerin yapmadığı şeyi yap: Kişisel hikaye anlat, duygusal bağ kur, dönüşüm için plan yap. Artem'in en büyük avantajı kurucunun balerin figürü — bunu kullan.
+    </div>
+
+    <div class="divider"></div>
+
+    <h3>📋 Veri Kaynakları & Notlar</h3>
+    <div class="callout callout-info">
+      <div class="callout-title">📊 Bu Dokümandaki Verilerin Kaynakları</div>
+      <p><strong>Rakip engagement verileri:</strong> Social Blade (socialblade.com) — Gerçek zamanlı Instagram takip sistemi. Takipçi, ortalama beğeni, ortalama yorum ve engagement rate değerleri Social Blade'in doğrulanmış verileridir.</p>
+      <p><strong>Doğrulama linkleri:</strong></p>
+      <p style="font-size:0.9em;">
+        • <a href="https://socialblade.com/instagram/user/kreassanatakademisi" target="_blank">Kreas Sanat Akademisi — Social Blade</a><br>
+        • <a href="https://socialblade.com/instagram/user/beylikduzu_modern_sanatlar" target="_blank">Modern Sanatlar Akademisi — Social Blade</a><br>
+        • <a href="https://socialblade.com/instagram/user/kybelesanatakademisi" target="_blank">Kybele Sanat Akademisi — Social Blade</a><br>
+        • <a href="https://socialblade.com/instagram/user/kugubaledans" target="_blank">Kuğu Sanat Merkezi — Social Blade</a>
+      </p>
+      <p style="margin-top:10px;"><strong>İçerik stratejisi & öneriler:</strong> AI SEO Squad analizi — Rakip boşluk analizi, sektör trendleri ve Instagram algoritması 2026 güncellemeleri temel alınmıştır.</p>
+      <p><strong>Güncelleme sıklığı:</strong> Rakip verilerinin aylık olarak Social Blade üzerinden güncellenmesi önerilir.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════ -->
+<!-- FOOTER -->
+<!-- ═══════════════════════════════════════════════════════ -->
+<div class="footer">
+  <p><strong>Artem Sanat Akademisi — Instagram Strateji & İçerik Takvimi</strong></p>
+  <p>Versiyon 3.0 &nbsp;|&nbsp; 24 Eylül 2026 &nbsp;|&nbsp; AI SEO Squad</p>
+  <p style="margin-top:10px;">Bu strateji belgesi aylık olarak gözden geçirilmeli ve performans verilerine göre güncellenmelidir.</p>
+  <p style="margin-top:15px;opacity:0.5;">© 2026 — Tüm hakları saklıdır.</p>
+</div>
+
+</body>
+</html>

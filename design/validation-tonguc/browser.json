@@ -1,0 +1,90 @@
+{
+  "status": 200,
+  "contentType": "text/html; charset=utf-8",
+  "url": "https://tonguckaracay.com/en",
+  "title": "SEO & Digital Marketing Consultant | Tonguç Karaçay",
+  "description": "Growing your business digitally with UI/UX Design, SEO, Online Advertising, and AI solutions. 25+ years of experience, 35+ brands including Turkish Airlines, BMW, Galatasaray.",
+  "h1": [
+    "Measurable Growth with UX, SEO & AI"
+  ],
+  "h2": 7,
+  "h3": 19,
+  "viewport": "width=device-width, initial-scale=1",
+  "lang": "en",
+  "canonical": "https://tonguckaracay.com/en",
+  "images": 10,
+  "scripts": 24,
+  "og": [
+    {
+      "property": "og:title",
+      "content": "SEO & Digital Marketing Consultant | Tonguç Karaçay"
+    },
+    {
+      "property": "og:description",
+      "content": "Growing your business digitally with UI/UX Design, SEO, Online Advertising, and AI solutions. 25+ years of experience, 35+ brands including Turkish Airlines, BMW, Galatasaray."
+    },
+    {
+      "property": "og:url",
+      "content": "https://tonguckaracay.com/en"
+    },
+    {
+      "property": "og:site_name",
+      "content": "Tonguç Karaçay"
+    },
+    {
+      "property": "og:locale",
+      "content": "en_US"
+    },
+    {
+      "property": "og:type",
+      "content": "website"
+    }
+  ],
+  "jsonld": [
+    "{\"@context\":\"https://schema.org\",\"@type\":\"Person\",\"name\":\"Tonguç Karaçay\",\"url\":\"https://tonguckaracay.com\",\"image\":\"https://tonguckaracay.com/tonguc-karacay.jpg\",\"jobTitle\":\"AI-Driven UX & Growth Consultant\",\"description\":\"25+ yıllık dijital pazarlama, SEO ve UI/UX deneyimiyle işletmelerin büyümesine yardımcı olan bağımsız danışman.\",\"knowsAbout\":[\"SEO\",\"Digital Marketing\",\"UI/UX Design\",\"Google Ads\",\"Artificial Intelligence\",\"E-commerce\",\"Content Marketing\",\"Web Analytics\"],\"worksFor\":{\"@type\":\"Organization\",\"name\":\"Tonguç Karaçay Danışmanlık\"},\"sameAs\":[\"https://www.linkedin.com/in/tonguckaracay\",\"https://twitter.com/tonguckaracay\"]}",
+    "{\"@context\":\"https://schema.org\",\"@type\":\"Organization\",\"name\":\"Tonguç Karaçay\",\"url\":\"https://tonguckaracay.com\",\"logo\":\"https://tonguckaracay.com/logo.png\",\"sameAs\":[\"https://www.linkedin.com/in/tonguckaracay\",\"https://twitter.com/tonguckaracay\"],\"contactPoint\":{\"@type\":\"ContactPoint\",\"contactType\":\"customer service\",\"availableLanguage\":[\"Turkish\",\"English\"]}}",
+    "{\"@context\":\"https://schema.org\",\"@type\":\"WebSite\",\"name\":\"Tonguç Karaçay\",\"url\":\"https://tonguckaracay.com\",\"potentialAction\":{\"@type\":\"SearchAction\",\"target\":{\"@type\":\"EntryPoint\",\"urlTemplate\":\"https://tonguckaracay.com/blog?q={search_term_string}\"},\"query-input\":\"required name=search_term_string\"}}"
+  ],
+  "links": [
+    "https://tonguckaracay.com/en",
+    "https://tonguckaracay.com/en/ai-training",
+    "https://tonguckaracay.com/en/products",
+    "https://tonguckaracay.com/en/blog",
+    "https://tonguckaracay.com/en/about",
+    "https://tonguckaracay.com/en/contact",
+    "https://tonguckaracay.com/en/blog",
+    "https://tonguckaracay.com/en/contact",
+    "https://tonguckaracay.com/en/ai-agent-patient-follow-up-appointment-reminders",
+    "https://tonguckaracay.com/en/contact",
+    "https://tonguckaracay.com/en#case-studies",
+    "https://tonguckaracay.com/en/contact",
+    "https://tonguckaracay.com/en/contact",
+    "https://tonguckaracay.com/en/contact",
+    "https://tonguckaracay.com/en/blog",
+    "https://tonguckaracay.com/en/ai-agent-patient-follow-up-appointment-reminders",
+    "https://tonguckaracay.com/en/automate-instagram-content-calendar-claude-mcp",
+    "https://tonguckaracay.com/en/geo-targeted-content-optimization-checklist",
+    "https://tonguckaracay.com/en/ai-tools-small-business-owners-training",
+    "https://tonguckaracay.com/en/ai-trend-analysis-instagram-reels-content-planning",
+    "https://tonguckaracay.com/en/how-to-reduce-token-costs-in-customer-service-chatbots",
+    "https://tonguckaracay.com/en/blog",
+    "https://tonguckaracay.com/en/about",
+    "https://tonguckaracay.com/en/contact",
+    "https://tonguckaracay.com/en",
+    "https://www.linkedin.com/in/tongu%C3%A7-kara%C3%A7ay-36311040/",
+    "https://www.instagram.com/tonguckaracay",
+    "https://behance.net/tonguc",
+    "https://tonguckaracay.com/en/services/ui-ux-design",
+    "https://tonguckaracay.com/en/services/seo-consulting",
+    "https://tonguckaracay.com/en/services/online-advertising",
+    "https://tonguckaracay.com/en/services/ai-solutions",
+    "https://tonguckaracay.com/en/services/social-media-management",
+    "mailto:tonguckaracay@gmail.com",
+    "https://tonguckaracay.com/en/products",
+    "https://tonguckaracay.com/en/about",
+    "https://tonguckaracay.com/en/contact",
+    "https://tonguckaracay.com/en/privacy-policy",
+    "https://tonguckaracay.com/en/terms-of-service",
+    "https://wa.me/905323824838?text=Hi%20Tongu%C3%A7%2C%20I%27m%20reaching%20out%20from%20your%20website."
+  ]
+}

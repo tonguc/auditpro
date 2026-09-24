@@ -1,23 +1,15 @@
-# dependencies
-/node_modules
-
-# next.js
-/.next/
-/out/
-
-# production
-/build
-
-# misc
-.DS_Store
-*.pem
-
-# debug
+node_modules
+.next
+out
+dist
+.release-snapshots
+deployment-artifacts
+backups
+launch-readiness-reports
+.env*
+!.env.example
 npm-debug.log*
-
-# env files
-.env*.local
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.tmp/

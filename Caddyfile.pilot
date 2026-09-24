@@ -1,0 +1,20 @@
+{$APP_DOMAIN}, www.{$APP_DOMAIN} {
+  encode zstd gzip
+  route {
+    basic_auth {
+      {$PILOT_AUTH_USER} {$PILOT_AUTH_HASH}
+    }
+    @payments path /api/billing/* /api/webhooks/stripe
+    respond @payments "Payments are disabled during the pilot." 403
+    reverse_proxy app:3000
+  }
+  header {
+    X-Robots-Tag "noindex, nofollow, noarchive"
+    Strict-Transport-Security "max-age=31536000; includeSubDomains"
+    X-Content-Type-Options "nosniff"
+    X-Frame-Options "DENY"
+    Referrer-Policy "strict-origin-when-cross-origin"
+    Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=(), usb=()"
+    -Server
+  }
+}
